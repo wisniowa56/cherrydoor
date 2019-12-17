@@ -1,10 +1,17 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""All REST API routes and functions"""
 from cherrydoor import api, Resource, current_user, parser, dt, inputs, mongo
+
+__author__ = "opliko"
+__license__ = "MIT"
+__version__ = "0.1.2"
+__status__ = "Prototype"
 
 parser.add_argument("time_from", help="start of time range")
 parser.add_argument("time_to", help="end of time range")
 parser.add_argument("username", help="username of requested user")
 parser.add_argument("card", help="MiFare card uid")
-
 
 class Stats(Resource):
     """

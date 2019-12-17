@@ -1,9 +1,17 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""All website routes"""
 from cherrydoor import app, mongo, hasher, LoginForm, login_manager, User
 from flask import render_template, url_for, request, session, redirect, flash
 from flask_login import current_user, login_user, logout_user, login_required
 
 # import VerificationError thrown when password doesn't match the hash
 from argon2.exceptions import VerificationError
+
+__author__ = "opliko"
+__license__ = "MIT"
+__version__ = "0.1.2"
+__status__ = "Prototype"
 
 # dashboard page
 @app.route("/")
