@@ -1,0 +1,36 @@
+<div id="addUserModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Zarządzanie użytkownikiem</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form id="addUserForm">
+        <div class="modal-body">
+            <div class="form-group">
+                <input id="username" class="form-control" name="username" placeholder="Nazwa użytkownika" required type="text">
+            </div>
+            <div class="form-group">
+                <input id="card" class="form-control" name="card" placeholder="ID karty" required type="text">
+            </div>
+        </div>
+        <div class="modal-footer">
+          <input type="submit" class="btn btn-primary" value="Utwórz">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script>
+    $('#addUserForm').submit(function(e){
+        e.preventDefault();
+        $.ajax({
+            url:'/api/user',
+            type:'POST',
+            data:$('#addUserForm').serialize()
+        });
+    });
+  </script>

@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+{% block head %}
+<script src="{{ url_for('static', filename='js/Chart.bundle.min.js') }}"></script>
+{% endblock %}
+{% block body %}
+<nav class="navbar navbar-expand-xl navbar-light bg-light">
+    <a class="navbar-brand" href="#">Cherrydoor</a>
+    <button class="btn btn-link" onclick="$('#addUserModal').modal('show')">Dodaj użytkownika</button>
+</nav>
+<div class="container">
+    <div class="row" style="background-color: #f3f3f3;">
+            <div class="chart-container" style="position: relative; height:90vh; width:100%;margin-top: auto;">
+                    <canvas id="myChart"></canvas>
+            </div>
+<script>
+var ctx = document.getElementById('myChart');
+var data = {
+    datasets: [{
+        label: "ilość użyć",
+        borderWidth: 1,
+        data: [{
+            x: new Date("6 Nov 2019"),
+            y: 5
+        }, {
+            x: new Date("7 Nov 2019"),
+            y: 1
+        }, {
+            x: new Date("8 Nov 2019"),
+            y: 15
+        }, {
+            x: new Date("9 Nov 2019"),
+            y: 20
+        }, {
+            x: new Date("10 Nov 2019"),
+            y: 10
+        },
+        {
+            x: new Date("11 Nov 2019"),
+            y: 8
+        }]
+    }]
+}
+var myChart = new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options: {
+        scales: {
+            xAxes: [{
+                type: 'time',
+                distribution: "series",
+                time: {
+                    unit: 'day'
+                }
+            }]
+        },
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+</script>
+    </div>
+</div>
+{% include "add-user-modal.html" %}
+{% endblock %}
