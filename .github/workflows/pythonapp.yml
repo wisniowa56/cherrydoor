@@ -19,7 +19,3 @@ jobs:
         pip install -r requirements.txt
     - name: Black Code Formatter
       uses: lgeiger/black-action@v1.0.1
-    - name: Test with pytest
-      run: |
-        pip install pytest
-        pytest
