@@ -23,4 +23,4 @@ Prosta webaplikacja do zarządzania i przeglądania statystyk wykorzystania zamk
 5. Uruchom serwer flaska: `python3 main.py`
 6. Ciesz się aplikacją która praktycznie jeszcze nie działa :)
 
-Aby stworzyć pierwszego użytkownika obecnie trzeba usunąć `@login_required` nad `def register():` w [`routes.py`](routes.py) - albo stworzyć go manualnie w bazie danych
+Aby stworzyć pierwszego użytkownika obecnie trzeba usunąć `@login_required` nad `def register():` w [`routes.py`](cherrydoor/routes.py#L33) - albo stworzyć go manualnie w bazie danych
