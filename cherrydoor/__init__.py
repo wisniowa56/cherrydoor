@@ -28,8 +28,10 @@ app.config["SECRET_KEY"] = config['secret-key'] #set up a secret key for cookie 
 
 #pymongo connection
 app.config["MONGO_URI"] = f"mongodb://{config['mongo']['url']}/{config['mongo']['name']}" #configure mongodb access uri
-mongo = PyMongo(app, username=config['mongo']['username'], password=config['mongo']['password']).db #set up PyMongo using credentials from config.json
-
+try:
+    mongo = PyMongo(app, username=config['mongo']['username'], password=config['mongo']['password']).db #set up PyMongo using credentials from config.json
+except KeyError:
+    mongo = PyMongo(app).db
 login_manager = LoginManager() #create login_manager for flask_login
 login_manager.login_view = 'login' #default view (page) used for logging in
 login_manager.session_protection = "strong" #set a better session protection
