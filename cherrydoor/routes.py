@@ -1,9 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """All website routes"""
-#flak-related imports
+# flak-related imports
 from flask import render_template, url_for, request, session, redirect, flash
 from flask_login import current_user, login_user, logout_user, login_required
+
 # import VerificationError thrown when password doesn't match the hash
 from argon2.exceptions import VerificationError
 

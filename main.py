@@ -1,13 +1,20 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Run server"""
-from cherrydoor import app, socket
+from multiprocessing import Pipe, Process
+from cherrydoor import app, socket, pipe
+from interface.commands import Commands
+pipe, pipe2 = Pipe()
+interface = Commands(pipe2)
+interface_run = Process(target=interface.start)
+server = Process(target=socket.run, kwargs={"app": app, "log_output": True})
 
-__author__ = "opliko"
-__license__ = "MIT"
-__version__ = "0.1.2"
-__status__ = "Prototype"
+def exit():
+    interface_run.terminate()
+    server.terminate()
 
 if __name__ == "__main__":
-    # app.run(debug=True)
-    socket.run(app, log_output=True)
+    import atexit
+    atexit.register(exit)
+    interface_run.start()
+    server.run()

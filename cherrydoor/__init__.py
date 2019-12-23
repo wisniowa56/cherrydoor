@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Main cherydoor module file
@@ -89,6 +89,9 @@ parser = reqparse.RequestParser()
 
 # create socketio instance
 socket = SocketIO(app)
+
+# create pipe that will be used for multiprocess communication
+pipe = None
 
 
 class User(UserMixin):

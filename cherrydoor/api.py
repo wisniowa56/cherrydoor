@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """All REST API routes and functions"""
 from cherrydoor import api, Resource, current_user, parser, dt, inputs, mongo
@@ -12,6 +12,7 @@ parser.add_argument("time_from", help="start of time range")
 parser.add_argument("time_to", help="end of time range")
 parser.add_argument("username", help="username of requested user")
 parser.add_argument("card", help="MiFare card uid")
+
 
 class Stats(Resource):
     """

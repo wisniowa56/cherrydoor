@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """All websocket routes and functions"""
 import functools
@@ -8,6 +8,7 @@ __author__ = "opliko"
 __license__ = "MIT"
 __version__ = "0.1.2"
 __status__ = "Prototype"
+
 
 def authenticated_only(f):
     @functools.wraps(f)
