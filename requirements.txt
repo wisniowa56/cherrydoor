@@ -4,7 +4,7 @@ astroid==2.3.0
 certifi==2019.9.11
 cffi==1.13.2
 Click==7.0
-colorama==0.4.1
+colorama==0.4.3
 dnspython==1.16.0
 docutils==0.15.2
 eventlet==0.25.1
