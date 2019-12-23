@@ -1,13 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""All websocket routes and functions"""
-import functools
 from cherrydoor import socket, emit, dt, mongo, current_user, disconnect
-
-__author__ = "opliko"
-__license__ = "MIT"
-__version__ = "0.1.2"
-__status__ = "Prototype"
+import functools
 
 
 def authenticated_only(f):

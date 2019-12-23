@@ -1,13 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Main cherydoor module file
-Creates app, api, socket and mongo instances and imports all routes.
-"""
-# built-in libraries import:
-from json import load
-import datetime as dt
-
 # flask-connected imports:
 from flask import Flask
 from flask_pymongo import PyMongo
@@ -21,10 +11,9 @@ from wtforms.validators import DataRequired
 # hashing function import:
 from argon2 import PasswordHasher
 
-__author__ = "opliko"
-__license__ = "MIT"
-__version__ = "0.1.2"
-__status__ = "Prototype"
+# built-in libraries import:
+from json import load
+import datetime as dt
 
 with open("config.json", "r", encoding="utf-8") as f:  # load configuration file
     config = load(f)  # convert confuguration to a dictionary using json.load()
@@ -89,9 +78,6 @@ parser = reqparse.RequestParser()
 
 # create socketio instance
 socket = SocketIO(app)
-
-# create pipe that will be used for multiprocess communication
-pipe = None
 
 
 class User(UserMixin):
