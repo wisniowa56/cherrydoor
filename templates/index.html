@@ -1,64 +1,29 @@
 {% extends "layout.html" %}
 {% block head %}
-<script src="{{ url_for('static', filename='js/Chart.bundle.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/Chart.bundle.min.js') }}" integrity="sha384-hPGA89ovC7qaXzMJ/+P9tMbfS/7I4fHQ8y2QLa2aN/r/ZbOYETChoovePc9gUuaC" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}" integrity="sha384-y1cAxF9K9+bXmUeR2EWB6am9zfPzjS1kpqw2940xYtR0nL0qJTxHyKgJNIE+dFSs" crossorigin="anonymous">
+<link rel="stylesheet" ref="{{ url_for('static', filename='css/Chart-min.css') }}" integrity="sha384-q9MZ/PQCC1nIFQdrr9yNOFXeSaXjv/yPOJOdBd32aODh8+EM6udfo91a6mRbEDih" crossorigin="anonymous">
 {% endblock %}
 {% block body %}
 <nav class="navbar navbar-expand-xl navbar-light bg-light">
-    <a class="navbar-brand" href="#">Cherrydoor</a>
-    <button class="btn btn-link" onclick="$('#addUserModal').modal('show')">Dodaj użytkownika</button>
+    <a class="navbar-brand" href="#"><img src="{{ url_for('static', filename='images/logo/logo-56px.png') }}" alt="logo"></img>Cherrydoor</a>
+    <button class="btn btn-link modal-link" data-modal="addUserModal">Dodaj użytkownika</button>
 </nav>
 <div class="container">
-    <div class="row" style="background-color: #f3f3f3;">
-            <div class="chart-container" style="position: relative; height:90vh; width:100%;margin-top: auto;">
-                    <canvas id="myChart"></canvas>
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-default">
+                <div class="card-header justify-content-center">
+                    <h2 class="text-center">Ilość użyć w ostatnim tygodniu</h2>
+                </div>
+                <div class="card-body doorchart-container">
+                    <canvas id="doorchart" class="chartjs"></canvas>
+                </div>
             </div>
-<script>
-var ctx = document.getElementById('myChart');
-var data = {
-    datasets: [{
-        label: "ilość użyć",
-        borderWidth: 1,
-        data: [{
-            x: new Date("6 Nov 2019"),
-            y: 5
-        }, {
-            x: new Date("7 Nov 2019"),
-            y: 1
-        }, {
-            x: new Date("8 Nov 2019"),
-            y: 15
-        }, {
-            x: new Date("9 Nov 2019"),
-            y: 20
-        }, {
-            x: new Date("10 Nov 2019"),
-            y: 10
-        },
-        {
-            x: new Date("11 Nov 2019"),
-            y: 8
-        }]
-    }]
-}
-var myChart = new Chart(ctx, {
-    type: 'line',
-    data: data,
-    options: {
-        scales: {
-            xAxes: [{
-                type: 'time',
-                distribution: "series",
-                time: {
-                    unit: 'day'
-                }
-            }]
-        },
-        responsive: true,
-        maintainAspectRatio: false
-    }
-});
-</script>
+        </div>
     </div>
 </div>
+<script src="{{ url_for('static', filename='js/main-chart.js') }}" integrity="sha256-XrlX1k3GYUAR0Fil/kw23lWsMbqYXMHeTASJ37h6fY4= sha384-jlHOnu4t0Ea2o123ZnIH2sfPHeZOmWDD4oXOewqKDNt4w7EaqOVxPiNbPI9Wfrf8"></script>
+<script src="{{ url_for('static', filename='js/form.js') }}" integrity="sha384-BD/MtGKgwQPMbvUYNrnASBBC4VVK4DzY7JB21e+wC7YlpEJ7Li0opg7Twg/XDGFz"></script>
 {% include "add-user-modal.html" %}
 {% endblock %}
