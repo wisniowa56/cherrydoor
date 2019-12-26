@@ -13,6 +13,11 @@
         "message":"Musisz się zalogować by uzyskać dostęp do tej strony"
     },
     "secret-key":"\\xd7w7\\x04\\r\\xfc/q\\x1a\\x9b&",
+    "https": {
+        "enabled": false,
+        "hsts-enabled": false,
+        "hsts-preload": false
+    },
     "interface": {
         "type":"serial",
         "baudrate":115200,

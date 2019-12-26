@@ -9,11 +9,12 @@ from json import load
 import datetime as dt
 
 # flask-connected imports:
-from flask import Flask
+from flask import Flask, escape
 from flask_pymongo import PyMongo
 from flask_login import current_user, LoginManager, UserMixin
 from flask_restful import Resource, Api, reqparse, inputs, abort
 from flask_socketio import SocketIO, emit, disconnect
+from flask_talisman import Talisman
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired
@@ -93,6 +94,73 @@ socket = SocketIO(app)
 # create pipe that will be used for multiprocess communication
 pipe = None
 
+csp = {
+    "default-src": [
+        "'none'",
+    ],
+    "script-src": [
+        "'self'",
+    ],
+    "style-src": [
+        "'self'",
+    ],
+    "img-src": [
+        "'self'",
+    ],
+    "connect-src": [
+        "'self'",
+    ],
+    "require-sri-for": [
+        "script",
+        "style",
+    ],
+    "base-uri": [
+        "'none'",
+    ],
+}
+try:
+    if config["https"]["enabled"]:
+        csp.update({
+            "block-all-mixed-content": [],
+            "upgrade-insecure-requests":[],
+        })
+except KeyError:
+    pass
+fp = {
+    "accelerometer": "'none'",
+    "ambient-light-sensor": "'none'",
+    "autoplay": "'none'",
+    "battery": "'none'",
+    "camera": "'self'",
+    "display-capture": "'none'",
+    "document-domain": "'none'",
+    "encrypted-media": "'none'",
+    "execution-while-not-rendered": "'self'",
+    "execution-while-out-of-viewport": "'self'",
+    "fullscreen": "'self'",
+    "geolocation": "'none'",
+    "gyroscope": "'none'",
+    "layout-animations": "'self'",
+    "legacy-image-formats": "'self'",
+    "magnetometer": "'none'",
+    "microphone": "'none'",
+    "midi": "'none'",
+    "navigation-override": "'none'",
+    "oversized-images": "'none'",
+    "payment": "'none'",
+    "picture-in-picture": "'none'",
+    "publickey-credentials": "'self'",
+    "speaker": "'self'",
+    "sync-xhr": "'self'",
+    "usb": "'none'",
+    "vr": "'none'",
+    "wake-lock": "'none'",
+    "xr-spatial-tracking": "'none'"
+}
+try:
+    Talisman(app, force_https=config["https"]["enabled"], session_cookie_secure=config["https"]["enabled"],feature_policy=fp, content_security_policy=csp, content_security_policy_report_uri="/csp-reports", strict_transport_security=config["https"]["hsts-enabled"], strict_transport_security_preload=config["https"]["hsts-preload"], referrer_policy="no-referrer", )
+except KeyError:
+    Talisman(app, feature_policy=fp, content_security_policy=csp, content_security_policy_report_uri="/csp-reports")
 
 class User(UserMixin):
     """

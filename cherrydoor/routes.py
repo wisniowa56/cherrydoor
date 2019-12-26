@@ -8,7 +8,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 # import VerificationError thrown when password doesn't match the hash
 from argon2.exceptions import VerificationError
 
-from cherrydoor import app, mongo, hasher, LoginForm, login_manager, User
+from cherrydoor import app, mongo, hasher, LoginForm, login_manager, User, load
 
 __author__ = "opliko"
 __license__ = "MIT"
@@ -92,6 +92,19 @@ def register():
 
     return render_template("register.html")
 
+
+@app.route("/csp-reports", methods=["POST"])
+def csp():
+    with open("csp-logs.json", "r+", encoding="utf-8") as f:
+        logs = load(f)
+        if not logs:
+            logs = {"logs":[]}
+        try:
+            logs["logs"].append(request.json(force=True))
+            json.dump(logs, f)
+        except:
+            return None, 400       
+    return None, 201
 
 @app.route("/logout")
 @login_required
