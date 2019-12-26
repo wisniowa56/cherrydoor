@@ -7,13 +7,13 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <form id="addUserForm">
+        <form class="modal-form" id="addUserForm" data-url="/api/user" data-type="POST">
         <div class="modal-body">
             <div class="form-group">
-                <input id="username" class="form-control" name="username" placeholder="Nazwa użytkownika" required type="text">
+                <input id="username" class="form-control" name="username" placeholder="Nazwa użytkownika" pattern="^[^<>/\\]{1,30}$" required type="text">
             </div>
             <div class="form-group">
-                <input id="card" class="form-control" name="card" placeholder="ID karty" required type="text">
+                <input id="card" class="form-control" name="card" placeholder="ID karty" pattern="[0-9a-fA-F]{10}" required type="text">
             </div>
         </div>
         <div class="modal-footer">
@@ -24,13 +24,3 @@
       </div>
     </div>
   </div>
-  <script>
-    $('#addUserForm').submit(function(e){
-        e.preventDefault();
-        $.ajax({
-            url:'/api/user',
-            type:'POST',
-            data:$('#addUserForm').serialize()
-        });
-    });
-  </script>
