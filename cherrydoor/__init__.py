@@ -5,7 +5,7 @@ Main cherydoor module file
 Creates app, api, socket and mongo instances and imports all routes.
 """
 # built-in libraries import:
-from json import load
+import json
 import datetime as dt
 
 # flask-connected imports:
@@ -28,7 +28,7 @@ __version__ = "0.1.2"
 __status__ = "Prototype"
 
 with open("config.json", "r", encoding="utf-8") as f:  # load configuration file
-    config = load(f)  # convert confuguration to a dictionary using json.load()
+    config = json.load(f)  # convert confuguration to a dictionary using json.load()
 
 
 class LoginForm(FlaskForm):
@@ -105,7 +105,8 @@ csp = {
         "'self'",
     ],
     "img-src": [
-        "'self'",
+        "data:*",
+        "'self'"
     ],
     "connect-src": [
         "'self'",
@@ -158,7 +159,7 @@ fp = {
     "xr-spatial-tracking": "'none'"
 }
 try:
-    Talisman(app, force_https=config["https"]["enabled"], session_cookie_secure=config["https"]["enabled"],feature_policy=fp, content_security_policy=csp, content_security_policy_report_uri="/csp-reports", strict_transport_security=config["https"]["hsts-enabled"], strict_transport_security_preload=config["https"]["hsts-preload"], referrer_policy="no-referrer", )
+    Talisman(app, force_https=config["https"]["enabled"], session_cookie_secure=config["https"]["enabled"], feature_policy=fp, content_security_policy=csp, content_security_policy_report_uri="/csp-reports", strict_transport_security=config["https"]["hsts-enabled"], strict_transport_security_preload=config["https"]["hsts-preload"], referrer_policy="no-referrer")
 except KeyError:
     Talisman(app, feature_policy=fp, content_security_policy=csp, content_security_policy_report_uri="/csp-reports")
 
@@ -201,21 +202,21 @@ class User(UserMixin):
         """
         Returns all mifare card ids associated with the account
         """
-        return mongo.users.find_one({"name": self.username})["cards"]
+        return mongo.users.find_one({"username": self.username})["cards"]
 
     def add_card(self, card):
         """
         adds a mifare card id to user profile
         """
         mongo.users.update_one(
-            {"name": self.username}, {"$push": {"cards": card}}, upsert=True
+            {"username": self.username}, {"$push": {"cards": card}}, upsert=True
         )
 
     def delete_card(self, card):
         """
         adds a mifare card id from user profile
         """
-        mongo.users.update_one({"name": self.username}, {"$pull": {"cards": card}})
+        mongo.users.update_one({"username": self.username}, {"$pull": {"cards": card}})
 
 
 @login_manager.user_loader
@@ -223,10 +224,10 @@ def load_user(username):
     """
     A function for loading users from database by username
     """
-    u = mongo.users.find_one({"name": username})
+    u = mongo.users.find_one({"username": username})
     if not u:
         return None
-    return User(username=u["name"])
+    return User(username=u["username"])
 
 
 import cherrydoor.api
