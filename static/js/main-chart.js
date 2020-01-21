@@ -1,3 +1,4 @@
+"user strict";
 Chart.platform.disableCSSInjection = true;
 var ctx = document.getElementById('doorchart');
 var usageData = []

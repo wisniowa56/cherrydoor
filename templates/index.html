@@ -1,13 +1,14 @@
 {% extends "layout.html" %}
 {% block head %}
 <script src="{{ url_for('static', filename='js/Chart.bundle.min.js') }}" integrity="sha384-hPGA89ovC7qaXzMJ/+P9tMbfS/7I4fHQ8y2QLa2aN/r/ZbOYETChoovePc9gUuaC" crossorigin="anonymous"></script>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}" integrity="sha384-y1cAxF9K9+bXmUeR2EWB6am9zfPzjS1kpqw2940xYtR0nL0qJTxHyKgJNIE+dFSs" crossorigin="anonymous">
-<link rel="stylesheet" ref="{{ url_for('static', filename='css/Chart-min.css') }}" integrity="sha384-q9MZ/PQCC1nIFQdrr9yNOFXeSaXjv/yPOJOdBd32aODh8+EM6udfo91a6mRbEDih" crossorigin="anonymous">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}" integrity="sha384-y1cAxF9K9+bXmUeR2EWB6am9zfPzjS1kpqw2940xYtR0nL0qJTxHyKgJNIE+dFSs sha256-s8M5tP1zqF+PS7T7Pb0dwvckpLq/J+ckERH3FlXbUoc=" crossorigin="anonymous">
+<link rel="stylesheet" ref="{{ url_for('static', filename='css/Chart-min.css') }}" integrity="sha384-q9MZ/PQCC1nIFQdrr9yNOFXeSaXjv/yPOJOdBd32aODh8+EM6udfo91a6mRbEDih sha256-aa0xaJgmK/X74WM224KMQeNQC2xYKwlAt08oZqjeF0E=" crossorigin="anonymous">
 {% endblock %}
 {% block body %}
 <nav class="navbar navbar-expand-xl navbar-light bg-light">
     <a class="navbar-brand" href="#"><img src="{{ url_for('static', filename='images/logo/logo-56px.png') }}" alt="logo"></img>Cherrydoor</a>
     <button class="btn btn-link modal-link" data-modal="addUserModal">Dodaj użytkownika</button>
+    <button class="btn btn-link modal-link" data-modal="manageUsersModal">Zarządzaj użytkownikami</button>
 </nav>
 <div class="container">
     <div class="row">
@@ -23,7 +24,9 @@
         </div>
     </div>
 </div>
-<script src="{{ url_for('static', filename='js/main-chart.js') }}" integrity="sha256-XrlX1k3GYUAR0Fil/kw23lWsMbqYXMHeTASJ37h6fY4= sha384-jlHOnu4t0Ea2o123ZnIH2sfPHeZOmWDD4oXOewqKDNt4w7EaqOVxPiNbPI9Wfrf8"></script>
-<script src="{{ url_for('static', filename='js/form.js') }}" integrity="sha384-BD/MtGKgwQPMbvUYNrnASBBC4VVK4DzY7JB21e+wC7YlpEJ7Li0opg7Twg/XDGFz"></script>
+<script src="{{ url_for('static', filename='js/main-chart.js') }}" integrity="sha384-habsLR7Ee4pzZKkSqaK4TB6wAVkDLSf9sJJ1CYyCPNZR6cCiVuG+eB7rtkY54qBw sha256-hQwg40DptsfLN4YebXuA6MB1/b+B39VNa5fieRN8zjo="></script>
+<script src="{{ url_for('static', filename='js/form.js') }}" integrity="sha384-Uw030zpyfhxPN5fRtoY1izumt4POX27NMZileuhdjTbX14aoyIKlxXpotXisRZ/K sha256-dApn4YEjUE/OpHOHplGyyoDZl9yylXm3LKfVGYBypx0="></script>
+<script src="{{ url_for('static', filename='js/users.js') }}" integrity="sha384-DCXmTcow22VYnhnj2MFgLLQm775kyjtU/tXOfAXAi72d2EvSY0wJ4AQS21PcunRO sha256-WMmCv6I/oR3r/uw80jUbS2U9bga0Xa7yfd+PV4xYevs="></script>
 {% include "add-user-modal.html" %}
+{% include "manage-users-modal.html" %}
 {% endblock %}
