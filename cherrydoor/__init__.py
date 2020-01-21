@@ -93,19 +93,17 @@ socket = SocketIO(app)
 
 
 csp = {
-    "default-src": ["'none'",],
-    "script-src": ["'self'",],
-    "style-src": ["'self'",],
+    "default-src": ["'none'"],
+    "script-src": ["'self'"],
+    "style-src": ["'self'"],
     "img-src": ["data:*", "'self'"],
-    "connect-src": ["'self'",],
-    "require-sri-for": ["script", "style",],
-    "base-uri": ["'none'",],
+    "connect-src": ["'self'"],
+    "require-sri-for": ["script", "style"],
+    "base-uri": ["'none'"],
 }
 try:
     if config["https"]["enabled"]:
-        csp.update(
-            {"block-all-mixed-content": [], "upgrade-insecure-requests": [],}
-        )
+        csp.update({"block-all-mixed-content": [], "upgrade-insecure-requests": []})
 except KeyError:
     pass
 fp = {
@@ -158,6 +156,10 @@ except KeyError:
         content_security_policy=csp,
         content_security_policy_report_uri="/csp-reports",
     )
+
+# create csp-logs.json if it doesn't exist
+with open("csp-logs.json", "a"):
+    pass
 
 
 class User(UserMixin):
