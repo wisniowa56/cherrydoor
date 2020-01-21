@@ -44,12 +44,12 @@ def stats(json={}):
     return json_results
 
 
-@socket.on("get_user", namespace="/api")
+@socket.on("user", namespace="/api")
 @authenticated_only
-def get_user(json={}):
+def user(json={}):
     try:
         username = json["username"]
-        user = mongo.users.find_one({"name": username}, {"password": 0, "_id":0})
+        user = mongo.users.find_one({"username": username}, {"password": 0, "_id":0})
         if not user:
             raise KeyError
     except KeyError:
@@ -60,5 +60,22 @@ def get_user(json={}):
                 raise KeyError
         except KeyError:
             return False
+    try:
+        if json["edit"]:
+            mongo.users.update_one(user, json["changes"])
+    except KeyError:
+        pass
     emit("user", user)
     return user
+
+
+@socket.on("users", namespace="/api")
+@authenticated_only
+def users():
+    try:
+        users = mongo.users.find({}, {"password": 0, "_id":0})
+        json_results = [jsn.dumps(doc, default=json_util.default) for doc in users]
+    except:
+        return False
+    emit("users", json_results)
+    return json_results
