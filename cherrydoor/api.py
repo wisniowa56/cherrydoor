@@ -79,7 +79,7 @@ class Card(Resource):
             if username == None:
                 raise KeyError
             result = mongo.users.find_one_or_404(
-                {"name": username, "cards": card}, {"password": 0, "_id": 0}
+                {"username": username, "cards": card}, {"password": 0, "_id": 0}
             )
         except KeyError:
             result = mongo.users.find_one_or_404(
@@ -118,7 +118,9 @@ class Card(Resource):
         except KeyError:
             current_user.add_card(card)
             return True, 201
-        mongo.users.find_one_and_update({"name": username}, {"$push": {"cards": card}})
+        mongo.users.find_one_and_update(
+            {"username": username}, {"$push": {"cards": card}}
+        )
         return True, 201
 
     def delete(self, card=None):
@@ -151,7 +153,7 @@ class Card(Resource):
             if username == None:
                 raise KeyError
             mongo.users.find_one_and_update(
-                {"name": username}, {"$pull": {"cards": card}}
+                {"username": username}, {"$pull": {"cards": card}}
             )
             return True, 200
         except KeyError:
@@ -185,7 +187,7 @@ class UserAPI(Resource):
             result = list(mongo.users.find({}, {"password": 0, "_id": 0}))
             return result, 200
         result = mongo.users.find_one_or_404(
-            {"name": username}, {"password": 0, "_id": 0}
+            {"username": username}, {"password": 0, "_id": 0}
         )
         return result, 200
 
@@ -212,8 +214,8 @@ class UserAPI(Resource):
         except KeyError:
             card = ""
         mongo.users.update_one(
-            {"name": username},
-            {"$set": {"name": username, "cards": [card]}},
+            {"username": username},
+            {"$set": {"username": username, "cards": [card]}},
             upsert=True,
         )
         return None, 201
@@ -234,7 +236,7 @@ class UserAPI(Resource):
                 return None, 400
         else:
             username = escape(username)
-        mongo.users.delete_one({"name": username})
+        mongo.users.delete_one({"username": username})
         return None, 204
 
 
