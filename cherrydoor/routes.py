@@ -96,18 +96,19 @@ def register():
 @app.route("/csp-reports", methods=["POST"])
 def csp():
     with open("csp-logs.json", "r+", encoding="utf-8") as f:
-        
+
         try:
             logs = json.load(f)
         except json.decoder.JSONDecodeError:
-            logs = {"logs":[]}
+            logs = {"logs": []}
         try:
-            logs["logs"].append(json.loads(request.data.decode('utf-8')))
-            f.seek(0,0)
+            logs["logs"].append(json.loads(request.data.decode("utf-8")))
+            f.seek(0, 0)
             json.dump(logs, f)
         except:
-            return None, 400       
+            return None, 400
     return None, 201
+
 
 @app.route("/logout")
 @login_required

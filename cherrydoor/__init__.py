@@ -91,40 +91,21 @@ parser = reqparse.RequestParser()
 # create socketio instance
 socket = SocketIO(app)
 
-# create pipe that will be used for multiprocess communication
-pipe = None
 
 csp = {
-    "default-src": [
-        "'none'",
-    ],
-    "script-src": [
-        "'self'",
-    ],
-    "style-src": [
-        "'self'",
-    ],
-    "img-src": [
-        "data:*",
-        "'self'"
-    ],
-    "connect-src": [
-        "'self'",
-    ],
-    "require-sri-for": [
-        "script",
-        "style",
-    ],
-    "base-uri": [
-        "'none'",
-    ],
+    "default-src": ["'none'",],
+    "script-src": ["'self'",],
+    "style-src": ["'self'",],
+    "img-src": ["data:*", "'self'"],
+    "connect-src": ["'self'",],
+    "require-sri-for": ["script", "style",],
+    "base-uri": ["'none'",],
 }
 try:
     if config["https"]["enabled"]:
-        csp.update({
-            "block-all-mixed-content": [],
-            "upgrade-insecure-requests":[],
-        })
+        csp.update(
+            {"block-all-mixed-content": [], "upgrade-insecure-requests": [],}
+        )
 except KeyError:
     pass
 fp = {
@@ -156,12 +137,28 @@ fp = {
     "usb": "'none'",
     "vr": "'none'",
     "wake-lock": "'none'",
-    "xr-spatial-tracking": "'none'"
+    "xr-spatial-tracking": "'none'",
 }
 try:
-    Talisman(app, force_https=config["https"]["enabled"], session_cookie_secure=config["https"]["enabled"], feature_policy=fp, content_security_policy=csp, content_security_policy_report_uri="/csp-reports", strict_transport_security=config["https"]["hsts-enabled"], strict_transport_security_preload=config["https"]["hsts-preload"], referrer_policy="no-referrer")
+    Talisman(
+        app,
+        force_https=config["https"]["enabled"],
+        session_cookie_secure=config["https"]["enabled"],
+        feature_policy=fp,
+        content_security_policy=csp,
+        content_security_policy_report_uri="/csp-reports",
+        strict_transport_security=config["https"]["hsts-enabled"],
+        strict_transport_security_preload=config["https"]["hsts-preload"],
+        referrer_policy="no-referrer",
+    )
 except KeyError:
-    Talisman(app, feature_policy=fp, content_security_policy=csp, content_security_policy_report_uri="/csp-reports")
+    Talisman(
+        app,
+        feature_policy=fp,
+        content_security_policy=csp,
+        content_security_policy_report_uri="/csp-reports",
+    )
+
 
 class User(UserMixin):
     """

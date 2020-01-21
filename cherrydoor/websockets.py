@@ -36,8 +36,7 @@ def stats(json={}):
         time_to = dt.datetime.now()
 
     results = mongo.logs.find(
-        {"timestamp": {"$lt": time_to, "$gte": time_from}},
-        {"card": 0, "_id":0},
+        {"timestamp": {"$lt": time_to, "$gte": time_from}}, {"card": 0, "_id": 0},
     )
     json_results = [jsn.dumps(doc, default=json_util.default) for doc in results]
     emit("stats", json_results, namespace="/api")
@@ -49,7 +48,7 @@ def stats(json={}):
 def user(json={}):
     try:
         username = json["username"]
-        user = mongo.users.find_one({"username": username}, {"password": 0, "_id":0})
+        user = mongo.users.find_one({"username": username}, {"password": 0, "_id": 0})
         if not user:
             raise KeyError
     except KeyError:
@@ -73,7 +72,7 @@ def user(json={}):
 @authenticated_only
 def users():
     try:
-        users = mongo.users.find({}, {"password": 0, "_id":0})
+        users = mongo.users.find({}, {"password": 0, "_id": 0})
         json_results = [jsn.dumps(doc, default=json_util.default) for doc in users]
     except:
         return False

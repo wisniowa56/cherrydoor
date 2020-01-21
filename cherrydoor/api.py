@@ -73,7 +73,7 @@ class Card(Resource):
             except KeyError:
                 return None, 400
         else:
-            card=escape(card.upper())
+            card = escape(card.upper())
         try:
             username = escape(params["username"])
             if username == None:
