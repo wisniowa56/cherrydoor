@@ -1,28 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
     <title>Cherrydoor</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js" integrity="sha256-bQmrZe4yPnQrLTY+1gYylfNMBuGfnT/HKsCGX+9Xuqo=" crossorigin="anonymous"></script>
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='images/logo/logo-48px.png') }}"
+      integrity="sha384-Yu3BXsb7ujtpi638uDTAHXPaRivIHQZo6kiz1QwwBWzGhryPETZUKe+5tpDB9Vpm"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/bootstrap.min.css') }}"
+      integrity="sha384-T8BvL2pDN59Kgod7e7p4kesUb+oyQPt3tFt8S+sIa0jUenn1byQ97GBKHUN8ZPk0"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/sleek.min.css') }}"
+      integrity="sha384-93DPUTWqtlv58l3hlSdezmzaCIFL8ePFgNP2Sot5LX/Q6hUXxncCCHfFcOFo+deZ"
+      crossorigin="anonymous"
+    />
+    <script
+      src="{{ url_for('static', filename='js/jquery-3.4.1.min.js') }}"
+      integrity="sha384-K5PE7vslc1v8x816FiQ4Fy7FeC13biD40h9rg1Ipj5sOUG62eS2xqR/ty3j4ZXB8"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="{{ url_for('static', filename='js/bootstrap.min.js') }}"
+      integrity="sha384-/lyEfZRU3I19/4GFIW4xZjxqWI8U2JH0BYTJoAzXZv6nPFekk5NQkTcpuHQtiOqD"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="{{ url_for('static', filename='js/socket.io.js') }}"
+      integrity="sha384-urGzJ3xfFgDcvacLzDZWnzEAY8JBSamfPbFn8Rbh3tKwvIx93JZ55/L0fWQ9ypV8"
+      crossorigin="anonymous"
+    ></script>
     {% block head %}{% endblock %}
-</head>
+  </head>
 
-<body>
-
+  <body>
     {% block body %}{% endblock %}
-
-    
-
-</body>
-
+  </body>
 </html>

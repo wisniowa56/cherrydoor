@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """All REST API routes and functions"""
-from cherrydoor import api, Resource, current_user, parser, dt, inputs, mongo
+from cherrydoor import api, Resource, current_user, parser, dt, inputs, mongo, escape
 
 __author__ = "opliko"
 __license__ = "MIT"
@@ -29,15 +29,15 @@ class Stats(Resource):
             return {"error": "Not Authenticated"}, 401
         params = parser.parse_args()
         try:
-            time_from = inputs.datetime_from_iso8601(time_from)
-            time_to = inputs.datetime_from_iso8601(time_to)
+            time_from = inputs.datetime_from_iso8601(escape(time_from))
+            time_to = inputs.datetime_from_iso8601(escape(time_to))
         except AttributeError:
             try:
-                time_from = inputs.datetime_from_iso8601(params["time_from"])
+                time_from = inputs.datetime_from_iso8601(escape(params["time_from"]))
             except (AttributeError, KeyError):
                 time_from = dt.date.today() - dt.timedelta(days=7)
             try:
-                time_to = inputs.datetime_from_iso8601(params["time_to"])
+                time_to = inputs.datetime_from_iso8601(escape(params["time_to"]))
             except (AttributeError, KeyError):
                 time_to = dt.datetime.now()
         try:
@@ -67,17 +67,19 @@ class Card(Resource):
         params = parser.parse_args()
         if not card:
             try:
-                card = params["card"]
+                card = escape(params["card"].upper())
                 if card == None:
                     raise KeyError
             except KeyError:
                 return None, 400
+        else:
+            card = escape(card.upper())
         try:
-            username = params["username"]
+            username = escape(params["username"])
             if username == None:
                 raise KeyError
             result = mongo.users.find_one_or_404(
-                {"name": username, "cards": card}, {"password": 0, "_id": 0}
+                {"username": username, "cards": card}, {"password": 0, "_id": 0}
             )
         except KeyError:
             result = mongo.users.find_one_or_404(
@@ -97,7 +99,7 @@ class Card(Resource):
 
         if not card:
             try:
-                card = params["card"]
+                card = escape(params["card"].upper())
                 if card == None:
                     raise KeyError
             except KeyError:
@@ -107,14 +109,18 @@ class Card(Resource):
                     },
                     400,
                 )
+        else:
+            card = escape(card.upper())
         try:
-            username = params["username"]
+            username = escape(params["username"])
             if username == None:
                 raise KeyError
         except KeyError:
             current_user.add_card(card)
             return True, 201
-        mongo.users.find_one_and_update({"name": username}, {"$push": {"cards": card}})
+        mongo.users.find_one_and_update(
+            {"username": username}, {"$push": {"cards": card}}
+        )
         return True, 201
 
     def delete(self, card=None):
@@ -130,7 +136,7 @@ class Card(Resource):
 
         if not card:
             try:
-                card = params["card"]
+                card = escape(params["card"].upper())
                 if card == None:
                     raise KeyError
             except KeyError:
@@ -140,12 +146,14 @@ class Card(Resource):
                     },
                     400,
                 )
+        else:
+            card = escape(card.upper())
         try:
-            username = params["username"]
+            username = escape(params["username"])
             if username == None:
                 raise KeyError
             mongo.users.find_one_and_update(
-                {"name": username}, {"$pull": {"cards": card}}
+                {"username": username}, {"$pull": {"cards": card}}
             )
             return True, 200
         except KeyError:
@@ -168,16 +176,18 @@ class UserAPI(Resource):
         if not username:
             params = parser.parse_args()
             try:
-                username = params["username"]
+                username = escape(params["username"])
                 if username == None:
                     raise KeyError
             except KeyError:
                 return None, 400
+        else:
+            username = escape(username)
         if username == "*":
             result = list(mongo.users.find({}, {"password": 0, "_id": 0}))
             return result, 200
         result = mongo.users.find_one_or_404(
-            {"name": username}, {"password": 0, "_id": 0}
+            {"username": username}, {"password": 0, "_id": 0}
         )
         return result, 200
 
@@ -190,20 +200,22 @@ class UserAPI(Resource):
         params = parser.parse_args()
         if not username:
             try:
-                username = params["username"]
+                username = escape(params["username"])
                 if username == None:
                     raise KeyError
             except KeyError:
                 return None, 400
+        else:
+            username = escape(username)
         try:
-            card = params["card"]
+            card = escape(params["card"].upper())
             if card == None:
                 raise KeyError
         except KeyError:
             card = ""
         mongo.users.update_one(
-            {"name": username},
-            {"$set": {"name": username, "cards": [card]}},
+            {"username": username},
+            {"$set": {"username": username, "cards": [card]}},
             upsert=True,
         )
         return None, 201
@@ -217,12 +229,14 @@ class UserAPI(Resource):
         params = parser.parse_args()
         if not username:
             try:
-                username = params["username"]
+                username = escape(params["username"])
                 if username == None:
                     raise KeyError
             except KeyError:
                 return None, 400
-        mongo.users.delete_one({"name": username})
+        else:
+            username = escape(username)
+        mongo.users.delete_one({"username": username})
         return None, 204
 
 

@@ -8,7 +8,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 # import VerificationError thrown when password doesn't match the hash
 from argon2.exceptions import VerificationError
 
-from cherrydoor import app, mongo, hasher, LoginForm, login_manager, User
+from cherrydoor import app, mongo, hasher, LoginForm, login_manager, User, json
 
 __author__ = "opliko"
 __license__ = "MIT"
@@ -27,7 +27,7 @@ def index():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        login_username = mongo.users.find_one({"name": str(form.username.data)})
+        login_username = mongo.users.find_one({"username": str(form.username.data)})
         if login_username:
             try:
                 if login_username["password"] != "" and hasher.verify(
@@ -74,13 +74,13 @@ def login():
 def register():
     if request.method == "POST":
         users = mongo.users
-        existing_user = users.find_one({"name": request.form["username"]})
+        existing_user = users.find_one({"username": request.form["username"]})
 
         if existing_user is None:
             hashpass = hasher.hash(request.form["pass"].encode("utf-8"))
             users.insert(
                 {
-                    "name": request.form["username"],
+                    "username": request.form["username"],
                     "password": hashpass,
                     "cards": [request.form["card"]],
                 }
@@ -91,6 +91,23 @@ def register():
         return "That username already exists!"
 
     return render_template("register.html")
+
+
+@app.route("/csp-reports", methods=["POST"])
+def csp():
+    with open("csp-logs.json", "r+", encoding="utf-8") as f:
+
+        try:
+            logs = json.load(f)
+        except json.decoder.JSONDecodeError:
+            logs = {"logs": []}
+        try:
+            logs["logs"].append(json.loads(request.data.decode("utf-8")))
+            f.seek(0, 0)
+            json.dump(logs, f)
+        except:
+            return None, 400
+    return None, 201
 
 
 @app.route("/logout")
