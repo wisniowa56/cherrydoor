@@ -26,7 +26,7 @@ jobs:
     - name: Black Code Formatter
       uses: lgeiger/black-action@v1.0.1
       with:
-        args: ". -t py38"
+        args: ". -t py38 --check"
     - name: Bandit Security Linter
       uses: jpetrucciani/bandit-check@master
 
