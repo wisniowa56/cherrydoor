@@ -1,2 +1,2 @@
-[Bandit]
-skips: B106, B107
+[bandit]
+skips: B106,B107
