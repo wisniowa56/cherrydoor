@@ -1,2 +1,2 @@
-#skip the hardcoded password test as it throws false-positives
-skips: ['B106', 'B107']
+[Bandit]
+skips: B106, B107
