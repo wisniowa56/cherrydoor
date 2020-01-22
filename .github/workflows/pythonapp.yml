@@ -25,3 +25,6 @@ jobs:
           ${{ runner.os }}-pip-
     - name: Black Code Formatter
       uses: lgeiger/black-action@v1.0.1
+    - name: Bandit Security Linter
+      uses: uses: jpetrucciani/bandit-check@master
+
