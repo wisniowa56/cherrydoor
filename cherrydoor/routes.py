@@ -77,14 +77,17 @@ def register():
         existing_user = users.find_one({"username": request.form["username"]})
 
         if existing_user is None:
-            hashpass = hasher.hash(request.form["pass"].encode("utf-8"))
-            users.insert(
-                {
-                    "username": request.form["username"],
-                    "password": hashpass,
-                    "cards": [request.form["card"]],
-                }
-            )
+            try:
+                username = request.form["username"]
+                password = request.form["pass"].encode("utf-8")
+            except:
+                return "No username or password specified", 400
+            try:
+                cards = [request.form["card"]]
+            except KeyError:
+                cards = []
+            hashpass = hasher.hash(password)
+            users.insert({"username": username, "password": hashpass, "cards": cards})
             session["username"] = request.form["username"]
             return redirect(url_for("index"))
 
