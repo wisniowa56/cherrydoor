@@ -22,10 +22,7 @@ class Commands:
             with interface:
                 # continuously read the interface until EXIT is sent
                 while message == [] or message[0] != "EXIT":
-                    try:
-                        message = read().upper().split()
-                    except connectionException:
-                        sleep(5)
+                    message = read().upper().split()
                     # after a newline, do the specidied command
                     try:
                         self.commands[message[0]](message[1])
@@ -41,7 +38,7 @@ class Commands:
             self.require_auth = self.check_auth()
             # send a contol signal for LEDs
             write(f"NTFY {4 if self.require_auth else 3}")
-        except KeyError:
+        except:
             # default to requiring authentication
             self.require_auth = True
         if self.require_auth:
@@ -74,15 +71,14 @@ class Commands:
             # get the current setting
             require_auth = mongo.settings.find_one({"setting": "require_auth"})
             # if the current setting was set manually - don't check the time
-            if not bool(require_auth["manual"]):
-                for item in breaks:
-                    # if current time is in one of the time ranges, return False, so auth is not required
-                    if time in DateTimeRange(item[0].time(), item[1].time()):
-                        return False
-                else:
-                    return True
-            else:
+            if bool(require_auth["manual"]):
                 return bool(require_auth["value"])
+            for item in breaks:
+                # if current time is in one of the time ranges, return False, so auth is not required
+                if time in DateTimeRange(item[0].time(), item[1].time()):
+                    return False
+            return True
+
         except (KeyError, TypeError):
             # default to requiring auth
             return True

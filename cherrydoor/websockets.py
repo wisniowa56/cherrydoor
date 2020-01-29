@@ -27,16 +27,16 @@ def authenticated_only(f):
 @authenticated_only
 def stats(json={}):
     try:
-        time_from = dt.datetime.fromisoformat(json["time_from"])
+        time_from = dt.datetime.fromisoformat(json["time_from"].replace("Z", ""))
     except KeyError:
         time_from = dt.datetime.today() - dt.timedelta(days=7)
     try:
-        time_to = dt.datetime.fromisoformat(json["time_to"])
+        time_to = dt.datetime.fromisoformat(json["time_to"].replace("Z", ""))
     except KeyError:
         time_to = dt.datetime.now()
 
     results = mongo.logs.find(
-        {"timestamp": {"$lt": time_to, "$gte": time_from}}, {"card": 0, "_id": 0},
+        {"timestamp": {"$lt": time_to, "$gte": time_from}}, {"card": 0, "_id": 0}
     )
     json_results = [jsn.dumps(doc, default=json_util.default) for doc in results]
     emit("stats", json_results, namespace="/api")
@@ -78,3 +78,35 @@ def users():
         return False
     emit("users", json_results)
     return json_results
+
+
+@socket.on("break_times", namespace="/api")
+@authenticated_only
+def break_times(json=[]):
+    if isinstance(json, list) and len(json) != 0:
+        try:
+            breaks = [
+                [
+                    dt.datetime.fromisoformat(item[0].replace("Z", "")),
+                    dt.datetime.fromisoformat(item[1].replace("Z", "")),
+                ]
+                for item in json
+            ]
+        except IndexError:
+            return None
+        mongo.settings.update(
+            {"setting": "break_times"},
+            {"setting": "break_times", "value": breaks},
+            upsert=True,
+        )
+        return_breaks = jsn.dumps(breaks, indent=4, sort_keys=True, default=str)
+        emit("break_times", return_breaks)
+        return return_breaks
+    try:
+        breaks = list(mongo.settings.find_one({"setting": "break_times"})["value"])
+        breaks = [[item[0].time(), item[1].time()] for item in breaks]
+        return_breaks = jsn.dumps(breaks, indent=4, sort_keys=True, default=str)
+    except KeyError:
+        return None
+    emit("break_times", return_breaks)
+    return return_breaks
