@@ -7,7 +7,15 @@ from interface.commands import Commands
 
 interface = Commands()
 interface_run = Process(target=interface.start)
-server = Process(target=socket.run, kwargs={"app": app, "log_output": True, "host":config["host"], "port":config["port"]})
+server = Process(
+    target=socket.run,
+    kwargs={
+        "app": app,
+        "log_output": True,
+        "host": config["host"],
+        "port": config["port"],
+    },
+)
 
 
 def exit():
