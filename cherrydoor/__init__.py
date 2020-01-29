@@ -80,7 +80,14 @@ login_manager.login_message = config["login-translation"]["message"]
 login_manager.init_app(app)
 
 # create an argon2 hasher instance that will be called for all future operations
-hasher = PasswordHasher()
+hasher = PasswordHasher(
+    time_cost=4,
+    memory_cost=65536,
+    parallelism=8,
+    hash_len=16,
+    salt_len=16,
+    encoding="utf-8",
+)
 
 # create a restful api instance from flask_restful
 api = Api(app)
@@ -96,7 +103,8 @@ csp = {
     "default-src": ["'none'"],
     "script-src": ["'self'"],
     "style-src": ["'self'"],
-    "img-src": ["data:*", "'self'"],
+    "font-src": ["'self'"],
+    "img-src": ["'self'"],
     "connect-src": ["'self'"],
     "require-sri-for": ["script", "style"],
     "base-uri": ["'none'"],

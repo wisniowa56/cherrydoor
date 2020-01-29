@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """All website routes"""
 # flak-related imports
-from flask import render_template, url_for, request, session, redirect, flash
+from flask import render_template, url_for, request, session, redirect, flash, escape
 from flask_login import current_user, login_user, logout_user, login_required
 
 # import VerificationError thrown when password doesn't match the hash
@@ -27,15 +27,17 @@ def index():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        login_username = mongo.users.find_one({"username": str(form.username.data)})
+        login_username = mongo.users.find_one(
+            {"username": escape(str(form.username.data))}
+        )
         if login_username:
             try:
                 if login_username["password"] != "" and hasher.verify(
                     login_username["password"].encode("utf-8"),
-                    form.password.data.encode("utf-8"),
+                    escape(form.password.data).encode("utf-8"),
                 ):
-                    user_obj = User(username=form.username.data)
-                    login_user(user_obj, remember=form.remember.data)
+                    user_obj = User(username=escape(form.username.data))
+                    login_user(user_obj, remember=escape(form.remember.data))
                     # if login was succesful - redirect user to the dashboard
                     return redirect(url_for("index"))
                 else:
@@ -74,18 +76,21 @@ def login():
 def register():
     if request.method == "POST":
         users = mongo.users
-        existing_user = users.find_one({"username": request.form["username"]})
+        existing_user = users.find_one({"username": escape(request.form["username"])})
 
         if existing_user is None:
-            hashpass = hasher.hash(request.form["pass"].encode("utf-8"))
-            users.insert(
-                {
-                    "username": request.form["username"],
-                    "password": hashpass,
-                    "cards": [request.form["card"]],
-                }
-            )
-            session["username"] = request.form["username"]
+            try:
+                username = escape(request.form["username"])
+                password = escape(request.form["pass"].encode("utf-8"))
+            except:
+                return "No username or password specified", 400
+            try:
+                cards = [escape(request.form["card"])]
+            except KeyError:
+                cards = []
+            hashpass = hasher.hash(password)
+            users.insert({"username": username, "password": hashpass, "cards": cards})
+            session["username"] = username
             return redirect(url_for("index"))
 
         return "That username already exists!"
