@@ -1,13 +1,12 @@
 import datetime as dt
+from time import sleep
 from datetimerange import DateTimeRange
-from interface import read, write, mongo, config, interface
+from interface import read, write, mongo, config, interface, connectionException
 
 
 class Commands:
     def __init__(self):
-        self.commands = {
-            "CARD": self.card,
-        }
+        self.commands = {"CARD": self.card}
         try:
             self.require_auth = bool(
                 mongo.settings.find_one({"setting": "require_auth"})["value"]
@@ -19,15 +18,22 @@ class Commands:
     def start(self):
         # message template - a two element list (command and argument)
         message = ["", ""]
-        with interface:
-            # continuously read the interface until EXIT is sent
-            while message == [] or message[0] != "EXIT":
-                message = read().upper().split()
-                # after a newline, do the specidied command
-                try:
-                    self.commands[message[0]](message[1])
-                except (KeyError, IndexError):
-                    pass
+        try:
+            with interface:
+                # continuously read the interface until EXIT is sent
+                while message == [] or message[0] != "EXIT":
+                    try:
+                        message = read().upper().split()
+                    except connectionException:
+                        sleep(5)
+                    # after a newline, do the specidied command
+                    try:
+                        self.commands[message[0]](message[1])
+                    except (KeyError, IndexError):
+                        pass
+        except connectionException:
+            sleep(10)
+            self.start()
 
     def card(self, block0):
         try:
@@ -61,7 +67,7 @@ class Commands:
         write(f"AUTH {1 if auth else 0}")
 
     def check_auth(self):
-        time = dt.datetime.now()
+        time = dt.datetime.now().time()
         try:
             # get the list of break times from mongodb
             breaks = list(mongo.settings.find_one({"setting": "break_times"})["value"])
@@ -71,7 +77,7 @@ class Commands:
             if not bool(require_auth["manual"]):
                 for item in breaks:
                     # if current time is in one of the time ranges, return False, so auth is not required
-                    if time in DateTimeRange(item[0], item[1]):
+                    if time in DateTimeRange(item[0].time(), item[1].time()):
                         return False
                 else:
                     return True

@@ -21,6 +21,7 @@ try:
     if config["interface"]["type"].lower() == "serial":
         import serial
 
+        connectionException = serial.serialutil.SerialException
         interface = serial.Serial()
         try:
             interface.baudrate = int(config["interface"]["baudrate"])
@@ -53,6 +54,7 @@ except (KeyError, AttributeError):
     # default to serial if no compatible interface if found in config file, or interface is not a string
     import serial
 
+    connectionException = serial.serialutil.SerialException
     interface = serial.Serial()
     try:
         interface.baudrate = int(config["interface"]["baudrate"])
