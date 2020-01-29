@@ -29,4 +29,3 @@ jobs:
         args: ". -t py38 --check"
     - name: Bandit Security Linter
       uses: jpetrucciani/bandit-check@master
-
