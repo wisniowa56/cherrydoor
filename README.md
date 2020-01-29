@@ -1,4 +1,5 @@
 [![Build status](https://github.com/oplik0/cherrydoor/workflows/test/badge.svg)](https://github.com/oplik0/cherrydoor/actions?query=workflow%3Atest)
+[![Maintainability](https://api.codeclimate.com/v1/badges/7b05467561774c611f8c/maintainability)](https://codeclimate.com/github/oplik0/cherrydoor/maintainability)
 [![HitCount](http://hits.dwyl.io/oplik0/cherrydoor.svg)](http://hits.dwyl.io/oplik0/cherrydoor)
 
 <h1 align="center">cherrydoor</h1>
