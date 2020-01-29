@@ -58,33 +58,58 @@ class Card(Resource):
     Card management and retrival. Accesible on `/api/card/<card>` and `/api/card` endpoints.
     """
 
-    def get(self, card=None):
+    def check_params(self, card=None, params=None):
         """
-        If HTTP GET is used, check if the card uid (passed in url or in request body as `card`) is associated with any user
+        Helper function that returns card and username from params and url - if they are there
         """
-        if not current_user.is_authenticated:
-            return {"error": "Not Authenticated"}, 401
-        params = parser.parse_args()
+        # if there is no card in url, try to get it from request body
         if not card:
             try:
-                card = escape(params["card"].upper())
+                card = params["card"]
                 if card == None:
                     raise KeyError
-            except KeyError:
-                return None, 400
-        else:
-            card = escape(card.upper())
+        card = escape(card.upper())
+        # try to get username from request body
         try:
             username = escape(params["username"])
-            if username == None:
-                raise KeyError
+        except KeyError:
+            username = None
+        return card, username
+    def get(self, card=None):
+        """
+        Used when HTTP GET request is recieved
+        This function checks if the card uid is associated with any user
+        UID can be a part of url (/api/card/<uid>) or be passed in request body
+        """
+        # check if request was made by a logged-in user
+        if not current_user.is_authenticated:
+            # return error 401 and explanation if that's not the case
+            return {"error": "Not Authenticated"}, 401
+        # get arguments from request body
+        params = parser.parse_args()
+        # make sure card was passed and is a valid uppercase string
+        # additionally, get username if it was passed in request body
+        try:
+            card, username = self.check_params(card, params)
+        except KeyError:
+            # if there is no card at all, return a 400 error with an explanation message
+            return (
+                    {
+                        "error": "no card specified. Pass card uid in url or as `card` in request body"
+                    },
+                    400,
+                )
+        if username:
+            # if username was passed with the request body, only check that user or return 404 if he doesn't exist
             result = mongo.users.find_one_or_404(
                 {"username": username, "cards": card}, {"password": 0, "_id": 0}
             )
-        except KeyError:
+        else:
+            # if no username was passed, check if any user has this card
             result = mongo.users.find_one_or_404(
                 {"cards": card}, {"password": 0, "_id": 0}
             )
+        #return the result and status code 200
         return result, 200
 
     def post(self, card=None):
@@ -93,34 +118,33 @@ class Card(Resource):
         User is determined by `username` passed in request body.
         If there is no `username` present, current user is modified.
         """
+        # check if request was made by a logged-in user
         if not current_user.is_authenticated:
+            # return error 401 and explanation if that's not the case
             return {"error": "Not Authenticated"}, 401
+        # get arguments from request body
         params = parser.parse_args()
-
-        if not card:
-            try:
-                card = escape(params["card"].upper())
-                if card == None:
-                    raise KeyError
-            except KeyError:
-                return (
+        # make sure card was passed and is a valid uppercase string
+        # additionally, get username if it was passed in request body
+        try:
+            card, username = self.check_params(card, params)
+        except KeyError:
+            # if there is no card at all, return a 400 error with an explanation message
+            return (
                     {
                         "error": "no card specified. Pass card uid in url or as `card` in request body"
                     },
                     400,
                 )
+        if username:
+            # if username was passed with the request body, add the card to that user
+            mongo.users.find_one_and_update(
+                {"username": username}, {"$push": {"cards": card}}
+            )
         else:
-            card = escape(card.upper())
-        try:
-            username = escape(params["username"])
-            if username == None:
-                raise KeyError
-        except KeyError:
+            # if no username was passed, add the card to current user
             current_user.add_card(card)
-            return True, 201
-        mongo.users.find_one_and_update(
-            {"username": username}, {"$push": {"cards": card}}
-        )
+        # return true and 201 status on completion
         return True, 201
 
     def delete(self, card=None):
@@ -133,32 +157,25 @@ class Card(Resource):
         if not current_user.is_authenticated:
             return {"error": "Not Authenticated"}, 401
         params = parser.parse_args()
-
-        if not card:
-            try:
-                card = escape(params["card"].upper())
-                if card == None:
-                    raise KeyError
-            except KeyError:
-                return (
+        # make sure card was passed and is a valid uppercase string.
+        # additionally, get username if it was passed in request body
+        try:
+            card, username = self.check_params(card, params)
+        except KeyError:
+            # if there is no card at all, return a 400 error with an explanation message
+            return (
                     {
                         "error": "no card specified. Pass card uid in url or as `card` in request body"
                     },
                     400,
                 )
-        else:
-            card = escape(card.upper())
-        try:
-            username = escape(params["username"])
-            if username == None:
-                raise KeyError
+        if username:
             mongo.users.find_one_and_update(
                 {"username": username}, {"$pull": {"cards": card}}
             )
-            return True, 200
-        except KeyError:
+        else:
             mongo.users.update({}, {"$pull": {"cards": card}})
-            return True, 200
+        return True, 200
 
 
 class UserAPI(Resource):

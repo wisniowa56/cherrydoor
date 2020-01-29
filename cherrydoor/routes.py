@@ -25,6 +25,7 @@ def index():
 # login page
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    # initiate form
     form = LoginForm()
     if form.validate_on_submit():
         login_username = mongo.users.find_one(
@@ -41,60 +42,52 @@ def login():
                     # if login was succesful - redirect user to the dashboard
                     return redirect(url_for("index"))
                 else:
-                    return render_template(
-                        "login.html",
-                        form=form,
-                        username_error="  is-invalid",
-                        password_error=" is-invalid",
-                    )
+                    error = " is-invalid"
             # if argon2 throws VerificationError it means the password doesn't match the hash for this username
-            except VerificationError:
-                return render_template(
-                    "login.html",
-                    form=form,
-                    username_error="",
-                    password_error=" is-invalid",
-                )
-            except KeyError:
-                return render_template(
-                    "login.html",
-                    form=form,
-                    username_error="  is-invalid",
-                    password_error=" is-invalid",
-                )
+            except (VerificationError, KeyError):
+                error = " is-invalid"
         # if there is no user with this username, return Invalid username.
-        return render_template(
-            "login.html", form=form, username_error=" is-invalid ", password_error=""
-        )
-    return render_template(
-        "login.html", form=form, username_error="", password_error=""
-    )
+        else:
+            error = " is-invalid"
+    else:
+        error = ""
+    return render_template("login.html", form=form, error=error)
 
 
 @app.route("/register", methods=["POST", "GET"])
 @login_required
 def register():
+    # register an user on a POST request
     if request.method == "POST":
-        users = mongo.users
-        existing_user = users.find_one({"username": escape(request.form["username"])})
-
-        if existing_user is None:
+        # check if username and password were passed to this function
+        try:
+            username = escape(request.form["username"])
+            password = escape(request.form["pass"].encode("utf-8"))
+        except:
+            return "No username or password specified", 400
+        # check if an user with this username exists
+        existing_user = mongo.users.find_one({"username": username})
+        # if not - register him
+        if not existing_user:
             try:
-                username = escape(request.form["username"])
-                password = escape(request.form["pass"].encode("utf-8"))
-            except:
-                return "No username or password specified", 400
-            try:
+                # if a card id was passed along - create a cards variable with it
                 cards = [escape(request.form["card"])]
             except KeyError:
+                # if not - make it empty
                 cards = []
+            # hash the password
             hashpass = hasher.hash(password)
+            # insert the user to database
             users.insert({"username": username, "password": hashpass, "cards": cards})
-            session["username"] = username
+            # log the user in
+            user_obj = User(username=username)
+            login_user(user_obj, remember=False)
+            # redirect user back to index
             return redirect(url_for("index"))
-
-        return "That username already exists!"
-
+        else:
+            # if the user exists - return a 401 message with that information
+            return {"error": "That username already exists!"}, 401
+    # render the registration form on a GET request
     return render_template("register.html")
 
 
