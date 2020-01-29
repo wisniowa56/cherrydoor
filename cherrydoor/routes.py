@@ -100,6 +100,7 @@ def register():
 
 @app.route("/csp-reports", methods=["POST"])
 def csp():
+    open("csp-logs.json", "a").close()
     with open("csp-logs.json", "r+", encoding="utf-8") as f:
 
         try:
