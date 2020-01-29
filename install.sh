@@ -18,4 +18,48 @@ else
     echo -e "\e[93mpip3 niezainstalowane. Instalowanie...\e[39m" &&
     $SUDO apt-get install python3-pip;
 fi;
+while true; do
+    read -p "Zainstalować aktualizację, jeśli jest dostępna? (y/n) " update
+    case $update in
+        y|Y|yes|Yes|tak|Tak ) 
+            branch=$(git symbolic-ref --short HEAD);
+            git fetch;
+            git reset --hard origin/$branch;
+            break;;
+        n|N|no|No|nie|Nie ) break;;
+        * ) continue;;
+    esac
+done
+
 pip3 install -r requirements.txt
+
+echo -e "--------------------------------------------------------"
+
+while true; do
+    read -p "Skonfigurować mongodb? (y/n) " mongoconfig
+    case $mongoconfig in
+        y|Y|yes|Yes|tak|Tak ) 
+            cat <(echo "var config = ") config.json > install/config.js;
+            while true; do
+                read -p "Skonfigurować konto administratora? (y/n) " admin
+                case $admin in
+                    y|Y|yes|Yes|tak|Tak ) 
+                        read -p "Nazwa użytkownika: " username;
+                        read -sp "Haslo: " password;
+                        $SUDO apt-get install -y argon2
+                        read hashed_password < <(echo -n "$password" | argon2 gktIC5njny5F70t+ -id -m 16 -t 4 -p 8 -e)
+                        echo "var user = {\"username\":\"$username\", \"password\":\"$hashed_password\"}" >> install/config.js;
+                        break;;
+                    n|N|no|No|nie|Nie ) echo 'var user = {}' >> install/config.js; 
+                        break;;
+                    * ) continue;;
+                esac
+            done
+            mongo install/mongo-config.js;
+            rm -rf install/config.js;
+            break;;
+        n|N|no|No|nie|Nie ) break;;
+        * ) continue;;
+        
+    esac
+done
