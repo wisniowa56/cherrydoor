@@ -27,31 +27,28 @@ def index():
 def login():
     # initiate form
     form = LoginForm()
-    if form.validate_on_submit():
-        login_username = mongo.users.find_one(
-            {"username": escape(str(form.username.data))}
-        )
-        if login_username:
-            try:
-                if login_username["password"] != "" and hasher.verify(
-                    login_username["password"].encode("utf-8"),
-                    escape(form.password.data).encode("utf-8"),
-                ):
-                    user_obj = User(username=escape(form.username.data))
-                    login_user(user_obj, remember=escape(form.remember.data))
-                    # if login was succesful - redirect user to the dashboard
-                    return redirect(url_for("index"))
-                else:
-                    error = " is-invalid"
+    # if form wasn't validated, render login page without error indication
+    if not form.validate_on_submit():
+        return render_template("login.html", form=form, error="")
+
+    try:
+        # escape username and password
+        username = escape(form.username.data)
+        password = escape(form.password.data)
+        login_user = mongo.users.find_one({"username": username})
+        if login_user:
+            validate = hasher.verify(
+                login_user["password"].encode("utf-8"), password.encode("utf-8"),
+            )
             # if argon2 throws VerificationError it means the password doesn't match the hash for this username
-            except (VerificationError, KeyError):
-                error = " is-invalid"
-        # if there is no user with this username, return Invalid username.
-        else:
-            error = " is-invalid"
-    else:
-        error = ""
-    return render_template("login.html", form=form, error=error)
+            if login_username["password"] != "" and validate:
+                user_obj = User(username=username)
+                login_user(user_obj, remember=escape(form.remember.data))
+                # if login was succesful - redirect user to the dashboard
+                return redirect(url_for("index"))
+    except (VerificationError, KeyError):
+        pass
+    return render_template("login.html", form=form, error=" is-invalid")
 
 
 @app.route("/register", methods=["POST", "GET"])
@@ -87,11 +84,6 @@ def register():
     login_user(user_obj, remember=False)
     # redirect user to index
     return redirect(url_for("index"))
-    
-        
-        
-    
-    
 
 
 @app.route("/csp-reports", methods=["POST"])

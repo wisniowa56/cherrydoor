@@ -22,7 +22,7 @@ class Commands:
             with interface:
                 # continuously read the interface until EXIT is sent
                 while message == [] or message[0] != "EXIT":
-                        message = read().upper().split()
+                    message = read().upper().split()
                     # after a newline, do the specidied command
                     try:
                         self.commands[message[0]](message[1])
@@ -78,7 +78,7 @@ class Commands:
                 if time in DateTimeRange(item[0].time(), item[1].time()):
                     return False
             return True
-                
+
         except (KeyError, TypeError):
             # default to requiring auth
             return True
