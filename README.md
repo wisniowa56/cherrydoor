@@ -1,4 +1,4 @@
-[![Build status](https://github.com/oplik0/cherrydoor/workflows/test/badge.svg)]()
+[![Build status](https://github.com/oplik0/cherrydoor/workflows/test/badge.svg)](https://github.com/oplik0/cherrydoor/actions?query=workflow%3Atest)
 [![HitCount](http://hits.dwyl.io/oplik0/cherrydoor.svg)](http://hits.dwyl.io/oplik0/cherrydoor)
 
 <h1 align="center">cherrydoor</h1>
