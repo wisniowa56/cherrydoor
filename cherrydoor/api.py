@@ -64,10 +64,9 @@ class Card(Resource):
         """
         # if there is no card in url, try to get it from request body
         if not card:
-            try:
-                card = params["card"]
-                if card == None:
-                    raise KeyError
+            card = params["card"]
+            if not card:
+                raise KeyError
         card = escape(card.upper())
         # try to get username from request body
         try:
@@ -75,6 +74,7 @@ class Card(Resource):
         except KeyError:
             username = None
         return card, username
+
     def get(self, card=None):
         """
         Used when HTTP GET request is recieved
@@ -94,11 +94,11 @@ class Card(Resource):
         except KeyError:
             # if there is no card at all, return a 400 error with an explanation message
             return (
-                    {
-                        "error": "no card specified. Pass card uid in url or as `card` in request body"
-                    },
-                    400,
-                )
+                {
+                    "error": "no card specified. Pass card uid in url or as `card` in request body"
+                },
+                400,
+            )
         if username:
             # if username was passed with the request body, only check that user or return 404 if he doesn't exist
             result = mongo.users.find_one_or_404(
@@ -109,7 +109,7 @@ class Card(Resource):
             result = mongo.users.find_one_or_404(
                 {"cards": card}, {"password": 0, "_id": 0}
             )
-        #return the result and status code 200
+        # return the result and status code 200
         return result, 200
 
     def post(self, card=None):
@@ -131,11 +131,11 @@ class Card(Resource):
         except KeyError:
             # if there is no card at all, return a 400 error with an explanation message
             return (
-                    {
-                        "error": "no card specified. Pass card uid in url or as `card` in request body"
-                    },
-                    400,
-                )
+                {
+                    "error": "no card specified. Pass card uid in url or as `card` in request body"
+                },
+                400,
+            )
         if username:
             # if username was passed with the request body, add the card to that user
             mongo.users.find_one_and_update(
@@ -164,11 +164,11 @@ class Card(Resource):
         except KeyError:
             # if there is no card at all, return a 400 error with an explanation message
             return (
-                    {
-                        "error": "no card specified. Pass card uid in url or as `card` in request body"
-                    },
-                    400,
-                )
+                {
+                    "error": "no card specified. Pass card uid in url or as `card` in request body"
+                },
+                400,
+            )
         if username:
             mongo.users.find_one_and_update(
                 {"username": username}, {"$pull": {"cards": card}}
