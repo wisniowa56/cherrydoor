@@ -1,28 +1,30 @@
 {
-    "mongo":{
-        "url":"localhost:27017",
-        "name":"cherrydoor",
-        "username":"cherrydoor",
-        "password":"test"
-    },
-    "login-translation":{
-        "username":"Nazwa użytkownika",
-        "password":"Hasło",
-        "remember-me":"Pamiętaj mnie",
-        "log-in":"Zaloguj się",
-        "message":"Musisz się zalogować by uzyskać dostęp do tej strony"
-    },
-    "secret-key":"\\xd7w7\\x04\\r\\xfc/q\\x1a\\x9b&",
-    "https": {
-        "enabled": false,
-        "hsts-enabled": false,
-        "hsts-preload": false
-    },
-    "interface": {
-        "type":"serial",
-        "baudrate":115200,
-        "port": "/dev/serial0",
-        "encoding": "utf-8"
-    },
-    "manufacturer-code": "18"
+  "host": "127.0.0.1",
+  "port": 5000,
+  "mongo": {
+    "url": "localhost:27017",
+    "name": "cherrydoor",
+    "username": "cherrydoor",
+    "password": "test"
+  },
+  "login-translation": {
+    "username": "Nazwa użytkownika",
+    "password": "Hasło",
+    "remember-me": "Pamiętaj mnie",
+    "log-in": "Zaloguj się",
+    "message": "Musisz się zalogować by uzyskać dostęp do tej strony"
+  },
+  "secret-key": "\\xd7w7\\x04\\r\\xfc/q\\x1a\\x9b&",
+  "https": {
+    "enabled": false,
+    "hsts-enabled": false,
+    "hsts-preload": false
+  },
+  "interface": {
+    "type": "serial",
+    "baudrate": 115200,
+    "port": "/dev/serial0",
+    "encoding": "utf-8"
+  },
+  "manufacturer-code": "18"
 }
