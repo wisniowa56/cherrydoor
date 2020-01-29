@@ -57,38 +57,41 @@ def login():
 @app.route("/register", methods=["POST", "GET"])
 @login_required
 def register():
-    # register an user on a POST request
-    if request.method == "POST":
-        # check if username and password were passed to this function
-        try:
-            username = escape(request.form["username"])
-            password = escape(request.form["pass"].encode("utf-8"))
-        except:
-            return "No username or password specified", 400
-        # check if an user with this username exists
-        existing_user = mongo.users.find_one({"username": username})
-        # if not - register him
-        if not existing_user:
-            try:
-                # if a card id was passed along - create a cards variable with it
-                cards = [escape(request.form["card"])]
-            except KeyError:
-                # if not - make it empty
-                cards = []
-            # hash the password
-            hashpass = hasher.hash(password)
-            # insert the user to database
-            users.insert({"username": username, "password": hashpass, "cards": cards})
-            # log the user in
-            user_obj = User(username=username)
-            login_user(user_obj, remember=False)
-            # redirect user back to index
-            return redirect(url_for("index"))
-        else:
-            # if the user exists - return a 401 message with that information
-            return {"error": "That username already exists!"}, 401
-    # render the registration form on a GET request
-    return render_template("register.html")
+    # render the registration form if the request type isn't POST
+    if request.method != "POST":
+        return render_template("register.html")
+    # otherwise check if username and password were passed to this function
+    try:
+        username = escape(request.form["username"])
+        password = escape(request.form["pass"].encode("utf-8"))
+    except:
+        return "No username or password specified", 400
+    # check if an user with this username exists
+    existing_user = mongo.users.find_one({"username": username})
+    # if the user exists - return a 401 message with that information
+    if existing_user:
+        return {"error": "That username already exists!"}, 401
+    # if not - register him
+    try:
+        # if a card id was passed along - create a cards variable with it
+        cards = [escape(request.form["card"])]
+    except KeyError:
+        # if not - make it empty
+        cards = []
+    # hash the password
+    hashpass = hasher.hash(password)
+    # insert the user to database
+    users.insert({"username": username, "password": hashpass, "cards": cards})
+    # log the user in
+    user_obj = User(username=username)
+    login_user(user_obj, remember=False)
+    # redirect user to index
+    return redirect(url_for("index"))
+    
+        
+        
+    
+    
 
 
 @app.route("/csp-reports", methods=["POST"])
