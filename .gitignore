@@ -332,4 +332,5 @@ ASALocalRun/
 #Visual Studio Code
 .vscode
 
-csp-logs.json
+/csp-logs.json
+/config.json

@@ -2,6 +2,9 @@ SUDO=''
 if (( $EUID != 0 )); then
     SUDO='sudo';
 fi;
+if [ ! -f "config.json" ]; then
+    cp install/config.json config.json
+fi;
 if hash mongo &>/dev/null; then
     echo -e "\e[92mMongoDB jest zainstalowane\e[39m";
 else
