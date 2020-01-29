@@ -58,6 +58,15 @@ class Card(Resource):
     Card management and retrival. Accesible on `/api/card/<card>` and `/api/card` endpoints.
     """
 
+    def __init__(self):
+        """
+        error messages
+        """
+        self.card_error = {
+            "error": "no card specified. Pass card uid in url or as `card` in request body"
+        }
+        self.auth_error = {"error": "Not Authenticated"}
+
     def check_params(self, card=None, params=None):
         """
         Helper function that returns card and username from params and url - if they are there
@@ -84,7 +93,7 @@ class Card(Resource):
         # check if request was made by a logged-in user
         if not current_user.is_authenticated:
             # return error 401 and explanation if that's not the case
-            return {"error": "Not Authenticated"}, 401
+            return self.auth_error, 401
         # get arguments from request body
         params = parser.parse_args()
         # make sure card was passed and is a valid uppercase string
@@ -93,12 +102,7 @@ class Card(Resource):
             card, username = self.check_params(card, params)
         except KeyError:
             # if there is no card at all, return a 400 error with an explanation message
-            return (
-                {
-                    "error": "no card specified. Pass card uid in url or as `card` in request body"
-                },
-                400,
-            )
+            return (self.card_error, 400)
         if username:
             # if username was passed with the request body, only check that user or return 404 if he doesn't exist
             result = mongo.users.find_one_or_404(
@@ -121,7 +125,7 @@ class Card(Resource):
         # check if request was made by a logged-in user
         if not current_user.is_authenticated:
             # return error 401 and explanation if that's not the case
-            return {"error": "Not Authenticated"}, 401
+            return self.auth_error, 401
         # get arguments from request body
         params = parser.parse_args()
         # make sure card was passed and is a valid uppercase string
@@ -130,12 +134,7 @@ class Card(Resource):
             card, username = self.check_params(card, params)
         except KeyError:
             # if there is no card at all, return a 400 error with an explanation message
-            return (
-                {
-                    "error": "no card specified. Pass card uid in url or as `card` in request body"
-                },
-                400,
-            )
+            return (self.card_error, 400)
         if username:
             # if username was passed with the request body, add the card to that user
             mongo.users.find_one_and_update(
@@ -155,7 +154,7 @@ class Card(Resource):
         If `*` is passed as username, returns all users.
         """
         if not current_user.is_authenticated:
-            return {"error": "Not Authenticated"}, 401
+            return self.auth_error, 401
         params = parser.parse_args()
         # make sure card was passed and is a valid uppercase string.
         # additionally, get username if it was passed in request body
@@ -163,12 +162,7 @@ class Card(Resource):
             card, username = self.check_params(card, params)
         except KeyError:
             # if there is no card at all, return a 400 error with an explanation message
-            return (
-                {
-                    "error": "no card specified. Pass card uid in url or as `card` in request body"
-                },
-                400,
-            )
+            return (self.card_error, 400)
         if username:
             mongo.users.find_one_and_update(
                 {"username": username}, {"$pull": {"cards": card}}
@@ -183,29 +177,45 @@ class UserAPI(Resource):
     User data management and retrieval. Accesible on `api/user/<username>` and `/api/user` endpoints.
     """
 
+    def __init__(self):
+        """
+        error messages
+        """
+        self.username_error = {
+            "error": "no username specified. Pass username in url or as `username` in request body"
+        }
+        self.auth_error = {"error": "Not Authenticated"}
+
+    def check_username(self, username, params):
+        """
+        Helper function for getting and validating username from url or request body
+        """
+        if not username:
+            params = parser.parse_args()
+            username = escape(params["username"])
+            if username == None:
+                raise KeyError
+        username = escape(username)
+        return username
+
     def get(self, username=None):
         """
         If HTTP GET is used, see if user with username passed in url or in request body (as `username`) exists and return their username and cards associated with them.
         When no user with request username exists, return 404 status code
         """
         if not current_user.is_authenticated:
-            return {"error": "Not Authenticated"}, 401
-        if not username:
-            params = parser.parse_args()
-            try:
-                username = escape(params["username"])
-                if username == None:
-                    raise KeyError
-            except KeyError:
-                return None, 400
-        else:
-            username = escape(username)
+            return self.auth_error, 401
+        params = parser.parse_args()
+        try:
+            username = self.check_username(username, params)
+        except KeyError:
+            return (self.username_error, 400)
         if username == "*":
             result = list(mongo.users.find({}, {"password": 0, "_id": 0}))
-            return result, 200
-        result = mongo.users.find_one_or_404(
-            {"username": username}, {"password": 0, "_id": 0}
-        )
+        else:
+            result = mongo.users.find_one_or_404(
+                {"username": username}, {"password": 0, "_id": 0}
+            )
         return result, 200
 
     def post(self, username=None):
@@ -213,20 +223,15 @@ class UserAPI(Resource):
         If HTTP POST is used, create a passwordless user (unable to manage the door, able to enter)
         """
         if not current_user.is_authenticated:
-            return {"error": "Not Authenticated"}, 401
+            return self.auth_error, 401
         params = parser.parse_args()
-        if not username:
-            try:
-                username = escape(params["username"])
-                if username == None:
-                    raise KeyError
-            except KeyError:
-                return None, 400
-        else:
-            username = escape(username)
+        try:
+            username = self.check_username(username, params)
+        except KeyError:
+            return (self.username_error, 400)
         try:
             card = escape(params["card"].upper())
-            if card == None:
+            if not card:
                 raise KeyError
         except KeyError:
             card = ""
@@ -242,17 +247,12 @@ class UserAPI(Resource):
         If HTTP DELETE is used, delete the specified user
         """
         if not current_user.is_authenticated:
-            return {"error": "Not Authenticated"}, 401
+            return self.auth_error, 401
         params = parser.parse_args()
-        if not username:
-            try:
-                username = escape(params["username"])
-                if username == None:
-                    raise KeyError
-            except KeyError:
-                return None, 400
-        else:
-            username = escape(username)
+        try:
+            username = self.check_username(username, params)
+        except KeyError:
+            return (self.username_error, 400)
         mongo.users.delete_one({"username": username})
         return None, 204
 
