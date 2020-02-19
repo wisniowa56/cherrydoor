@@ -1,9 +1,12 @@
 "user strict";
+if (typeof socket == "undefined") {
+  var socket = io.connect("/api");
+}
 const actions = {
   closeModal: () => $(".modal.show").modal("hide"),
   emitUsers: setTimeout(() => {
     socket.emit("users");
-  })
+  }, 100)
 };
 $(".modal-link").click(e => {
   $("#" + e.target.attributes["data-modal"].value).modal("show");

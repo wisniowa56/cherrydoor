@@ -83,7 +83,15 @@ def users():
 @socket.on("break_times", namespace="/api")
 @authenticated_only
 def break_times(json=[]):
-    if isinstance(json, list) and len(json) != 0:
+    if isinstance(json, list) and len(json) != 0 and isinstance(json[0], list):
+        if not any(json[0]):
+            mongo.settings.update(
+                {"setting": "break_times"},
+                {"setting": "break_times", "value": []},
+                upsert=True,
+            )
+            emit("break_times", [])
+            return []
         try:
             breaks = [
                 [
@@ -104,7 +112,7 @@ def break_times(json=[]):
         return return_breaks
     try:
         breaks = list(mongo.settings.find_one({"setting": "break_times"})["value"])
-        breaks = [[item[0].time(), item[1].time()] for item in breaks]
+        breaks = [[item[0].isoformat(), item[1].isoformat()] for item in breaks]
         return_breaks = jsn.dumps(breaks, indent=4, sort_keys=True, default=str)
     except KeyError:
         return None
