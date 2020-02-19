@@ -12,7 +12,7 @@ from cherrydoor import app, mongo, hasher, LoginForm, login_manager, User, json
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.1.2"
+__version__ = "0.3.8"
 __status__ = "Prototype"
 
 # dashboard page

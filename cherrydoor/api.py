@@ -5,7 +5,7 @@ from cherrydoor import api, Resource, current_user, parser, dt, inputs, mongo, e
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.1.2"
+__version__ = "0.3.8"
 __status__ = "Prototype"
 
 parser.add_argument("time_from", help="start of time range")

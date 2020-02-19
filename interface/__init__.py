@@ -1,6 +1,11 @@
 from json import load
 from pymongo import MongoClient
 
+__author__ = "opliko"
+__license__ = "MIT"
+__version__ = "0.3.8"
+__status__ = "Prototype"
+
 with open("config.json", "r", encoding="utf-8") as f:  # load configuration file
     config = load(f)  # convert confuguration to a dictionary using json.load()
 

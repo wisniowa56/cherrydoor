@@ -8,7 +8,7 @@ from cherrydoor import socket, emit, dt, mongo, current_user, disconnect
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.1.2"
+__version__ = "0.3.8"
 __status__ = "Prototype"
 
 
