@@ -24,7 +24,7 @@ from argon2 import PasswordHasher
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.1.2"
+__version__ = "0.3.8"
 __status__ = "Prototype"
 
 with open("config.json", "r", encoding="utf-8") as f:  # load configuration file

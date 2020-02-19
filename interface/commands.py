@@ -3,6 +3,11 @@ from time import sleep
 from datetimerange import DateTimeRange
 from interface import read, write, mongo, config, interface, connectionException
 
+__author__ = "opliko"
+__license__ = "MIT"
+__version__ = "0.3.8"
+__status__ = "Prototype"
+
 
 class Commands:
     def __init__(self):

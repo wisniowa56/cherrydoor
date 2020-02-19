@@ -8,7 +8,7 @@ from cherrydoor import socket, emit, dt, mongo, current_user, disconnect
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.1.2"
+__version__ = "0.3.8"
 __status__ = "Prototype"
 
 
@@ -83,28 +83,36 @@ def users():
 @socket.on("break_times", namespace="/api")
 @authenticated_only
 def break_times(json=[]):
-    if isinstance(json, list) and len(json) != 0:
-        try:
-            breaks = [
-                [
-                    dt.datetime.fromisoformat(item[0].replace("Z", "")),
-                    dt.datetime.fromisoformat(item[1].replace("Z", "")),
+    if isinstance(json, list) and len(json) != 0 and isinstance(json[0], list):
+        if not any(json[0]):
+            mongo.settings.update(
+                {"setting": "break_times"},
+                {"setting": "break_times", "value": []},
+                upsert=True,
+            )
+            return_breaks = []
+        else:
+            try:
+                breaks = [
+                    [
+                        dt.datetime.fromisoformat(item[0].replace("Z", "")),
+                        dt.datetime.fromisoformat(item[1].replace("Z", "")),
+                    ]
+                    for item in json
                 ]
-                for item in json
-            ]
-        except IndexError:
-            return None
-        mongo.settings.update(
-            {"setting": "break_times"},
-            {"setting": "break_times", "value": breaks},
-            upsert=True,
-        )
-        return_breaks = jsn.dumps(breaks, indent=4, sort_keys=True, default=str)
+            except IndexError:
+                return None
+            mongo.settings.update(
+                {"setting": "break_times"},
+                {"setting": "break_times", "value": breaks},
+                upsert=True,
+            )
+            return_breaks = jsn.dumps(breaks, indent=4, sort_keys=True, default=str)
         emit("break_times", return_breaks)
         return return_breaks
     try:
         breaks = list(mongo.settings.find_one({"setting": "break_times"})["value"])
-        breaks = [[item[0].time(), item[1].time()] for item in breaks]
+        breaks = [[item[0].isoformat(), item[1].isoformat()] for item in breaks]
         return_breaks = jsn.dumps(breaks, indent=4, sort_keys=True, default=str)
     except KeyError:
         return None

@@ -1,28 +1,35 @@
 "user strict";
+if (typeof socket == "undefined") {
+  var socket = io.connect("/api");
+}
 Chart.platform.disableCSSInjection = true;
-var ctx = document.getElementById('doorchart');
-var usageData = []
+$(document).ready(() => {
+  var ctx = document.getElementById("doorchart");
+  var usageData = [];
 
-var socket = io.connect("/api");
-setInterval(() => socket.emit("stats"), 500);
-socket.on('stats', function(json){
-        var tmpDict = {};
-        json.map((el) => {
-            return JSON.parse(el)
-        }).map((el)=>{
-            el.timestamp = new Date(el.timestamp["$date"])
-            return el
-        }).forEach((el) => {
-            date = `${el.timestamp.getFullYear()}-${el.timestamp.getMonth()}-${el.timestamp.getDate()}`;
-            !!tmpDict[date] ? tmpDict[date].y++ : tmpDict[date] = {x: new Date(date), y: 1};
-        });
-        usageData = Object.values(tmpDict);
-        usageData.sort((a,b)=>a.x.getTime()-b.x.getTime());
-        chart.data.datasets[0].data = usageData;
-        chart.update();
-    });
+  setInterval(() => socket.emit("stats"), 500);
+  socket.on("stats", function(json) {
+    var tmpDict = {};
+    json
+      .map(el => {
+        return JSON.parse(el);
+      })
+      .map(el => {
+        el.timestamp = new Date(el.timestamp["$date"]);
+        return el;
+      })
+      .forEach(el => {
+        date = `${el.timestamp.getFullYear()}-${el.timestamp.getMonth()}-${el.timestamp.getDate()}`;
+        !!tmpDict[date]
+          ? tmpDict[date].y++
+          : (tmpDict[date] = { x: new Date(date), y: 1 });
+      });
+    usageData = Object.values(tmpDict);
+    usageData.sort((a, b) => a.x.getTime() - b.x.getTime());
+    chart.data.datasets[0].data = usageData;
+    chart.update();
+  });
   if (ctx !== null) {
-    
     var chart = new Chart(ctx, {
       type: "line",
       label: "ilość użyć",
@@ -58,10 +65,10 @@ socket.on('stats', function(json){
         scales: {
           xAxes: [
             {
-              type: 'time',
+              type: "time",
               distribution: "series",
               time: {
-                    unit: 'day'
+                unit: "day"
               },
               gridLines: {
                 display: false
@@ -73,7 +80,7 @@ socket.on('stats', function(json){
               gridLines: {
                 display: true,
                 color: "#eee",
-                zeroLineColor: "#eee",
+                zeroLineColor: "#eee"
               },
               ticks: {
                 callback: function(value) {
@@ -126,5 +133,4 @@ socket.on('stats', function(json){
       }
     });
   }
-
-  
+});

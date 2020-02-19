@@ -1,2 +1,3 @@
 [bandit]
 skips: B106,B107
+exclude: ./tests

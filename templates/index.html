@@ -4,6 +4,22 @@
   integrity="sha384-hPGA89ovC7qaXzMJ/+P9tMbfS/7I4fHQ8y2QLa2aN/r/ZbOYETChoovePc9gUuaC"
   crossorigin="anonymous"
 ></script>
+<script
+  src="{{ url_for('static', filename='js/moment.min.js') }}"
+  integrity="sha384-fYxN7HsDOBRo1wT/NSZ0LkoNlcXvpDpFy6WzB42LxuKAX7sBwgo7vuins+E1HCaw sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ="
+  crossorigin="anonymous"
+></script>
+<script
+  src="{{ url_for('static', filename='js/pl.min.js') }}"
+  integrity="sha384-j2pKlka54OdbGS4GhJ9+YiMiwR4DXtGwhFCyoYvGiuQJRQZMA2FNvwzyibFXopm5 sha256-Hj9HwaHet9CxBaXHOnFfqoPDB9iav0fWhuCcZz905oo="
+  crossorigin="anonymous"
+></script>
+<script
+  defer
+  src="{{ url_for('static', filename='js/tempusdominus-bootstrap-4.min.js') }}"
+  integrity="sha384-7+ImCvz/PDFsHevxN/SH5PaqmRRGpVl3dtDoKBFHhNQyKABEKLpbMj+rCsFdx0nF sha256-z0oKYg6xiLq3yJGsp/LsY9XykbweQlHl42jHv2XTBz4="
+  crossorigin="anonymous"
+></script>
 <link
   rel="stylesheet"
   href="{{ url_for('static', filename='css/index.css') }}"
@@ -16,12 +32,24 @@
   integrity="sha384-q9MZ/PQCC1nIFQdrr9yNOFXeSaXjv/yPOJOdBd32aODh8+EM6udfo91a6mRbEDih sha256-q9MZ/PQCC1nIFQdrr9yNOFXeSaXjv/yPOJOdBd32aODh8+EM6udfo91a6mRbEDih"
   crossorigin="anonymous"
 />
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/tempusdominus-bootstrap-4.min.css') }}"
+  integrity="sha384-k5MS6IlVv1vgCg5G7d2uh4UbzgD7FpDwcuGKVohXaq1OmI5GFoletOlct+j7iUka sha256-XPTBwC3SBoWHSmKasAk01c08M6sIA5gF5+sRxqak2Qs="
+  crossorigin="anonymous"
+/>
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/all.min.css') }}"
+  integrity="sha384-v8BU367qNbs/aIZIxuivaU55N5GPF89WBerHoGA4QTcbUjYiLQtKdrfXnqAcXyTv sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk="
+/>
   {% endblock %}
   {% block body %}
   <nav class="navbar navbar-expand-xl navbar-light bg-light">
       <a class="navbar-brand" href="#"><img src="{{ url_for('static', filename='images/logo/logo-56px.png') }}" alt="logo"></img>Cherrydoor</a>
       <button class="btn btn-link modal-link" data-modal="addUserModal">Dodaj użytkownika</button>
       <button class="btn btn-link modal-link" data-modal="manageUsersModal">Zarządzaj użytkownikami</button>
+      <button class="btn btn-link modal-link" data-modal="settingsModal">Ustawienia</button>
   </nav>
   <div class="container">
       <div class="row">
@@ -37,16 +65,28 @@
           </div>
       </div>
   </div>
-  <script src="{{ url_for('static', filename='js/main-chart.js') }}" integrity="sha384-habsLR7Ee4pzZKkSqaK4TB6wAVkDLSf9sJJ1CYyCPNZR6cCiVuG+eB7rtkY54qBw sha256-hQwg40DptsfLN4YebXuA6MB1/b+B39VNa5fieRN8zjo=">
-</script>
+
+<script 
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/main-chart.js') }}" 
+  integrity="sha384-Hlaoy8oJ9tfAoGmZL7EOy5XrwiXt5zVGT/0P1X3jcF34fhWBWIw/W1eyeV8Lsk6C sha256-eA+SkgvsP7PUJafg0iT+VkhrptFFREQffbNBlIicT+I="
+></script>
 <script
   type="text/javascript"
   src="{{ url_for('static', filename='js/modals.js') }}"
-  integrity="sha384-Fkz/8XDl5adqpC/eS+oXUYxllJigI17HNwrRT7hmhBFBl7DoJ0bh4ZHm7eoEkwN/ sha256-Fkz/8XDl5adqpC/eS+oXUYxllJigI17HNwrRT7hmhBFBl7DoJ0bh4ZHm7eoEkwN/"
+  integrity="sha384-j2MR/kvsNy1v2x1qMECngWvlmsVIqgjVXppKxoWXH63gvAzpCOQrfNXUDdWtOUA1 sha256-x2t08s0+Xoko33dzj8rbbGuZuhtxdvpdPvh1zZ6XV9c="
 ></script>
 <script
   type="text/javascript"
   src="{{ url_for('static', filename='js/users.js') }}"
-  integrity="sha384-hsqxTk2/BTThrzW1v2pRT+3YkiG9DUQblvDsANndgHKHvaRONXkKDEihrjNHa9I7 sha256-hsqxTk2/BTThrzW1v2pRT+3YkiG9DUQblvDsANndgHKHvaRONXkKDEihrjNHa9I7"
+  integrity="sha384-fwaG6FgSfOJoEk0G8uMboiA8HvTpTBpaFG3AxKd1W01eLtvpaStxPniZ4prKWwqH sha256-lKMztDe8TsRj4sxLZDhIdBYWFypEbyaOknEbBPAN8Nw="
 ></script>
-{% include "manage-users-modal.html" %} {% endblock %}
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/settings.js') }}"
+  integrity="sha384-bdlSTQKXW+CzEGn4b9WLoFQKiNDNSpXW9YKzJPg7Cdkj9sEwJ+T48FS3Kgns9Pm9 sha256-pETyhtIz8IPDbUWquseIy1En9o9U9X5wEl3xawENFzQ="
+></script>
+{% include "add-user-modal.html" %}
+{% include "manage-users-modal.html" %}
+{% include "settings-modal.html" %}
+{% endblock %}

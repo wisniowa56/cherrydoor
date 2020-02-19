@@ -12,7 +12,7 @@ from cherrydoor import app, mongo, hasher, LoginForm, login_manager, User, json
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.1.2"
+__version__ = "0.3.8"
 __status__ = "Prototype"
 
 # dashboard page
@@ -35,13 +35,13 @@ def login():
         # escape username and password
         username = escape(form.username.data)
         password = escape(form.password.data)
-        login_user = mongo.users.find_one({"username": username})
-        if login_user:
+        user = mongo.users.find_one({"username": username})
+        if user:
             validate = hasher.verify(
-                login_user["password"].encode("utf-8"), password.encode("utf-8"),
+                user["password"].encode("utf-8"), password.encode("utf-8")
             )
             # if argon2 throws VerificationError it means the password doesn't match the hash for this username
-            if login_username["password"] != "" and validate:
+            if user["password"] != "" and validate:
                 user_obj = User(username=username)
                 login_user(user_obj, remember=escape(form.remember.data))
                 # if login was succesful - redirect user to the dashboard
