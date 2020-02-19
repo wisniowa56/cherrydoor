@@ -9,29 +9,28 @@ function fillHtml(id) {
 <div class="row breakTimeInput input-group" id="breakTimeInput${id}">
     <label class="control-label col" for="breakTimeInputFrom">Od</label>
     <label class="control-label col" for="breakTimeInputTo">Do</label>
-    <div class="col-1"></div>
-    <div class="w-100"></div>
+    <div class="col-1"></div><div class="w-100"></div>
     <div id="breakTimeInputFrom${id}" class="input-group date breakTimeInputFrom col" data-target-input="nearest">
         <input type="text" class="form-control datetimepicker-input breakTimeInput" placeholder="00:00:00" data-toggle="datetimepicker" data-target="#breakTimeInputFrom${id}"></input>
         <div class="input-group-append d-none d-sm-flex" data-target="#breakTimeInputFrom${id}" data-toggle="datetimepicker">
-            <span class="input-group-text">
-                <i class="far fa-clock"></"></i>
-            </i>
-            </span>
+            <span class="input-group-text"><i class="far fa-clock"></i></span>
         </div>
     </div>
     <div id="breakTimeInputTo${id}" class="input-group date breakTimeInputTo col" data-target-input="nearest">
         <input type="text" class="form-control datetimepicker-input breakTimeInput" placeholder="00:00:00" data-toggle="datetimepicker" data-target="#breakTimeInputTo${id}"></input>
         <div class="input-group-append d-none d-sm-flex" data-target="#breakTimeInputTo${id}" data-toggle="datetimepicker">
-            <span class="input-group-text">
-                <i class="far fa-clock"></i>
-            </i>
-            </span>
+            <span class="input-group-text"><i class="far fa-clock"></i></span>
         </div>
     </div>
     <div class="col-1"><button class="btn btn-danger btn-sm deleteBreakTime" data-target="#breakTime${id}"><i class="material-icons">delete</i></button></div>
 </div><hr></div>`;
 }
+const addDeletion = () => {
+  $(".deleteBreakTime").click(e => {
+    e.preventDefault();
+    $(e.delegateTarget.attributes["data-target"].value).remove();
+  });
+};
 var timeId = 0;
 socket.on("break_times", json => {
   if (!json.length) {
@@ -62,10 +61,7 @@ socket.on("break_times", json => {
       datePickerTo.datetimepicker("minDate", e.date);
     });
   });
-  $(".deleteBreakTime").click(e => {
-    e.preventDefault();
-    $(e.delegateTarget.attributes["data-target"].value).remove();
-  });
+  addDeletion();
 });
 
 $(document).ready(() => {
@@ -103,10 +99,7 @@ $(document).ready(() => {
     datePickerFrom.on("change.datetimepicker", e => {
       datePickerTo.datetimepicker("minDate", e.date);
     });
-    $(".deleteBreakTime").click(e => {
-      e.preventDefault();
-      $(e.delegateTarget.attributes["data-target"].value).remove();
-    });
+    addDeletion();
   });
   $("#submitSettings").click(() => {
     var breakTimes = [];

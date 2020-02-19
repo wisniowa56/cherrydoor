@@ -90,24 +90,24 @@ def break_times(json=[]):
                 {"setting": "break_times", "value": []},
                 upsert=True,
             )
-            emit("break_times", [])
-            return []
-        try:
-            breaks = [
-                [
-                    dt.datetime.fromisoformat(item[0].replace("Z", "")),
-                    dt.datetime.fromisoformat(item[1].replace("Z", "")),
+            return_breaks = []
+        else:
+            try:
+                breaks = [
+                    [
+                        dt.datetime.fromisoformat(item[0].replace("Z", "")),
+                        dt.datetime.fromisoformat(item[1].replace("Z", "")),
+                    ]
+                    for item in json
                 ]
-                for item in json
-            ]
-        except IndexError:
-            return None
-        mongo.settings.update(
-            {"setting": "break_times"},
-            {"setting": "break_times", "value": breaks},
-            upsert=True,
-        )
-        return_breaks = jsn.dumps(breaks, indent=4, sort_keys=True, default=str)
+            except IndexError:
+                return None
+            mongo.settings.update(
+                {"setting": "break_times"},
+                {"setting": "break_times", "value": breaks},
+                upsert=True,
+            )
+            return_breaks = jsn.dumps(breaks, indent=4, sort_keys=True, default=str)
         emit("break_times", return_breaks)
         return return_breaks
     try:
