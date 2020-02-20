@@ -166,8 +166,7 @@ except KeyError:
     )
 
 # create csp-logs.json if it doesn't exist
-with open("csp-logs.json", "a"):
-    pass
+open("csp-logs.json", "a").close()
 
 
 class User(UserMixin):

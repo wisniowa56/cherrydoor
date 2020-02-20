@@ -11,7 +11,7 @@ __status__ = "Prototype"
 
 class Commands:
     def __init__(self):
-        self.commands = {"CARD": self.card}
+        self.commandFunctions = {"CARD": self.card}
         try:
             self.require_auth = bool(
                 mongo.settings.find_one({"setting": "require_auth"})["value"]
@@ -30,7 +30,7 @@ class Commands:
                     message = read().upper().split()
                     # after a newline, do the specidied command
                     try:
-                        self.commands[message[0]](message[1])
+                        self.commandFunctions[message[0]](message[1])
                     except (KeyError, IndexError):
                         pass
         except connectionException:

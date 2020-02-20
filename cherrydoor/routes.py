@@ -30,22 +30,23 @@ def login():
     # if form wasn't validated, render login page without error indication
     if not form.validate_on_submit():
         return render_template("login.html", form=form, error="")
-
     try:
         # escape username and password
         username = escape(form.username.data)
         password = escape(form.password.data)
         user = mongo.users.find_one({"username": username})
-        if user:
-            validate = hasher.verify(
-                user["password"].encode("utf-8"), password.encode("utf-8")
-            )
-            # if argon2 throws VerificationError it means the password doesn't match the hash for this username
-            if user["password"] != "" and validate:
-                user_obj = User(username=username)
-                login_user(user_obj, remember=escape(form.remember.data))
-                # if login was succesful - redirect user to the dashboard
-                return redirect(url_for("index"))
+        if not user:
+            # if no user with selected is found raise VerificationError to return the template with error on inputs
+            raise VerificationError
+        validate = hasher.verify(
+            user["password"].encode("utf-8"), password.encode("utf-8")
+        )
+        # if argon2 throws VerificationError it means the password doesn't match the hash for this username
+        if user["password"] != "" and validate:
+            user_obj = User(username=username)
+            login_user(user_obj, remember=escape(form.remember.data))
+            # if login was succesful - redirect user to the dashboard
+            return redirect(url_for("index"))
     except (VerificationError, KeyError):
         pass
     return render_template("login.html", form=form, error=" is-invalid")
