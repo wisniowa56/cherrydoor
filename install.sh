@@ -21,9 +21,8 @@ if hash mongo &>/dev/null; then
     echo -e "\e[92mMongoDB jest zainstalowane\e[39m";
 else
     echo -e "\e[93mMongoDB niezainstalowane. Instalowanie...\e[39m"
-    wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | $SUDO apt-key add - &&
-    echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.2 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list    $SUDO apt-get update &&
-    $SUDO apt-get install -y mongodb-org
+    $SUDO apt-get update &&
+    $SUDO apt-get install -y mongodb-server;
     $SUDO service mongod start;
 fi;
 if hash pip3 &>/dev/null; then
