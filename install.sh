@@ -2,6 +2,18 @@ SUDO=''
 if (( $EUID != 0 )); then
     SUDO='sudo';
 fi;
+while true; do
+    read -p "Zainstalować aktualizację, jeśli jest dostępna? (y/n) " update
+    case $update in
+        y|Y|yes|Yes|tak|Tak ) 
+            branch=$(git symbolic-ref --short HEAD);
+            git fetch;
+            git reset --hard origin/$branch;
+            break;;
+        n|N|no|No|nie|Nie ) break;;
+        * ) continue;;
+    esac
+done
 if [ ! -f "config.json" ]; then
     cp install/config.json config.json
 fi;
@@ -20,18 +32,6 @@ else
     echo -e "\e[93mpip3 niezainstalowane. Instalowanie...\e[39m" &&
     $SUDO apt-get install python3-pip;
 fi;
-while true; do
-    read -p "Zainstalować aktualizację, jeśli jest dostępna? (y/n) " update
-    case $update in
-        y|Y|yes|Yes|tak|Tak ) 
-            branch=$(git symbolic-ref --short HEAD);
-            git fetch;
-            git reset --hard origin/$branch;
-            break;;
-        n|N|no|No|nie|Nie ) break;;
-        * ) continue;;
-    esac
-done
 
 pip3 install -r requirements.txt
 
