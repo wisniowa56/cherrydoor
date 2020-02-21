@@ -10,8 +10,7 @@ if hash mongo &>/dev/null; then
 else
     echo -e "\e[93mMongoDB niezainstalowane. Instalowanie...\e[39m"
     wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | $SUDO apt-key add - &&
-    echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse" | $SUDO tee /etc/apt/sources.list.d/mongodb-org-4.2.list &&
-    $SUDO apt-get update &&
+    echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.2 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list    $SUDO apt-get update &&
     $SUDO apt-get install -y mongodb-org
     $SUDO service mongod start;
 fi;
