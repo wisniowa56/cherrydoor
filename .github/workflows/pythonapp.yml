@@ -42,9 +42,9 @@ jobs:
           pip install setuptools wheel twine
       - name: "check if branch is versioned"
         run: |
-          if [[ "$GITHUB_REF" =~ [\d\.\-{dev}]* ]]; then 
-          echo ::set-output name=VERSIONED::"true"; else
-          echo ::set-output name=VERSIONED::"false"; fi
+          if [[ "$GITHUB_REF" =~ ([\d\.{dev}\-]{2,}) ]]; then 
+          echo ::set-output name=VERSIONED::"true" && echo "branch is versioned"; else
+          echo ::set-output name=VERSIONED::"false" && ehco "branch is not versioned"; fi
         shell: bash
       - name: Automatically set dev version
         if: steps.vars.outputs.VERSIONED
