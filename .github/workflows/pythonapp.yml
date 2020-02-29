@@ -52,7 +52,7 @@ jobs:
       - name: Automatically set dev version
         if: steps.versioned.outputs.VERSIONED
         run: |
-          echo ::set-env name=CHERRYDOOR_VERSION::$(echo $(echo "$GITHUB_REF" | egrep -woi "([0-9\.{dev}\-]+)" && git rev-list master.. --count) | tr -d " ")
+          echo ::set-env name=CHERRYDOOR_VERSION::$(echo $(echo "$GITHUB_REF" | egrep -woi "([0-9\.{dev}\-]+)" && git rev-list origin/master.. --count) | tr -d " ")
       - name: Build and publish
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
