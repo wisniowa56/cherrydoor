@@ -46,6 +46,7 @@ jobs:
           echo ::set-output name=VERSIONED::'true' && echo "branch is versioned"; else
           echo ::set-output name=VERSIONED::'false' && ehco "branch is not versioned"; fi
         shell: bash
+        id: VERSIONED
       - name: Automatically set dev version
         if: steps.vars.outputs.VERSIONED == 'true'
         run: |
