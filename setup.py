@@ -1,5 +1,6 @@
 from setuptools import setup, find_packages
 from os import environ
+
 __author__ = "opliko"
 __license__ = "MIT"
 __version__ = "4.0dev1"
@@ -7,6 +8,8 @@ __status__ = "Prototype"
 
 try:
     __version__ == environ["CHERRYDOOR_VERSION"]
+except:
+    pass
 
 with open("README.md", "r", encoding="utf-8") as f:
     readme = f.read()
