@@ -337,3 +337,5 @@ ASALocalRun/
 
 .pytest_cache
 build
+dist
+Cherrydoor.egg-info

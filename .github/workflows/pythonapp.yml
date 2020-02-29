@@ -41,11 +41,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install setuptools wheel twine
       - name: "check if branch is versioned"
-        shell: bash
         run: |
-          if [ "$GITHUB_REF" =~ [\d\.\-{dev}]* ]; then 
+          if [[ "$GITHUB_REF" =~ [\d\.\-{dev}]* ]]; then 
           echo ::set-output name=VERSIONED::"true"; else
           echo ::set-output name=VERSIONED::"false"; fi
+        shell: bash
       - name: Automatically set dev version
         if: steps.vars.outputs.VERSIONED
         run: |
