@@ -43,11 +43,11 @@ jobs:
       - name: "check if branch is versioned"
         run: |
           if [[ "$GITHUB_REF" =~ ([\d\.{dev}\-]{2,}) ]]; then 
-          echo ::set-output name=VERSIONED::"true" && echo "branch is versioned"; else
-          echo ::set-output name=VERSIONED::"false" && ehco "branch is not versioned"; fi
+          echo ::set-output name=VERSIONED::'true' && echo "branch is versioned"; else
+          echo ::set-output name=VERSIONED::'false' && ehco "branch is not versioned"; fi
         shell: bash
       - name: Automatically set dev version
-        if: steps.vars.outputs.VERSIONED
+        if: steps.vars.outputs.VERSIONED == 'true'
         run: |
           echo ::set-env name=CHERRYDOOR_VERSION::$(echo $(echo "$GITHUB_REF" | egrep -woi "([0-9\.{dev}\-]+)" && git rev-list master.. --count) | tr -d " ")
       - name: Build and publish
