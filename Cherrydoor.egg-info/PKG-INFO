@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: Cherrydoor
-Version: 4.0.dev1
+Version: 4.0.dev2
 Summary: An overengineered rfid lock manager created for my school community. Made for Raspberry Pi connected with another microcontroler that send and recieved rfid data via UART
 Home-page: https://github.com/oplik0/cherrydoor
 Author: opliko
