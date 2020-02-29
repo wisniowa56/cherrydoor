@@ -41,7 +41,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install setuptools wheel twine
       - name: generate build number
-        uses: zyborg/gh-action-buildnum@v1
+        uses: oplik0/gh-action-buildnum@v1
         with:
           gist_token: ${{ secrets.GIST_TOKEN }}
           version_key: ${{ github.ref }}
