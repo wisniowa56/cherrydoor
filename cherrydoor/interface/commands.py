@@ -1,11 +1,18 @@
 import datetime as dt
 from time import sleep
 from datetimerange import DateTimeRange
-from interface import read, write, mongo, config, interface, connectionException
+from cherrydoor.interface import (
+    read,
+    write,
+    mongo,
+    config,
+    interface,
+    connectionException,
+)
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.3.8"
+__version__ = "4.0dev1"
 __status__ = "Prototype"
 
 

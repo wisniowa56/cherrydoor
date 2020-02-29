@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """All REST API routes and functions"""
-from cherrydoor import api, Resource, current_user, parser, dt, inputs, mongo, escape
+from cherrydoor.server import (
+    api,
+    Resource,
+    current_user,
+    parser,
+    dt,
+    inputs,
+    mongo,
+    escape,
+)
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.3.8"
+__version__ = "4.0dev1"
 __status__ = "Prototype"
 
 parser.add_argument("time_from", help="start of time range")

@@ -4,11 +4,11 @@
 import functools
 from bson import json_util
 import json as jsn
-from cherrydoor import socket, emit, dt, mongo, current_user, disconnect
+from cherrydoor.server import socket, emit, dt, mongo, current_user, disconnect
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.3.8"
+__version__ = "4.0dev1"
 __status__ = "Prototype"
 
 

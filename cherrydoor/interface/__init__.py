@@ -3,12 +3,17 @@ from pymongo import MongoClient
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.3.8"
+__version__ = "4.0dev1"
 __status__ = "Prototype"
 
-with open("config.json", "r", encoding="utf-8") as f:  # load configuration file
-    config = load(f)  # convert confuguration to a dictionary using json.load()
-
+try:
+    with open("config.json", "r", encoding="utf-8") as f:  # load configuration file
+        config = load(f)  # convert confuguration to a dictionary using json.load()
+except FileNotFoundError:
+    # load configuration file from `/var/cherrydoor` if it exists
+    with open("/var/cherrydoor/config.json", "r", encoding="utf-8") as f:
+        # convert confuguration to a dictionary using json.load())
+        config = load(f)
 try:
     # set up PyMongo using credentials from config.json
     mongo = MongoClient(
