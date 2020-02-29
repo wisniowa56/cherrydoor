@@ -46,14 +46,10 @@ jobs:
           if [ "$GITHUB_REF" =~ [\d\.\-{dev}]* ]; then 
           echo ::set-output name=VERSIONED::"true"; else
           echo ::set-output name=VERSIONED::"false"; fi
-        env:
-          GITHUB_REF: ${{ github.GITHUB_REF }}
       - name: Automatically set dev version
         if: steps.vars.outputs.VERSIONED
         run: |
           echo ::set-env name=CHERRYDOOR_VERSION::$(echo $(echo "$GITHUB_REF" | egrep -woi "([0-9\.{dev}\-]+)" && git rev-list master.. --count) | tr -d " ")
-        env:
-          GITHUB_REF: ${{ github.GITHUB_REF }}
       - name: Build and publish
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
