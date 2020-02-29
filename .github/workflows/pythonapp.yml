@@ -46,9 +46,9 @@ jobs:
           echo ::set-output name=VERSIONED::'true' && echo "branch is versioned"; else
           echo ::set-output name=VERSIONED::'false' && ehco "branch is not versioned"; fi
         shell: bash
-        id: VERSIONED
+        id: versioned
       - name: Automatically set dev version
-        if: steps.vars.outputs.VERSIONED == 'true'
+        if: steps.versioned.outputs.VERSIONED
         run: |
           echo ::set-env name=CHERRYDOOR_VERSION::$(echo $(echo "$GITHUB_REF" | egrep -woi "([0-9\.{dev}\-]+)" && git rev-list master.. --count) | tr -d " ")
       - name: Build and publish
