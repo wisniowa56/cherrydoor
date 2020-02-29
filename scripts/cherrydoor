@@ -7,6 +7,8 @@ import sys
 import os
 import json
 from subprocess import call
+from argon2 import PasswordHasher
+from pymongo import MongoClient
 
 parser = argparse.ArgumentParser(description="Cherrydoor management")
 subparsers = parser.add_subparsers(dest="subcommand")
@@ -90,14 +92,12 @@ User=ubuntu
 WantedBy=multi-user.target
 """
                 )
-        except (IOError, PermissionError) as e:
+        except (IOError, PermissionError):
             print(
                 "Potrzebujesz do tego uprawnień roota. Spróbuj uruchomić skrypt z użyciem 'sudo'",
                 file=sys.stderr,
             )
             sys.exit(1)
-        from argon2 import PasswordHasher
-        from pymongo import MongoClient
 
         hasher = PasswordHasher(
             time_cost=4,

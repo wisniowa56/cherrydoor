@@ -7,6 +7,8 @@ import sys
 import os
 import json
 from subprocess import call
+from argon2 import PasswordHasher
+from pymongo import MongoClient
 
 
 def cherrydoor():
@@ -92,16 +94,15 @@ User=ubuntu
 WantedBy=multi-user.target
 """
                     )
-                    try:
-                        call("sudo systemctl enable cherrydoor && sudo systemctl daemon-reload")
-            except (IOError, PermissionError) as e:
+                    call(
+                        "sudo systemctl enable cherrydoor && sudo systemctl daemon-reload"
+                    )
+            except (IOError, PermissionError):
                 print(
                     "Potrzebujesz do tego uprawnień roota. Spróbuj uruchomić skrypt z użyciem 'sudo'",
                     file=sys.stderr,
                 )
                 sys.exit(1)
-            from argon2 import PasswordHasher
-            from pymongo import MongoClient
 
             hasher = PasswordHasher(
                 time_cost=4,
