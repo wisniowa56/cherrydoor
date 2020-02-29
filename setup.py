@@ -24,7 +24,7 @@ setup(
     long_description=readme,
     long_description_content_type="text/markdown",
     license="MIT",
-    keywords="wisniowasu mongodb rfid lock ",
+    keywords="wisniowasu mongodb flask rfid lock cherrydoor",
     url="https://github.com/oplik0/cherrydoor",
     packages=find_packages(),
     include_package_data=True,
