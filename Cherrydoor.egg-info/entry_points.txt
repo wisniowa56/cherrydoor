@@ -1,0 +1,3 @@
+[console_scripts]
+cherrydoor = cherrydoor.cherrydoor:cherrydoor
+

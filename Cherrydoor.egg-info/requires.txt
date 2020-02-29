@@ -1,0 +1,11 @@
+argon2-cffi>=19
+DateTimeRange>=0.6Flask>=1
+Flask-WTF>=0.14
+Flask-Login>=0.4
+Flask-PyMongo>=2.3
+Flask-RESTful>=0.3
+Flask-SocketIO>=4.2
+flask-talisman>=0.7
+pyserial>=3.4
+pymongo>=3.10
+eventlet
