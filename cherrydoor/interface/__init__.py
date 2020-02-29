@@ -3,7 +3,7 @@ from pymongo import MongoClient
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.4dev2"
+__version__ = "0.4"
 __status__ = "Prototype"
 
 try:
