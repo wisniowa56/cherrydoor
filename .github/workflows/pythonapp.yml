@@ -43,9 +43,9 @@ jobs:
       - name: "check if branch is versioned"
         shell: bash
         run: |
-          if [[ "$GITHUB_REF" ~= [\d\.\-{dev}]* ]]; then 
+          if [ "$GITHUB_REF" =~ [\d\.\-{dev}]* ]; then 
           echo ::set-output name=VERSIONED::"true"; else
-          echo ::set-output name=VERSIONED::"false"
+          echo ::set-output name=VERSIONED::"false"; fi
         env:
           GITHUB_REF: ${{ github.GITHUB_REF }}
       - name: Automatically set dev version
