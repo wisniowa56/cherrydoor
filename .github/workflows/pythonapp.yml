@@ -1,4 +1,4 @@
-name: test
+name: python
 
 on: push
 
@@ -28,3 +28,32 @@ jobs:
           args: ". -t py38 --check"
       - name: Bandit Security Linter
         uses: jpetrucciani/bandit-check@master
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.x"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
+      - name: "check if branch is versioned"
+        shell: bash
+        run: |
+          if [[ ${{ github.GITHUB_REF }} ~= [\d\.\-{dev}]* ]]; then 
+          echo ::set-output name=VERSIONED::"true"; else
+          echo ::set-output name=VERSIONED::"false"
+      - name: Automatically set dev version
+        if: steps.vars.outputs.VERSIONED
+        run: |
+          echo ::set-env name=CHERRYDOOR_VERSION::$(echo $(echo ${{ github.GITHUB_REF }} | egrep -woi "([0-9\.{dev}\-]+)" && git rev-list master.. --count) | tr -d " ")
+      - name: Build and publish
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          python setup.py sdist bdist_wheel
+          twine upload dist/*
