@@ -7,8 +7,8 @@ __version__ = "4.0dev2"
 __status__ = "Prototype"
 
 try:
-    __version__ == environ["CHERRYDOOR_VERSION"]
-except:
+    __version__ = environ["CHERRYDOOR_VERSION"]
+except KeyError:
     pass
 
 with open("README.md", "r", encoding="utf-8") as f:
