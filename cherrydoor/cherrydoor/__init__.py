@@ -27,7 +27,7 @@ def cherrydoor():
         from getpass import getpass
 
         if sys.platform == "linux":
-            # install mongodb and some other things if they're not installed
+            # install database and some other things if they're not installed
             try:
                 call("cherrydoor-install")
             except (PermissionError, FileNotFoundError):
@@ -112,11 +112,11 @@ WantedBy=multi-user.target
                 salt_len=16,
                 encoding="utf-8",
             )
-            mongo = MongoClient(
+            db = MongoClient(
                 f"mongodb://{config['mongo']['url']}/{config['mongo']['name']}"
             ).db
 
-            mongo.command(
+            db.command(
                 "createUser",
                 config["mongo"]["username"],
                 pwd=config["mongo"]["password"],
@@ -125,15 +125,15 @@ WantedBy=multi-user.target
                     {"role": "clusterMonitor", "db": "admin"},
                 ],
             )
-            mongo.create_collection("users")
-            mongo.create_collection("logs")
-            mongo.create_collection("settings")
+            db.create_collection("users")
+            db.create_collection("logs")
+            db.create_collection("settings")
             if input(
                 "Czy chcesz stworzć nowego użytkownika-administratora? [y/n]"
             ).lower() in ["y", "yes", "tak", "t"]:
                 username = input("Wprowadź nazwę użytkownika: ")
                 password = hasher.hash(getpass("Hasło: "))
-                mongo.users.insert(
+                db.users.insert(
                     {"username": username, "password": password, "cards": []}
                 )
             print(

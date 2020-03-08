@@ -8,7 +8,7 @@ from cherrydoor.server import (
     parser,
     dt,
     inputs,
-    mongo,
+    db,
     escape,
 )
 
@@ -52,7 +52,7 @@ class Stats(Resource):
         try:
             results = [
                 result
-                for result in mongo.logs.find(
+                for result in db.logs.find(
                     {"timestamp": {"$lt": time_to, "$gte": time_from}},
                     {"card": 0, "_id": 0},
                 )
@@ -114,12 +114,12 @@ class Card(Resource):
             return (self.card_error, 400)
         if username:
             # if username was passed with the request body, only check that user or return 404 if he doesn't exist
-            result = mongo.users.find_one_or_404(
+            result = db.users.find_one_or_404(
                 {"username": username, "cards": card}, {"password": 0, "_id": 0}
             )
         else:
             # if no username was passed, check if any user has this card
-            result = mongo.users.find_one_or_404(
+            result = db.users.find_one_or_404(
                 {"cards": card}, {"password": 0, "_id": 0}
             )
         # return the result and status code 200
@@ -146,7 +146,7 @@ class Card(Resource):
             return (self.card_error, 400)
         if username:
             # if username was passed with the request body, add the card to that user
-            mongo.users.find_one_and_update(
+            db.users.find_one_and_update(
                 {"username": username}, {"$push": {"cards": card}}
             )
         else:
@@ -173,11 +173,11 @@ class Card(Resource):
             # if there is no card at all, return a 400 error with an explanation message
             return (self.card_error, 400)
         if username:
-            mongo.users.find_one_and_update(
+            db.users.find_one_and_update(
                 {"username": username}, {"$pull": {"cards": card}}
             )
         else:
-            mongo.users.update({}, {"$pull": {"cards": card}})
+            db.users.update({}, {"$pull": {"cards": card}})
         return True, 200
 
 
@@ -220,9 +220,9 @@ class UserAPI(Resource):
         except KeyError:
             return (self.username_error, 400)
         if username == "*":
-            result = list(mongo.users.find({}, {"password": 0, "_id": 0}))
+            result = list(db.users.find({}, {"password": 0, "_id": 0}))
         else:
-            result = mongo.users.find_one_or_404(
+            result = db.users.find_one_or_404(
                 {"username": username}, {"password": 0, "_id": 0}
             )
         return result, 200
@@ -244,7 +244,7 @@ class UserAPI(Resource):
                 raise KeyError
         except KeyError:
             card = ""
-        mongo.users.update_one(
+        db.users.update_one(
             {"username": username},
             {"$set": {"username": username, "cards": [card]}},
             upsert=True,
@@ -262,7 +262,7 @@ class UserAPI(Resource):
             username = self.check_username(username, params)
         except KeyError:
             return (self.username_error, 400)
-        mongo.users.delete_one({"username": username})
+        db.users.delete_one({"username": username})
         return None, 204
 
 

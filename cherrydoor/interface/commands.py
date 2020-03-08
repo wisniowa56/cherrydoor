@@ -1,14 +1,7 @@
 import datetime as dt
 from time import sleep
 from datetimerange import DateTimeRange
-from cherrydoor.interface import (
-    read,
-    write,
-    mongo,
-    config,
-    interface,
-    connectionException,
-)
+from cherrydoor.interface import read, write, db, config, interface, connectionException
 
 __author__ = "opliko"
 __license__ = "MIT"
@@ -21,7 +14,7 @@ class Commands:
         self.commandFunctions = {"CARD": self.card}
         try:
             self.require_auth = bool(
-                mongo.settings.find_one({"setting": "require_auth"})["value"]
+                db.settings.find_one({"setting": "require_auth"})["value"]
             )
             write(f"NTFY {4 if self.require_auth else 3}")
         except (KeyError, TypeError):
@@ -55,7 +48,7 @@ class Commands:
             self.require_auth = True
         if self.require_auth:
             # check if card is associated with an user
-            auth = bool(mongo.users.count_documents({"cards": block0[:10]}))
+            auth = bool(db.users.count_documents({"cards": block0[:10]}))
         else:
             try:
                 # if authentication is not required check manufacturer code - 2 last digits of block0
@@ -63,7 +56,7 @@ class Commands:
             except KeyError:
                 auth = False
         # add attempt to logs
-        mongo.logs.insert(
+        db.logs.insert(
             {
                 "timestamp": dt.datetime.now(),
                 "card": block0[:10],
@@ -78,10 +71,10 @@ class Commands:
     def check_auth(self):
         time = dt.datetime.now().time()
         try:
-            # get the list of break times from mongodb
-            breaks = list(mongo.settings.find_one({"setting": "break_times"})["value"])
+            # get the list of break times from database
+            breaks = list(db.settings.find_one({"setting": "break_times"})["value"])
             # get the current setting
-            require_auth = mongo.settings.find_one({"setting": "require_auth"})
+            require_auth = db.settings.find_one({"setting": "require_auth"})
             # if the current setting was set manually - don't check the time
             if bool(require_auth["manual"]):
                 return bool(require_auth["value"])

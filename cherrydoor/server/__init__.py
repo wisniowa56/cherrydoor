@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Main cherydoor module file
-Creates app, api, socket and mongo instances and imports all routes.
+Creates app, api, socket and db instances and imports all routes.
 """
 # built-in libraries import:
 import json
@@ -10,7 +10,6 @@ import datetime as dt
 
 # flask-connected imports:
 from flask import Flask, escape
-from flask_pymongo import PyMongo
 from flask_login import current_user, LoginManager, UserMixin
 from flask_restful import Resource, Api, reqparse, inputs, abort
 from flask_socketio import SocketIO, emit, disconnect
@@ -60,24 +59,32 @@ app = Flask(__name__, template_folder="../templates", static_folder="../static")
 app.config["SECRET_KEY"] = config["secret-key"]
 
 # pymongo connection
-# configure mongodb access uri
-app.config[
-    "MONGO_URI"
-] = f"mongodb://{config['mongo']['url']}/{config['mongo']['name']}"
+# configure database access uri
 try:
-    # set up PyMongo using credentials from config.json
-    mongo = PyMongo(
-        app, username=config["mongo"]["username"], password=config["mongo"]["password"]
-    ).db
+    if config["mongo"]:
+        from flask_pymongo import PyMongo
+
+        app.config[
+            "MONGO_URI"
+        ] = f"mongodb://{config['mongo']['url']}/{config['mongo']['name']}"
+        try:
+            # set up PyMongo using credentials from config.json
+            db = PyMongo(
+                app,
+                username=config["mongo"]["username"],
+                password=config["mongo"]["password"],
+            ).db
+        except KeyError:
+            # if username or password aren't defined in config, don't use them at all
+            db = PyMongo(app).db
+        try:
+            db.client.server_info()
+        except Exception as e:
+            print(
+                f"Connection to MongoDB failed. Are you sure it's installed and correctly configured? Error: {e}"
+            )
 except KeyError:
-    # if username or password aren't defined in config, don't use them at all
-    mongo = PyMongo(app).db
-try:
-    mongo.client.server_info()
-except Exception as e:
-    print(
-        f"Connection to MongoDB failed. Are you sure it's installed and correctly configured? Error: {e}"
-    )
+    print("No supported database present in config.json")
 # create login_manager for flask_login
 login_manager = LoginManager()
 # default view (page) used for logging in
@@ -215,13 +222,13 @@ class User(UserMixin):
         """
         Returns all mifare card ids associated with the account
         """
-        return mongo.users.find_one({"username": self.username})["cards"]
+        return db.users.find_one({"username": self.username})["cards"]
 
     def add_card(self, card):
         """
         adds a mifare card id to user profile
         """
-        mongo.users.update_one(
+        db.users.update_one(
             {"username": self.username}, {"$push": {"cards": card}}, upsert=True
         )
 
@@ -229,7 +236,7 @@ class User(UserMixin):
         """
         adds a mifare card id from user profile
         """
-        mongo.users.update_one({"username": self.username}, {"$pull": {"cards": card}})
+        db.users.update_one({"username": self.username}, {"$pull": {"cards": card}})
 
 
 @login_manager.user_loader
@@ -237,7 +244,7 @@ def load_user(username):
     """
     A function for loading users from database by username
     """
-    u = mongo.users.find_one({"username": username})
+    u = db.users.find_one({"username": username})
     if not u:
         return None
     return User(username=u["username"])

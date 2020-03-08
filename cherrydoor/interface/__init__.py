@@ -15,17 +15,30 @@ except FileNotFoundError:
         # convert confuguration to a dictionary using json.load())
         config = load(f)
 try:
-    # set up PyMongo using credentials from config.json
-    mongo = MongoClient(
-        f"mongodb://\
-{config['mongo']['username']}:\
-{config['mongo']['password']}@\
-{config['mongo']['url']}/\
-{config['mongo']['name']}"
-    )[config["mongo"]["name"]]
+    if config["mongo"]:
+        from flask_pymongo import PyMongo
+
+        app.config[
+            "MONGO_URI"
+        ] = f"mongodb://{config['mongo']['url']}/{config['mongo']['name']}"
+        try:
+            # set up PyMongo using credentials from config.json
+            db = PyMongo(
+                app,
+                username=config["mongo"]["username"],
+                password=config["mongo"]["password"],
+            ).db
+        except KeyError:
+            # if username or password aren't defined in config, don't use them at all
+            db = PyMongo(app).db
+        try:
+            db.client.server_info()
+        except Exception as e:
+            print(
+                f"Connection to MongoDB failed. Are you sure it's installed and correctly configured? Error: {e}"
+            )
 except KeyError:
-    # if username or password aren't defined in config, don't use them at all
-    mongo = MongoClient(f"mongodb://{config['mongo']['url']}")[config["mongo"]["name"]]
+    print("No supported database present in config.json")
 
 try:
     if config["interface"]["type"].lower() == "serial":
