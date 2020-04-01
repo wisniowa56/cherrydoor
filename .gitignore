@@ -334,3 +334,9 @@ ASALocalRun/
 
 /csp-logs.json
 /config.json
+
+.pytest_cache
+build
+dist/
+
+Cherrydoor.egg-info/

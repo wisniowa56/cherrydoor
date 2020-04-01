@@ -33,6 +33,11 @@ else
     echo -e "\e[93mpip3 niezainstalowane. Instalowanie...\e[39m" &&
     $SUDO apt-get install python3-pip;
 fi;
+if ! (locate libffi); then 
+    echo -e "\e[93mlibffi niezainstalowane. Instalowanie...\e[39m" &&
+    $SUDO apt-get install build-essential libffi-dev &&
+    $SUDO apt-get install python3-cffi;
+fi;
 
 pip3 install -r requirements.txt
 

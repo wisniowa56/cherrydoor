@@ -8,11 +8,11 @@ from flask_login import current_user, login_user, logout_user, login_required
 # import VerificationError thrown when password doesn't match the hash
 from argon2.exceptions import VerificationError
 
-from cherrydoor import app, mongo, hasher, LoginForm, login_manager, User, json
+from cherrydoor.server import app, db, hasher, LoginForm, login_manager, User, json
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.3.8"
+__version__ = "0.4"
 __status__ = "Prototype"
 
 # dashboard page
@@ -34,7 +34,7 @@ def login():
         # escape username and password
         username = escape(form.username.data)
         password = escape(form.password.data)
-        user = mongo.users.find_one({"username": username})
+        user = db.users.find_one({"username": username})
         if not user:
             # if no user with selected is found raise VerificationError to return the template with error on inputs
             raise VerificationError
@@ -65,7 +65,7 @@ def register():
     except:
         return "No username or password specified", 400
     # check if an user with this username exists
-    existing_user = mongo.users.find_one({"username": username})
+    existing_user = db.users.find_one({"username": username})
     # if the user exists - return a 401 message with that information
     if existing_user:
         return {"error": "That username already exists!"}, 401
@@ -89,7 +89,10 @@ def register():
 
 @app.route("/csp-reports", methods=["POST"])
 def csp():
-    open("csp-logs.json", "a").close()
+    try:
+        open("csp-logs.json", "a").close()
+    except PermissionError:
+        return
     with open("csp-logs.json", "r+", encoding="utf-8") as f:
 
         try:

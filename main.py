@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 """Run server"""
 from multiprocessing import Process
-from cherrydoor import app, socket, config
-from interface.commands import Commands
+from cherrydoor.server import app, socket, config
+from cherrydoor.interface.commands import Commands
 
 interface = Commands()
 interface_run = Process(target=interface.start)

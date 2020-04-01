@@ -5,7 +5,7 @@
     "url": "localhost:27017",
     "name": "cherrydoor",
     "username": "cherrydoor",
-    "password": "test"
+    "password": "password"
   },
   "login-translation": {
     "username": "Nazwa użytkownika",
