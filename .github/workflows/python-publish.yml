@@ -1,0 +1,51 @@
+name: python publish
+
+on:
+  push:
+    branches:
+      - master
+      - "v[0-9]+.[0-9]+**"
+    tags:
+      - "v[0-9]+.[0-9]+**"
+
+publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.x"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
+      - name: generate build number
+        id: version
+        uses: oplik0/gh-action-buildnum@v1
+        with:
+          gist_token: ${{ secrets.GIST_TOKEN }}
+          version_key: ${{ github.ref }}
+          set_env: true
+      - name: Automatically set dev version
+        if: ${{ contains(github.ref, "master") }}
+        run: |
+          echo ::set-env name=CHERRYDOOR_VERSION::$(echo $(echo "$GITHUB_REF" | egrep -woi "([0-9\.{dev}\-]+)" && echo "$BUILDNUM_FOR_VERSION") | tr -d " ")
+      - name: Build and publish
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          python setup.py sdist bdist_wheel
+          twine upload dist/*
+      - name: Create Release
+        if: ${{ contains(github.ref, "master") }}
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ format("v{0}", steps.version.outputs.version_build_number) }}
+          release_name: ${{ format("v{0}", steps.version.outputs.version_build_number) }}
+          draft: false
+          prerelease: true
