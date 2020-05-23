@@ -21,6 +21,7 @@ jobs:
             python -m pip install --upgrade pip
             pip install setuptools wheel twine
         - name: generate build number
+          if: ${{ !contains(github.ref, 'master') }}
           id: version
           uses: oplik0/gh-action-buildnum@v1
           with:
