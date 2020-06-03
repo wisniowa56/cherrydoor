@@ -1,6 +1,6 @@
-[![Build status](https://github.com/wisniowa56/cherrydoor/workflows/python/badge.svg)](https://github.com/oplik0/cherrydoor/actions?query=workflow%3Atest)
+[![python tests](https://github.com/wisniowa56/cherrydoor/workflows/python%20tests/badge.svg)](https://github.com/wisniowa56/cherrydoor/actions?query=workflow%3A%22python+tests%22)
 [![Maintainability](https://api.codeclimate.com/v1/badges/7b05467561774c611f8c/maintainability)](https://codeclimate.com/github/oplik0/cherrydoor/maintainability)
-[![HitCount](http://hits.dwyl.io/oplik0/cherrydoor.svg)](http://hits.dwyl.io/oplik0/cherrydoor)
+[![HitCount](http://hits.dwyl.io/wisniowa56/cherrydoor.svg)](http://hits.dwyl.io/wisniowa56/cherrydoor)
 
 <h1 align="center">cherrydoor</h1>
 <p align="center">
@@ -18,7 +18,7 @@ Prosta webaplikacja do zarządzania i przeglądania statystyk wykorzystania zamk
 
 ## Instalacja i uruchamianie:
 
-1. Sklonuj projekt `git clone https://github.com/oplik0/cherrydoor cherrydoor` i przejdź do powstałego folderu `cd cherrydoor`
+1. Sklonuj projekt `git clone https://github.com/wisniowa56/cherrydoor cherrydoor` i przejdź do powstałego folderu `cd cherrydoor`
 2. Uruchom skrypt instalacyjny: `bash install.sh`
 3. Jeśli nie jesteś pewien, czy korzystasz z najnowszej wersji aplikacji, wpisz `y` przy pytaniu o aktualizację
 4. Wpisz `y` by skonfigurować MongoDB, kolejne `y` by stworzyć pierwszego administratora. Wpisz jego nazwę i hasło.
