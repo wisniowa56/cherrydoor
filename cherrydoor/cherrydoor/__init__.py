@@ -10,7 +10,6 @@ from subprocess import call
 from argon2 import PasswordHasher
 from pymongo import MongoClient
 
-
 def cherrydoor():
     parser = argparse.ArgumentParser(description="Cherrydoor management")
     subparsers = parser.add_subparsers(dest="subcommand")
@@ -25,10 +24,12 @@ def cherrydoor():
     args = parser.parse_args()
     if args.subcommand == "install":
         from getpass import getpass
+        from elevate import elevate
 
+        elevate()
         if sys.platform == "linux":
             # Ask to escalate privileges if not launched as superuser
-            if os.geteuid() != 0:
+            
                 os.execvp('sudo', ['sudo', 'python3'] + sys.argv)
             # install database and some other things if they're not installed
             try:
