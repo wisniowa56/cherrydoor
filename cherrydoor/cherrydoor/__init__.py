@@ -72,15 +72,7 @@ def cherrydoor():
             config["secret-key"] = os.urandom(24).hex()
             # let user choose a password for the database
             config["mongo"]["password"] = getpass("Wprowadź hasło do bazy danych: ")
-            try:
-                # files configuration
-                if not os.path.exists("/var/cherrydoor"):
-                    os.makedirs("/var/cherrydoor")
-                with open("/var/cherrydoor/config.json", "w", encoding="utf-8") as f:
-                    json.dump(config, f)
-                with open("/etc/systemd/system/cherrydoor.service", "w") as f:
-                    f.write(
-                        f"""\
+            service_config = f"""\
 [Unit]
 Description=Cherrydoor Service
 After=network.target
@@ -93,16 +85,28 @@ User=ubuntu
 [Install]
 WantedBy=multi-user.target
 """
-                    )
+            try:
+                # files configuration
+                if not os.path.exists("/var/cherrydoor"):
+                    os.makedirs("/var/cherrydoor")
+                with open("/var/cherrydoor/config.json", "w", encoding="utf-8") as f:
+                    json.dump(config, f)
+            except (IOError, PermissionError):
+                print(
+                    "Nie udało się stworzyć plików w /var/cherrydoor. Spróbuj stworzyć ten folder manualnie i nadać mu właściwe uprawnienia",
+                    file=sys.stderr,
+                )
+            try:
+                with open("/etc/systemd/system/cherrydoor.service", "w") as f:
+                    f.write(service_config)
                     call(
                         "sudo systemctl enable cherrydoor && sudo systemctl daemon-reload"
                     )
             except (IOError, PermissionError):
                 print(
-                    "Potrzebujesz do tego uprawnień roota. Spróbuj uruchomić skrypt z użyciem 'sudo'",
-                    file=sys.stderr,
+                    "Nie udało się stworzyć pliku usługi pod /etc/systemd/system/cherrydoor.service - spróbuj uruchomić skrypt z właściwymi uprawnieniami lub stworzyć ten plik manualnie. Zawartość:",                    file=sys.stderr,
                 )
-                sys.exit(1)
+                print(service_config, file=sys.stderr)
 
             hasher = PasswordHasher(
                 time_cost=4,
