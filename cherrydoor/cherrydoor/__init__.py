@@ -27,6 +27,9 @@ def cherrydoor():
         from getpass import getpass
 
         if sys.platform == "linux":
+            # Ask to escalate privileges if not launched as superuser
+            if os.geteuid() != 0:
+                os.execvp('sudo', ['sudo', 'python3'] + sys.argv)
             # install database and some other things if they're not installed
             try:
                 call("cherrydoor-install")
