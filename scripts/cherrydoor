@@ -81,6 +81,7 @@ if args.subcommand == "install":
                 "Nie udało się stworzyć plików w /var/cherrydoor. Spróbuj stworzyć ten folder manualnie i nadać mu właściwe uprawnienia",
                 file=sys.stderr,
             )
+            sys.exit(1)
          try:
             with open("/etc/systemd/system/cherrydoor.service", "w") as f:
                 f.write(
