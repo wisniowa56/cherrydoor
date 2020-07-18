@@ -3,7 +3,7 @@ from pymongo import MongoClient
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.4"
+ __version__ = "0.4.1"
 __status__ = "Prototype"
 
 try:
@@ -26,7 +26,9 @@ try:
             ).db
         except KeyError:
             # if username or password aren't defined in config, don't use them at all
-            db = MongoClient(f"mongodb://{config['mongo']['url']}/{config['mongo']['name']}").db
+            db = MongoClient(
+                f"mongodb://{config['mongo']['url']}/{config['mongo']['name']}"
+            ).db
         try:
             db.client.server_info()
         except Exception as e:

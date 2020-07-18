@@ -10,6 +10,7 @@ from subprocess import call
 from argon2 import PasswordHasher
 from pymongo import MongoClient
 
+
 def cherrydoor():
     parser = argparse.ArgumentParser(description="Cherrydoor management")
     subparsers = parser.add_subparsers(dest="subcommand")
@@ -25,10 +26,11 @@ def cherrydoor():
     if args.subcommand == "install":
         from getpass import getpass
         from elevate import elevate
+
         # Ask to elevate privileges if not launched as superuser
         elevate()
         if sys.platform == "linux":
-                        
+
             # install database and some other things if they're not installed
             try:
                 call("cherrydoor-install")
@@ -106,7 +108,8 @@ WantedBy=multi-user.target
                     )
             except (IOError, PermissionError):
                 print(
-                    "Nie udało się stworzyć pliku usługi pod /etc/systemd/system/cherrydoor.service - spróbuj uruchomić skrypt z właściwymi uprawnieniami lub stworzyć ten plik manualnie. Zawartość:",                    file=sys.stderr,
+                    "Nie udało się stworzyć pliku usługi pod /etc/systemd/system/cherrydoor.service - spróbuj uruchomić skrypt z właściwymi uprawnieniami lub stworzyć ten plik manualnie. Zawartość:",
+                    file=sys.stderr,
                 )
                 print(service_config, file=sys.stderr)
 
