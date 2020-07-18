@@ -16,21 +16,17 @@ except FileNotFoundError:
         config = load(f)
 try:
     if config["mongo"]:
-        from flask_pymongo import PyMongo
 
-        app.config[
-            "MONGO_URI"
-        ] = f"mongodb://{config['mongo']['url']}/{config['mongo']['name']}"
         try:
             # set up PyMongo using credentials from config.json
-            db = PyMongo(
-                app,
+            db = MongoClient(
+                f"mongodb://{config['mongo']['url']}/{config['mongo']['name']}",
                 username=config["mongo"]["username"],
                 password=config["mongo"]["password"],
             ).db
         except KeyError:
             # if username or password aren't defined in config, don't use them at all
-            db = PyMongo(app).db
+            db = MongoClient(f"mongodb://{config['mongo']['url']}/{config['mongo']['name']}").db
         try:
             db.client.server_info()
         except Exception as e:
