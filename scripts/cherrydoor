@@ -76,6 +76,12 @@ if args.subcommand == "install":
                 os.makedirs("/var/cherrydoor")
             with open("/var/cherrydoor/config.json", "w", encoding="utf-8") as f:
                 json.dump(config, f)
+         except (IOError, PermissionError):
+            print(
+                "Nie udało się stworzyć plików w /var/cherrydoor. Spróbuj stworzyć ten folder manualnie i nadać mu właściwe uprawnienia",
+                file=sys.stderr,
+            )
+         try:
             with open("/etc/systemd/system/cherrydoor.service", "w") as f:
                 f.write(
                     f"""\
@@ -94,11 +100,25 @@ WantedBy=multi-user.target
                 )
         except (IOError, PermissionError):
             print(
-                "Potrzebujesz do tego uprawnień roota. Spróbuj uruchomić skrypt z użyciem 'sudo'",
+                "Nie udało się stworzyć pliku usługi pod /etc/systemd/system/cherrydoor.service - spróbuj uruchomić skrypt z właściwymi uprawnieniami lub stworzyć ten plik manualnie. Zawartość:",
                 file=sys.stderr,
             )
-            sys.exit(1)
-
+            print(
+                f"""\
+[Unit]
+Description=Cherrydoor Service
+After=network.target
+[Service]
+ExecStart={os.path.realpath(__file__)} start
+Environment=PYTHONUNBUFFERED=1
+Restart=always
+Type=simple
+User=ubuntu
+[Install]
+WantedBy=multi-user.target
+""",
+                file=sys.stderr,
+            )
         hasher = PasswordHasher(
             time_cost=4,
             memory_cost=65536,
