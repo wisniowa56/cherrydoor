@@ -1,47 +1,47 @@
 {% extends "layout.html" %} {% block head %}
 <script
   src="{{ url_for('static', filename='js/Chart.bundle.min.js') }}"
-  integrity="sha384-UnCTYNCW9jJi1gfLKui5aGo30oB+sAW9Zfq80Fq+lF7H5x43lUcHpZSDQRwMqLyB sha256-dTt+/wrZmNfAXekn19T7jvlqvVQvlS3km+zsFe8Z41k="
+  
   crossorigin="anonymous"
 ></script>
 <script
   src="{{ url_for('static', filename='js/moment.min.js') }}"
-  integrity="sha384-fYxN7HsDOBRo1wT/NSZ0LkoNlcXvpDpFy6WzB42LxuKAX7sBwgo7vuins+E1HCaw sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ="
+  
   crossorigin="anonymous"
 ></script>
 <script
   src="{{ url_for('static', filename='js/pl.min.js') }}"
-  integrity="sha384-6a3YyRI/Aym2Mi2S8ryBECZMdAF+jfWUUawvGWsrPADv9uZY4SLq/h8oK/up2lDM sha256-MnLvsSDbeKfD8fPyUuC7lvQlbOenYCEXrQaCHdy60FI="
+  
   crossorigin="anonymous"
 ></script>
 <script
   defer
   src="{{ url_for('static', filename='js/tempusdominus-bootstrap-4.min.js') }}"
-  integrity="sha384-63Mkk7i+hBEQvvVC0w21jkdX2z8kTJhyOLy160f6DFBw77WwjmwgBx7lGHhb4vr1 sha256-n9R4Amp2bxTh8nCUfDKfsmsaQwqnywOU5R+jQul7mRk="
+  
   crossorigin="anonymous"
 ></script>
 <link
   rel="stylesheet"
   href="{{ url_for('static', filename='css/index.css') }}"
-  integrity="sha384-85lat4NNM1/kgs9R4cNDtSnWESro3mC2NgU/3+jxTQ5IkqYNcbZbGIHzB5fFBPSn sha256-85lat4NNM1/kgs9R4cNDtSnWESro3mC2NgU/3+jxTQ5IkqYNcbZbGIHzB5fFBPSn"
+  
   crossorigin="anonymous"
 />
 <link
   rel="stylesheet"
   href="{{ url_for('static', filename='css/Chart.min.css') }}"
-  integrity="sha384-q9MZ/PQCC1nIFQdrr9yNOFXeSaXjv/yPOJOdBd32aODh8+EM6udfo91a6mRbEDih sha256-q9MZ/PQCC1nIFQdrr9yNOFXeSaXjv/yPOJOdBd32aODh8+EM6udfo91a6mRbEDih"
+  
   crossorigin="anonymous"
 />
 <link
   rel="stylesheet"
   href="{{ url_for('static', filename='css/tempusdominus-bootstrap-4.min.css') }}"
-  integrity="sha384-FGgvBHRaShbr9FcQZRFoi/olyVAFzZuusIxm5dbtmS4kYQ/cvReFI1bzptXqu+cR sha256-mAXUAPBhIopldhlRwHB86PEmOkBMmhmywswzTaQuukU="
+  
   crossorigin="anonymous"
 />
 <link
   rel="stylesheet"
   href="{{ url_for('static', filename='css/all.min.css') }}"
-  integrity="sha384-loV8TFJfvzlNfnSU++F76Jx2ZCCpHQIXg1Ikg/WdAha3Mj7AK0UHyNoEuviWl6wF sha256-mpoo11BXmsZm9WwlCp/gyiUaPTEpAsWqjdwRi3dqHvY="
+  
   />
   {% endblock %}
   {% block body %}
@@ -69,22 +69,22 @@
 <script 
   type="text/javascript"
   src="{{ url_for('static', filename='js/main-chart.js') }}" 
-  integrity="sha384-1bI3g6Hvr2i8PJwXrr5SPvwgCSBLmnHI6TvMI4Gyd5dPwoi8cWoAP3aKVTQDAJhp sha256-MB4Cu/qqg7ejXWvynfEfkiVtv6Qw2vhw6FlVL5+CVS0="
+  
 ></script>
 <script
   type="text/javascript"
   src="{{ url_for('static', filename='js/modals.js') }}"
-  integrity="sha384-j2MR/kvsNy1v2x1qMECngWvlmsVIqgjVXppKxoWXH63gvAzpCOQrfNXUDdWtOUA1 sha256-x2t08s0+Xoko33dzj8rbbGuZuhtxdvpdPvh1zZ6XV9c="
+  
 ></script>
 <script
   type="text/javascript"
   src="{{ url_for('static', filename='js/users.js') }}"
-  integrity="sha384-fwaG6FgSfOJoEk0G8uMboiA8HvTpTBpaFG3AxKd1W01eLtvpaStxPniZ4prKWwqH sha256-lKMztDe8TsRj4sxLZDhIdBYWFypEbyaOknEbBPAN8Nw="
+  
 ></script>
 <script
   type="text/javascript"
   src="{{ url_for('static', filename='js/settings.js') }}"
-  integrity="sha384-bdlSTQKXW+CzEGn4b9WLoFQKiNDNSpXW9YKzJPg7Cdkj9sEwJ+T48FS3Kgns9Pm9 sha256-pETyhtIz8IPDbUWquseIy1En9o9U9X5wEl3xawENFzQ="
+  
 ></script>
 {% include "add-user-modal.html" %}
 {% include "manage-users-modal.html" %}
