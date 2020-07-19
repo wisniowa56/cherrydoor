@@ -7,9 +7,11 @@ Creates app, api, socket and db instances and imports all routes.
 # built-in libraries import:
 import json
 import datetime as dt
+from hashlib import sha256, sha384
+import base64
 
 # flask-connected imports:
-from flask import Flask, escape
+from flask import Flask, escape, url_for
 from flask_login import current_user, LoginManager, UserMixin
 from flask_restful import Resource, Api, reqparse, inputs, abort
 from flask_socketio import SocketIO, emit, disconnect
@@ -23,7 +25,7 @@ from argon2 import PasswordHasher
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.4.8"
+__version__ = "0.5.dev"
 __status__ = "Prototype"
 try:
     with open("config.json", "r", encoding="utf-8") as f:  # load configuration file
@@ -124,6 +126,7 @@ csp = {
     "img-src": ["'self'"],
     "connect-src": ["'self'"],
     "base-uri": ["'none'"],
+    "require_sri_for": ["scripts", "styles"]
 }
 try:
     if config["https"]["enabled"]:
@@ -248,6 +251,23 @@ def load_user(username):
         return None
     return User(username=u["username"])
 
+
+def sri_for(endpoint, **values):
+    input = url_for(endpoint, **values)
+    input = input.replace(app.static_url_path, app.static_folder)
+    hash = sha256()
+    with open(input, "rb") as f:
+        while True:
+            data = f.read(65536)
+            if not data:
+                break
+            hash.update(data)
+    hash = hash.digest()
+    hash_base64 = base64.b64encode(hash).decode()
+    return f"sha256-{hash_base64}"
+
+
+app.jinja_env.globals['sri_for'] = sri_for
 
 import cherrydoor.server.api
 import cherrydoor.server.routes

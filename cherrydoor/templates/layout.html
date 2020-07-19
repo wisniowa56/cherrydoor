@@ -14,27 +14,32 @@
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/bootstrap.min.css') }}"
+      integrity="{{ sri_for('static', filename='css/bootstrap.min.css') }}"
       
       crossorigin="anonymous"
     />
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/sleek.min.css') }}"
+      integrity="{{ sri_for('static', filename='css/sleek.min.css') }}"
       
       crossorigin="anonymous"
     />
     <script
       src="{{ url_for('static', filename='js/jquery-3.4.1.min.js') }}"
+  integrity="{{ sri_for('static', filename='js/jquery-3.4.1.min.js') }}"
       
       crossorigin="anonymous"
     ></script>
     <script
       src="{{ url_for('static', filename='js/bootstrap.min.js') }}"
+  integrity="{{ sri_for('static', filename='js/bootstrap.min.js') }}"
       
       crossorigin="anonymous"
     ></script>
     <script
       src="{{ url_for('static', filename='js/socket.io.js') }}"
+  integrity="{{ sri_for('static', filename='js/socket.io.js') }}"
       
       crossorigin="anonymous"
     ></script>

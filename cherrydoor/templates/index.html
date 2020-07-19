@@ -1,46 +1,51 @@
 {% extends "layout.html" %} {% block head %}
 <script
   src="{{ url_for('static', filename='js/Chart.bundle.min.js') }}"
-  
+  integrity="{{ sri_for('static', filename='js/Chart.bundle.min.js') }}"
   crossorigin="anonymous"
 ></script>
 <script
   src="{{ url_for('static', filename='js/moment.min.js') }}"
-  
+  integrity="{{ sri_for('static', filename='js/moment.min.js') }}"
   crossorigin="anonymous"
 ></script>
 <script
   src="{{ url_for('static', filename='js/pl.min.js') }}"
-  
+  integrity="{{ sri_for('static', filename='js/pl.min.js') }}"
   crossorigin="anonymous"
 ></script>
 <script
   defer
   src="{{ url_for('static', filename='js/tempusdominus-bootstrap-4.min.js') }}"
+  integrity="{{ sri_for('static', filename='js/tempusdominus-bootstrap-4.min.js') }}"
   
   crossorigin="anonymous"
 ></script>
 <link
   rel="stylesheet"
   href="{{ url_for('static', filename='css/index.css') }}"
+  integrity="{{ sri_for('static', filename='css/index.css') }}"
   
   crossorigin="anonymous"
 />
 <link
   rel="stylesheet"
   href="{{ url_for('static', filename='css/Chart.min.css') }}"
+  integrity="{{ sri_for('static', filename='css/Chart.min.css') }}"
   
   crossorigin="anonymous"
 />
 <link
   rel="stylesheet"
   href="{{ url_for('static', filename='css/tempusdominus-bootstrap-4.min.css') }}"
+  integrity="{{ sri_for('static', filename='css/tempusdominus-bootstrap-4.min.css') }}"
   
   crossorigin="anonymous"
 />
 <link
   rel="stylesheet"
   href="{{ url_for('static', filename='css/all.min.css') }}"
+  integrity="{{ sri_for('static', filename='css/all.min.css') }}"
   
   />
   {% endblock %}
@@ -68,22 +73,26 @@
 
 <script 
   type="text/javascript"
-  src="{{ url_for('static', filename='js/main-chart.js') }}" 
+  src="{{ url_for('static', filename='js/main-chart.js') }}"
+  integrity="{{ sri_for('static', filename='js/main-chart.js') }}" 
   
 ></script>
 <script
   type="text/javascript"
   src="{{ url_for('static', filename='js/modals.js') }}"
+  integrity="{{ sri_for('static', filename='js/modals.js') }}"
   
 ></script>
 <script
   type="text/javascript"
   src="{{ url_for('static', filename='js/users.js') }}"
+  integrity="{{ sri_for('static', filename='js/users.js') }}"
   
 ></script>
 <script
   type="text/javascript"
   src="{{ url_for('static', filename='js/settings.js') }}"
+  integrity="{{ sri_for('static', filename='js/settings.js') }}"
   
 ></script>
 {% include "add-user-modal.html" %}
