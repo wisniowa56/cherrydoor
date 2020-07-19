@@ -5,7 +5,7 @@ from cherrydoor.interface import read, write, db, config, interface, connectionE
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.4.6"
+__version__ = "0.4.7"
 __status__ = "Prototype"
 
 
