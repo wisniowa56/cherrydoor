@@ -28,7 +28,7 @@ setup(
     url="https://github.com/oplik0/cherrydoor",
     packages=find_packages(),
     include_package_data=True,
-    package_data={"": ["templates/*", "static/*/*"]},
+    package_data={"": ["templates/*", "static/*/*", "static/images/*/*"]},
     zip_safe=False,
     scripts=["scripts/cherrydoor-install"],
     entry_points={"console_scripts": ["cherrydoor = cherrydoor.cherrydoor:cherrydoor"]},
