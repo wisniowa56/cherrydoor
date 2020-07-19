@@ -23,7 +23,7 @@ from argon2 import PasswordHasher
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.4.5"
+__version__ = "0.4.6"
 __status__ = "Prototype"
 try:
     with open("config.json", "r", encoding="utf-8") as f:  # load configuration file
@@ -73,10 +73,10 @@ try:
                 app,
                 username=config["mongo"]["username"],
                 password=config["mongo"]["password"],
-            ).db
+            ).cherrydoor
         except KeyError:
             # if username or password aren't defined in config, don't use them at all
-            db = PyMongo(app).db
+            db = PyMongo(app).cherrydoor
         try:
             db.client.server_info()
         except Exception as e:
