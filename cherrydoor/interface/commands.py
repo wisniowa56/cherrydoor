@@ -2,10 +2,11 @@ import datetime as dt
 from time import sleep
 from datetimerange import DateTimeRange
 from cherrydoor.interface import read, write, db, config, interface, connectionException
+from pymongo.errors import OperationFailure
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.4.7"
+__version__ = "0.4.8"
 __status__ = "Prototype"
 
 
@@ -17,7 +18,7 @@ class Commands:
                 db.settings.find_one({"setting": "require_auth"})["value"]
             )
             write(f"NTFY {4 if self.require_auth else 3}")
-        except (KeyError, TypeError):
+        except (KeyError, TypeError, OperationFailure):
             self.require_auth = True
 
     def start(self):
