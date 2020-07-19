@@ -29,7 +29,7 @@ def cherrydoor():
 
         # Ask to elevate privileges if not launched as superuser
         elevate()
-        if sys.platform == "linux":
+        if sys.platform == "linux" or 1 == 1:
 
             # install database and some other things if they're not installed
             try:
@@ -39,12 +39,12 @@ def cherrydoor():
             # generate a configuration based on default config
             if not os.path.exists("/var/cherrydoor/config.json"):
                 config = {
-                    "__comment__": "This is a backup default config for setuptools installation - it shouldn't be used if installed from GitHub",
+                    "__comment__": "This is a default config for setuptools installation - it shouldn't be used if installed from GitHub",
                     "host": "127.0.0.1",
                     "port": 5000,
                     "mongo": {
                         "url": "localhost:27017",
-                        "name": "cherrydoor2",
+                        "name": "cherrydoor",
                         "username": "cherrydoor",
                         "password": "test",
                     },
@@ -123,7 +123,7 @@ WantedBy=multi-user.target
             )
             db = MongoClient(
                 f"mongodb://{config['mongo']['url']}/{config['mongo']['name']}"
-            ).db
+            )[config["mongo"]["name"]]
 
             db.command(
                 "createUser",
