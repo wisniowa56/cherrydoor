@@ -45,7 +45,6 @@ setup(
         "pyserial>=3.4",
         "pymongo>=3.10",
         "eventlet",
-        "elevate",
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",

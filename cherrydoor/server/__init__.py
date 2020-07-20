@@ -9,6 +9,7 @@ import json
 import datetime as dt
 from hashlib import sha256, sha384
 import base64
+from pathlib import Path
 
 # flask-connected imports:
 from flask import Flask, escape, url_for
@@ -27,14 +28,22 @@ __author__ = "opliko"
 __license__ = "MIT"
 __version__ = "0.5.dev"
 __status__ = "Prototype"
-try:
-    with open("config.json", "r", encoding="utf-8") as f:  # load configuration file
-        config = json.load(f)  # convert confuguration to a dictionary using json.load()
-except FileNotFoundError:
-    # load configuration file from `/var/cherrydoor` if it exists
-    with open("/var/cherrydoor/config.json", "r", encoding="utf-8") as f:
-        # convert confuguration to a dictionary using json.load())
-        config = json.load(f)
+default_routes = [
+    "config.json",
+    "/var/cherrydoor/config.json",
+    f"{Path.home()}/.config/cherrydoor/config.json",
+]
+for route in default_routes:
+    try:
+        # load configuration file from one of the default routes
+        with open(route, "r", encoding="utf-8") as f:
+            # convert confuguration to a dictionary using json.load()
+            config = json.load(f)
+    except FileNotFoundError:
+        # ignore if config wasn't found
+        pass
+if config == None:
+    raise FileNotFoundError("No config.json found")
 
 
 class LoginForm(FlaskForm):
@@ -126,7 +135,7 @@ csp = {
     "img-src": ["'self'"],
     "connect-src": ["'self'"],
     "base-uri": ["'none'"],
-    "require_sri_for": ["scripts", "styles"]
+    "require_sri_for": ["scripts", "styles"],
 }
 try:
     if config["https"]["enabled"]:
@@ -267,7 +276,7 @@ def sri_for(endpoint, **values):
     return f"sha256-{hash_base64}"
 
 
-app.jinja_env.globals['sri_for'] = sri_for
+app.jinja_env.globals["sri_for"] = sri_for
 
 import cherrydoor.server.api
 import cherrydoor.server.routes
