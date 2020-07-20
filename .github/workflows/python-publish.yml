@@ -48,6 +48,9 @@ jobs:
           twine upload --skip-existing dist/*
       - name: Set published version for release
         run: echo ::set-env name=PUBLISHED_VERSION::$(cat VERSION)
+      - name: Geneate changelog
+        id: changelog
+        uses: srepollock/changelog-generator-action@0.1.1
       - name: Create Release
         uses: softprops/action-gh-release@v1
         env:
@@ -55,6 +58,7 @@ jobs:
         with:
           tag_name: ${{ env.PUBLISHED_VERSION }}
           prerelease: ${{ contains(github.ref, 'dev') }}
+          body: ${{ steps.changelog.outputs.changelog }}
           files: |
             dist/*.whl
             dist/*.tar.gz
