@@ -14,13 +14,13 @@ else
     $SUDO apt-get install -y mongodb-org;
     $SUDO service mongod start;
 fi;
-if hash pip3 &>/dev/null; then
-    echo -e "\e[92mpip3 jest zainstalowane, instalowanie wymaganych modułów\e[39m";
+if hash pip3 &>/dev/null; then;
 else
     echo -e "\e[93mpip3 niezainstalowane. Instalowanie...\e[39m" &&
     $SUDO apt-get install python3-pip;
 fi;
-if ! (locate libffi) > /dev/null; then 
+libffi="$(whereis libffi)"
+if [ "$libffi" = "libffi:" ]; then 
     echo -e "\e[93mlibffi niezainstalowane. Instalowanie...\e[39m" &&
     $SUDO apt-get install build-essential libffi-dev &&
     $SUDO apt-get install python3-cffi;
