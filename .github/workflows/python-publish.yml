@@ -53,7 +53,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.PUBLISHED_VERSION) }}
+          tag_name: ${{ env.PUBLISHED_VERSION }}
           prerelease: ${{ contains(github.ref, 'dev') }}
           files: |
             dist/*.whl
