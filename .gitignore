@@ -341,3 +341,4 @@ build
 dist/
 
 Cherrydoor.egg-info/
+VERSION

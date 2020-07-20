@@ -39,6 +39,8 @@ jobs:
         run: |
           python setup.py sdist bdist_wheel
           twine upload --skip-existing dist/*
+      - name: Set published version for release
+        run: echo ::set-env name=PUBLISHED_VERSION::$(cat VERSION)
       - name: Create Release
         uses: softprops/action-gh-release@v1
         env:

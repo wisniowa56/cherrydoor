@@ -10,7 +10,9 @@ try:
     __version__ = environ["CHERRYDOOR_VERSION"]
 except KeyError:
     pass
-environ["PUBLISHED_VERSION"] = __version__
+if "CI" in environ:
+    with open("VERSION", "w", encoding="utf-8") as f:
+        f.write(__version__)
 with open("README.md", "r", encoding="utf-8") as f:
     readme = f.read()
 
