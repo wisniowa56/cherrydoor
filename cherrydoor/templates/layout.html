@@ -1,52 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="" />
-    <meta name="author" content="" />
-    <title>Cherrydoor</title>
-    <link
-      rel="shortcut icon"
-      href="{{ url_for('static', filename='images/logo/logo-48px.png') }}"
-          />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/bootstrap.min.css') }}"
-      integrity="{{ sri_for('static', filename='css/bootstrap.min.css') }}"
-      
-      crossorigin="anonymous"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/sleek.min.css') }}"
-      integrity="{{ sri_for('static', filename='css/sleek.min.css') }}"
-      
-      crossorigin="anonymous"
-    />
-    <script
-      src="{{ url_for('static', filename='js/jquery-3.4.1.min.js') }}"
-  integrity="{{ sri_for('static', filename='js/jquery-3.4.1.min.js') }}"
-      
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="{{ url_for('static', filename='js/bootstrap.min.js') }}"
-  integrity="{{ sri_for('static', filename='js/bootstrap.min.js') }}"
-      
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="{{ url_for('static', filename='js/socket.io.js') }}"
-  integrity="{{ sri_for('static', filename='js/socket.io.js') }}"
-      
-      crossorigin="anonymous"
-    ></script>
-    {% block head %}{% endblock %}
-  </head>
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content="" />
+		<meta name="author" content="" />
+		<title>Cherrydoor</title>
+		<link
+			rel="shortcut icon"
+			href="{{ url_for('static', filename='images/logo/logo-48px.png') }}"
+		/>
+		<link
+			rel="stylesheet"
+			href="{{ url_for('static', filename='css/bootstrap.min.css') }}"
+			integrity="{{ sri_for('static', filename='css/bootstrap.min.css') }}"
+			crossorigin="anonymous"
+		/>
+		<link
+			rel="stylesheet"
+			href="{{ url_for('static', filename='css/sleek.min.css') }}"
+			integrity="{{ sri_for('static', filename='css/sleek.min.css') }}"
+			crossorigin="anonymous"
+		/>
+		<script
+			src="{{ url_for('static', filename='js/jquery-3.4.1.min.js') }}"
+			integrity="{{ sri_for('static', filename='js/jquery-3.4.1.min.js') }}"
+			crossorigin="anonymous"
+		></script>
+		<script
+			src="{{ url_for('static', filename='js/bootstrap.min.js') }}"
+			integrity="{{ sri_for('static', filename='js/bootstrap.min.js') }}"
+			crossorigin="anonymous"
+		></script>
+		<script
+			src="{{ url_for('static', filename='js/socket.io.js') }}"
+			integrity="{{ sri_for('static', filename='js/socket.io.js') }}"
+			crossorigin="anonymous"
+		></script>
+		{% block head %}{% endblock %}
+	</head>
 
-  <body>
-    {% block body %}{% endblock %}
-  </body>
+	<body>
+		{% block body %}{% endblock %}
+	</body>
 </html>

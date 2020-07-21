@@ -1,31 +1,31 @@
 {% extends "layout.html" %} {% block head %}
 <link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='css/login.css') }}"
-  integrity="sri_for('static', filename='css/login.css') "
-  />
+	rel="stylesheet"
+	href="{{ url_for('static', filename='css/login.css') }}"
+	integrity="sri_for('static', filename='css/login.css') "
+/>
 {% endblock %} {% block body %}
 <div class="container">
-  <div class="row">
-    <div class="login-form">
-      <form method="POST" action="{{ url_for('login') }}">
-        {{ form.csrf_token }}
-        <h2 class="text-center">{{ form.submit.label }}</h2>
-        <div class="form-group">
-          {{ form.username(class_="form-control"+error) }}
-        </div>
-        <div class="form-group">
-          {{ form.password(class_="form-control"+error) }}
-        </div>
-        <div class="form-group">
-          {{ form.submit(class_="btn btn-primary btn-block") }}
-        </div>
-        <div class="clearfix">
-          {{ form.remember(size=5) }} {{ form.remember.label }}
-        </div>
-      </form>
-      <br />
-    </div>
-  </div>
+	<div class="row">
+		<div class="login-form">
+			<form method="POST" action="{{ url_for('login') }}">
+				{{ form.csrf_token }}
+				<h2 class="text-center">{{ form.submit.label }}</h2>
+				<div class="form-group">
+					{{ form.username(class_="form-control"+error) }}
+				</div>
+				<div class="form-group">
+					{{ form.password(class_="form-control"+error) }}
+				</div>
+				<div class="form-group">
+					{{ form.submit(class_="btn btn-primary btn-block") }}
+				</div>
+				<div class="clearfix">
+					{{ form.remember(size=5) }} {{ form.remember.label }}
+				</div>
+			</form>
+			<br />
+		</div>
+	</div>
 </div>
 {% endblock %}
