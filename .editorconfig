@@ -8,6 +8,6 @@ charset = utf-8
 [{*.py}]
 indent_style = tab
 indent_size = 4
-[{*.ts,*.json,*.cjs,*.svelte,*.html,*.css}]
+[{*.ts,*.js,*.json,*.cjs,*.svelte,*.html,*.css}]
 indent_style = tab
 indent_size = 2
