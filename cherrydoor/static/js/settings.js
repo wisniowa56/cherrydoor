@@ -5,59 +5,59 @@ if (typeof socket == "undefined") {
 moment.locale("pl");
 function fillHtml(id) {
   return `
-  <div id="breakTime${id}">
+	<div id="breakTime${id}">
 <div class="row breakTimeInput input-group" id="breakTimeInput${id}">
-    <label class="control-label col" for="breakTimeInputFrom">Od</label>
-    <label class="control-label col" for="breakTimeInputTo">Do</label>
-    <div class="col-1"></div><div class="w-100"></div>
-    <div id="breakTimeInputFrom${id}" class="input-group date breakTimeInputFrom col" data-target-input="nearest">
-        <input type="text" class="form-control datetimepicker-input breakTimeInput" placeholder="00:00:00" data-toggle="datetimepicker" data-target="#breakTimeInputFrom${id}"></input>
-        <div class="input-group-append d-none d-sm-flex" data-target="#breakTimeInputFrom${id}" data-toggle="datetimepicker">
-            <span class="input-group-text"><i class="far fa-clock"></i></span>
-        </div>
-    </div>
-    <div id="breakTimeInputTo${id}" class="input-group date breakTimeInputTo col" data-target-input="nearest">
-        <input type="text" class="form-control datetimepicker-input breakTimeInput" placeholder="00:00:00" data-toggle="datetimepicker" data-target="#breakTimeInputTo${id}"></input>
-        <div class="input-group-append d-none d-sm-flex" data-target="#breakTimeInputTo${id}" data-toggle="datetimepicker">
-            <span class="input-group-text"><i class="far fa-clock"></i></span>
-        </div>
-    </div>
-    <div class="col-1"><button class="btn btn-danger btn-sm deleteBreakTime" data-target="#breakTime${id}"><i class="material-icons">delete</i></button></div>
+		<label class="control-label col" for="breakTimeInputFrom">Od</label>
+		<label class="control-label col" for="breakTimeInputTo">Do</label>
+		<div class="col-1"></div><div class="w-100"></div>
+		<div id="breakTimeInputFrom${id}" class="input-group date breakTimeInputFrom col" data-target-input="nearest">
+				<input type="text" class="form-control datetimepicker-input breakTimeInput" placeholder="00:00:00" data-toggle="datetimepicker" data-target="#breakTimeInputFrom${id}"></input>
+				<div class="input-group-append d-none d-sm-flex" data-target="#breakTimeInputFrom${id}" data-toggle="datetimepicker">
+						<span class="input-group-text"><i class="far fa-clock"></i></span>
+				</div>
+		</div>
+		<div id="breakTimeInputTo${id}" class="input-group date breakTimeInputTo col" data-target-input="nearest">
+				<input type="text" class="form-control datetimepicker-input breakTimeInput" placeholder="00:00:00" data-toggle="datetimepicker" data-target="#breakTimeInputTo${id}"></input>
+				<div class="input-group-append d-none d-sm-flex" data-target="#breakTimeInputTo${id}" data-toggle="datetimepicker">
+						<span class="input-group-text"><i class="far fa-clock"></i></span>
+				</div>
+		</div>
+		<div class="col-1"><button class="btn btn-danger btn-sm deleteBreakTime" data-target="#breakTime${id}"><i class="material-icons">delete</i></button></div>
 </div><hr></div>`;
 }
 const addDeletion = () => {
-  $(".deleteBreakTime").click(e => {
+  $(".deleteBreakTime").click((e) => {
     e.preventDefault();
     $(e.delegateTarget.attributes["data-target"].value).remove();
   });
 };
 var timeId = 0;
-socket.on("break_times", json => {
+socket.on("break_times", (json) => {
   if (!json.length) {
     $("#breakTimesContainer").html("");
     return;
   }
   var break_times = [
-    ...JSON.parse(json).map(break_time => {
+    ...JSON.parse(json).map((break_time) => {
       return [new Date(break_time[0]), new Date(break_time[1])];
-    })
+    }),
   ];
   var breakTimesContainer = $("#breakTimesContainer");
   breakTimesContainer.html("");
 
-  break_times.forEach(break_time => {
+  break_times.forEach((break_time) => {
     breakTimesContainer.append(fillHtml(++timeId));
     let datePickerFrom = $(`#breakTimeInputFrom${timeId}`);
     let datePickerTo = $(`#breakTimeInputTo${timeId}`);
     datePickerFrom.datetimepicker({
       format: "LT",
-      defaultDate: break_time[0]
+      defaultDate: break_time[0],
     });
     datePickerTo.datetimepicker({
       format: "LT",
-      defaultDate: break_time[1]
+      defaultDate: break_time[1],
     });
-    datePickerFrom.on("change.datetimepicker", e => {
+    datePickerFrom.on("change.datetimepicker", (e) => {
       datePickerTo.datetimepicker("minDate", e.date);
     });
   });
@@ -78,8 +78,8 @@ $(document).ready(() => {
         next: "far fa-chevron-right",
         today: "far fa-calendar-check-o",
         clear: "far fa-trash",
-        close: "far fa-times"
-      }
+        close: "far fa-times",
+      },
     }
   );
   $("#settingsModal").on("show.bs.modal", () => {
@@ -91,12 +91,12 @@ $(document).ready(() => {
     let datePickerFrom = $(`#breakTimeInputFrom${timeId}`);
     let datePickerTo = $(`#breakTimeInputTo${timeId}`);
     datePickerFrom.datetimepicker({
-      format: "LT"
+      format: "LT",
     });
     datePickerTo.datetimepicker({
-      format: "LT"
+      format: "LT",
     });
-    datePickerFrom.on("change.datetimepicker", e => {
+    datePickerFrom.on("change.datetimepicker", (e) => {
       datePickerTo.datetimepicker("minDate", e.date);
     });
     addDeletion();

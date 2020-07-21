@@ -196,8 +196,8 @@ except KeyError:
 
 class User(UserMixin):
     """
-    User class used by flask_login
-    """
+	User class used by flask_login
+	"""
 
     def __init__(self, username):
         self.username = username
@@ -205,56 +205,56 @@ class User(UserMixin):
     @staticmethod
     def is_authenticated(self):
         """
-        Authentication status
-        """
+		Authentication status
+		"""
         return True
 
     @staticmethod
     def is_active(self):
         """
-        Shows that the user is logged in
-        """
+		Shows that the user is logged in
+		"""
         return True
 
     @staticmethod
     def is_anonymous(self):
         """
-        A logged in user is not anonymous
-        """
+		A logged in user is not anonymous
+		"""
         return False
 
     def get_id(self):
         """
-        Returns the id - in this case username
-        """
+		Returns the id - in this case username
+		"""
         return self.username
 
     def get_cards(self):
         """
-        Returns all mifare card ids associated with the account
-        """
+		Returns all mifare card ids associated with the account
+		"""
         return db.users.find_one({"username": self.username})["cards"]
 
     def add_card(self, card):
         """
-        adds a mifare card id to user profile
-        """
+		adds a mifare card id to user profile
+		"""
         db.users.update_one(
             {"username": self.username}, {"$push": {"cards": card}}, upsert=True
         )
 
     def delete_card(self, card):
         """
-        adds a mifare card id from user profile
-        """
+		adds a mifare card id from user profile
+		"""
         db.users.update_one({"username": self.username}, {"$pull": {"cards": card}})
 
 
 @login_manager.user_loader
 def load_user(username):
     """
-    A function for loading users from database by username
-    """
+	A function for loading users from database by username
+	"""
     u = db.users.find_one({"username": username})
     if not u:
         return None

@@ -25,15 +25,15 @@ parser.add_argument("card", help="MiFare card uid")
 
 class Stats(Resource):
     """
-    Usage statistics. Accesible on `/api/stats` and `/api/stats/<string:time_from>/<string:time_to>` endpoint
-    """
+	Usage statistics. Accesible on `/api/stats` and `/api/stats/<string:time_from>/<string:time_to>` endpoint
+	"""
 
     def get(self, time_from=None, time_to=None):
         """
-        If http GET is used, the api will return list of logs with range determined by request parameters `time_from` and `time_to` or in url (iso8601 formatted).
-        When no parameters are present, this method will retuen logs between 7 days ago and today
-        Logs are retrived from `logs` collection and need to contain `timestamp` field with a valid datetime as a value.
-        """
+		If http GET is used, the api will return list of logs with range determined by request parameters `time_from` and `time_to` or in url (iso8601 formatted).
+		When no parameters are present, this method will retuen logs between 7 days ago and today
+		Logs are retrived from `logs` collection and need to contain `timestamp` field with a valid datetime as a value.
+		"""
         if not current_user.is_authenticated:
             return {"error": "Not Authenticated"}, 401
         params = parser.parse_args()
@@ -64,13 +64,13 @@ class Stats(Resource):
 
 class Card(Resource):
     """
-    Card management and retrival. Accesible on `/api/card/<card>` and `/api/card` endpoints.
-    """
+	Card management and retrival. Accesible on `/api/card/<card>` and `/api/card` endpoints.
+	"""
 
     def __init__(self):
         """
-        error messages
-        """
+		error messages
+		"""
         self.card_error = {
             "error": "no card specified. Pass card uid in url or as `card` in request body"
         }
@@ -78,8 +78,8 @@ class Card(Resource):
 
     def check_params(self, card=None, params=None):
         """
-        Helper function that returns card and username from params and url - if they are there
-        """
+		Helper function that returns card and username from params and url - if they are there
+		"""
         # if there is no card in url, try to get it from request body
         if not card:
             card = params["card"]
@@ -95,10 +95,10 @@ class Card(Resource):
 
     def get(self, card=None):
         """
-        Used when HTTP GET request is recieved
-        This function checks if the card uid is associated with any user
-        UID can be a part of url (/api/card/<uid>) or be passed in request body
-        """
+		Used when HTTP GET request is recieved
+		This function checks if the card uid is associated with any user
+		UID can be a part of url (/api/card/<uid>) or be passed in request body
+		"""
         # check if request was made by a logged-in user
         if not current_user.is_authenticated:
             # return error 401 and explanation if that's not the case
@@ -127,10 +127,10 @@ class Card(Resource):
 
     def post(self, card=None):
         """
-        If HTTP POST is used, add the card to a user.
-        User is determined by `username` passed in request body.
-        If there is no `username` present, current user is modified.
-        """
+		If HTTP POST is used, add the card to a user.
+		User is determined by `username` passed in request body.
+		If there is no `username` present, current user is modified.
+		"""
         # check if request was made by a logged-in user
         if not current_user.is_authenticated:
             # return error 401 and explanation if that's not the case
@@ -157,11 +157,11 @@ class Card(Resource):
 
     def delete(self, card=None):
         """
-        If HTTP DELETE is used, delete the card from database of users.
-        User is determined by `username` passed in request body.
-        If there is no `username` present, card will be removed from any and all users that it's associated with.
-        If `*` is passed as username, returns all users.
-        """
+		If HTTP DELETE is used, delete the card from database of users.
+		User is determined by `username` passed in request body.
+		If there is no `username` present, card will be removed from any and all users that it's associated with.
+		If `*` is passed as username, returns all users.
+		"""
         if not current_user.is_authenticated:
             return self.auth_error, 401
         params = parser.parse_args()
@@ -183,13 +183,13 @@ class Card(Resource):
 
 class UserAPI(Resource):
     """
-    User data management and retrieval. Accesible on `api/user/<username>` and `/api/user` endpoints.
-    """
+	User data management and retrieval. Accesible on `api/user/<username>` and `/api/user` endpoints.
+	"""
 
     def __init__(self):
         """
-        error messages
-        """
+		error messages
+		"""
         self.username_error = {
             "error": "no username specified. Pass username in url or as `username` in request body"
         }
@@ -197,8 +197,8 @@ class UserAPI(Resource):
 
     def check_username(self, username, params):
         """
-        Helper function for getting and validating username from url or request body
-        """
+		Helper function for getting and validating username from url or request body
+		"""
         if not username:
             params = parser.parse_args()
             username = escape(params["username"])
@@ -209,9 +209,9 @@ class UserAPI(Resource):
 
     def get(self, username=None):
         """
-        If HTTP GET is used, see if user with username passed in url or in request body (as `username`) exists and return their username and cards associated with them.
-        When no user with request username exists, return 404 status code
-        """
+		If HTTP GET is used, see if user with username passed in url or in request body (as `username`) exists and return their username and cards associated with them.
+		When no user with request username exists, return 404 status code
+		"""
         if not current_user.is_authenticated:
             return self.auth_error, 401
         params = parser.parse_args()
@@ -229,8 +229,8 @@ class UserAPI(Resource):
 
     def post(self, username=None):
         """
-        If HTTP POST is used, create a passwordless user (unable to manage the door, able to enter)
-        """
+		If HTTP POST is used, create a passwordless user (unable to manage the door, able to enter)
+		"""
         if not current_user.is_authenticated:
             return self.auth_error, 401
         params = parser.parse_args()
@@ -253,8 +253,8 @@ class UserAPI(Resource):
 
     def delete(self, username=None):
         """
-        If HTTP DELETE is used, delete the specified user
-        """
+		If HTTP DELETE is used, delete the specified user
+		"""
         if not current_user.is_authenticated:
             return self.auth_error, 401
         params = parser.parse_args()
