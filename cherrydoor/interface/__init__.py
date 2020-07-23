@@ -17,7 +17,8 @@ for route in default_routes:
         # load configuration file from one of the default routes
         with open(route, "r", encoding="utf-8") as f:
             # convert confuguration to a dictionary using json.load()
-            config = json.load(f)
+            config = load(f)
+            break
     except FileNotFoundError:
         # ignore if config wasn't found
         pass

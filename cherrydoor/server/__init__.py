@@ -39,6 +39,7 @@ for route in default_routes:
         with open(route, "r", encoding="utf-8") as f:
             # convert confuguration to a dictionary using json.load()
             config = json.load(f)
+            break
     except FileNotFoundError:
         # ignore if config wasn't found
         pass
@@ -135,7 +136,9 @@ csp = {
     "img-src": ["'self'"],
     "connect-src": ["'self'"],
     "base-uri": ["'none'"],
-    "require_sri_for": ["scripts", "styles"],
+    "form-action": ["'self'"],
+    "require-sri-for": ["scripts", "styles"],
+    "require-trusted-types-for": ["'script'"],
 }
 try:
     if config["https"]["enabled"]:
@@ -177,12 +180,14 @@ try:
     Talisman(
         app,
         force_https=config["https"]["enabled"],
+        force_https_permanent=config["https"]["enabled"],
         session_cookie_secure=config["https"]["enabled"],
         feature_policy=fp,
         content_security_policy=csp,
         content_security_policy_report_uri="/csp-reports",
         strict_transport_security=config["https"]["hsts-enabled"],
         strict_transport_security_preload=config["https"]["hsts-preload"],
+        #        content_security_policy_nonce_in=["script-src", "style-src"],
         referrer_policy="no-referrer",
     )
 except KeyError:
