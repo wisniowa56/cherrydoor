@@ -1,92 +1,95 @@
 {% extends "layout.html" %} {% block head %}
 <script
-  src="{{ url_for('static', filename='js/Chart.bundle.min.js') }}"
-  
-  crossorigin="anonymous"
+	src="{{ url_for('static', filename='js/Chart.bundle.min.js') }}"
+	integrity="{{ sri_for('static', filename='js/Chart.bundle.min.js') }}"
+	crossorigin="anonymous"
 ></script>
 <script
-  src="{{ url_for('static', filename='js/moment.min.js') }}"
-  
-  crossorigin="anonymous"
+	src="{{ url_for('static', filename='js/moment.min.js') }}"
+	integrity="{{ sri_for('static', filename='js/moment.min.js') }}"
+	crossorigin="anonymous"
 ></script>
 <script
-  src="{{ url_for('static', filename='js/pl.min.js') }}"
-  
-  crossorigin="anonymous"
+	src="{{ url_for('static', filename='js/moment-timezone-with-data.js') }}"
+	integrity="{{ sri_for('static', filename='js/moment-timezone-with-data.js') }}"
+	crossorigin="anonymous"
 ></script>
 <script
-  defer
-  src="{{ url_for('static', filename='js/tempusdominus-bootstrap-4.min.js') }}"
-  
-  crossorigin="anonymous"
+	src="{{ url_for('static', filename='js/pl.min.js') }}"
+	integrity="{{ sri_for('static', filename='js/pl.min.js') }}"
+	crossorigin="anonymous"
+></script>
+<script
+	defer
+	src="{{ url_for('static', filename='js/tempusdominus-bootstrap-4.min.js') }}"
+	integrity="{{ sri_for('static', filename='js/tempusdominus-bootstrap-4.min.js') }}"
+	crossorigin="anonymous"
 ></script>
 <link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='css/index.css') }}"
-  
-  crossorigin="anonymous"
+	rel="stylesheet"
+	href="{{ url_for('static', filename='css/index.css') }}"
+	integrity="{{ sri_for('static', filename='css/index.css') }}"
+	crossorigin="anonymous"
 />
 <link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='css/Chart.min.css') }}"
-  
-  crossorigin="anonymous"
+	rel="stylesheet"
+	href="{{ url_for('static', filename='css/Chart.min.css') }}"
+	integrity="{{ sri_for('static', filename='css/Chart.min.css') }}"
+	crossorigin="anonymous"
 />
 <link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='css/tempusdominus-bootstrap-4.min.css') }}"
-  
-  crossorigin="anonymous"
+	rel="stylesheet"
+	href="{{ url_for('static', filename='css/tempusdominus-bootstrap-4.min.css') }}"
+	integrity="{{ sri_for('static', filename='css/tempusdominus-bootstrap-4.min.css') }}"
+	crossorigin="anonymous"
 />
 <link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='css/all.min.css') }}"
-  
-  />
-  {% endblock %}
-  {% block body %}
-  <nav class="navbar navbar-expand-xl navbar-light bg-light">
-      <a class="navbar-brand" href="#"><img src="{{ url_for('static', filename='images/logo/logo-56px.png') }}" alt="logo"></img>Cherrydoor</a>
-      <button class="btn btn-link modal-link" data-modal="addUserModal">Dodaj użytkownika</button>
-      <button class="btn btn-link modal-link" data-modal="manageUsersModal">Zarządzaj użytkownikami</button>
-      <button class="btn btn-link modal-link" data-modal="settingsModal">Ustawienia</button>
-  </nav>
-  <div class="container">
-      <div class="row">
-          <div class="col-12">
-              <div class="card card-default">
-                  <div class="card-header justify-content-center">
-                      <h2 class="text-center">Ilość użyć w ostatnim tygodniu</h2>
-                  </div>
-                  <div class="card-body doorchart-container">
-                      <canvas id="doorchart" class="chartjs"></canvas>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
+	rel="stylesheet"
+	href="{{ url_for('static', filename='css/all.min.css') }}"
+	integrity="{{ sri_for('static', filename='css/all.min.css') }}"
+/>
+{% endblock %} {% block body %}
+<nav class="navbar navbar-expand-xl navbar-light bg-light">
+	<a class="navbar-brand" href="#"><img src="{{ url_for('static', filename='images/logo/logo-56px.png') }}" alt="logo"></img>Cherrydoor</a>
+	<button class="btn btn-link modal-link" data-modal="addUserModal">Dodaj użytkownika</button>
+	<button class="btn btn-link modal-link" data-modal="manageUsersModal">Zarządzaj użytkownikami</button>
+	<button class="btn btn-link modal-link" data-modal="settingsModal">Ustawienia</button>
+</nav>
 
-<script 
-  type="text/javascript"
-  src="{{ url_for('static', filename='js/main-chart.js') }}" 
-  
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<div class="card card-default">
+				<div class="card-header justify-content-center">
+					<h2 class="text-center">Ilość użyć w ostatnim tygodniu</h2>
+				</div>
+				<div class="card-body doorchart-container">
+					<canvas id="doorchart" class="chartjs"></canvas>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script
+	type="text/javascript"
+	src="{{ url_for('static', filename='js/main-chart.js') }}"
+	integrity="{{ sri_for('static', filename='js/main-chart.js') }}"
 ></script>
 <script
-  type="text/javascript"
-  src="{{ url_for('static', filename='js/modals.js') }}"
-  
+	type="text/javascript"
+	src="{{ url_for('static', filename='js/modals.js') }}"
+	integrity="{{ sri_for('static', filename='js/modals.js') }}"
 ></script>
 <script
-  type="text/javascript"
-  src="{{ url_for('static', filename='js/users.js') }}"
-  
+	type="text/javascript"
+	src="{{ url_for('static', filename='js/users.js') }}"
+	integrity="{{ sri_for('static', filename='js/users.js') }}"
 ></script>
 <script
-  type="text/javascript"
-  src="{{ url_for('static', filename='js/settings.js') }}"
-  
+	type="text/javascript"
+	src="{{ url_for('static', filename='js/settings.js') }}"
+	integrity="{{ sri_for('static', filename='js/settings.js') }}"
 ></script>
-{% include "add-user-modal.html" %}
-{% include "manage-users-modal.html" %}
-{% include "settings-modal.html" %}
-{% endblock %}
+{% include "add-user-modal.html" %} {% include "manage-users-modal.html" %} {%
+include "settings-modal.html" %} {% endblock %}

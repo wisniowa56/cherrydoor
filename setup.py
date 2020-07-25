@@ -3,14 +3,16 @@ from os import environ
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.4.8"
+__version__ = "0.5b1"
 __status__ = "Prototype"
 
 try:
     __version__ = environ["CHERRYDOOR_VERSION"]
 except KeyError:
     pass
-
+if "CI" in environ:
+    with open("VERSION", "w", encoding="utf-8") as f:
+        f.write(__version__)
 with open("README.md", "r", encoding="utf-8") as f:
     readme = f.read()
 
@@ -45,7 +47,6 @@ setup(
         "pyserial>=3.4",
         "pymongo>=3.10",
         "eventlet",
-        "elevate",
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",

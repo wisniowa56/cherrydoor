@@ -7,8 +7,8 @@ try {
     pwd: config.mongo.password,
     roles: [
       { role: "readWrite", db: config.mongo.name },
-      { role: "clusterMonitor", db: "admin" }
-    ]
+      { role: "clusterMonitor", db: "admin" },
+    ],
   });
 } catch (e) {}
 db.createCollection("users");
@@ -19,6 +19,6 @@ if (user != {} && user.username != "" && user.password != "") {
   db.users.insert({
     username: user.username,
     password: user.password,
-    cards: []
+    cards: [],
   });
 }

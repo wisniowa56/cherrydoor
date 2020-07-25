@@ -1,19 +1,29 @@
 from json import load
 from pymongo import MongoClient
+from pathlib import Path
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.4.8"
+__version__ = "0.5b1"
 __status__ = "Prototype"
 
-try:
-    with open("config.json", "r", encoding="utf-8") as f:  # load configuration file
-        config = load(f)  # convert confuguration to a dictionary using json.load()
-except FileNotFoundError:
-    # load configuration file from `/var/cherrydoor` if it exists
-    with open("/var/cherrydoor/config.json", "r", encoding="utf-8") as f:
-        # convert confuguration to a dictionary using json.load())
-        config = load(f)
+default_routes = [
+    "config.json",
+    "/var/cherrydoor/config.json",
+    f"{Path.home()}/.config/cherrydoor/config.json",
+]
+for route in default_routes:
+    try:
+        # load configuration file from one of the default routes
+        with open(route, "r", encoding="utf-8") as f:
+            # convert confuguration to a dictionary using json.load()
+            config = load(f)
+            break
+    except FileNotFoundError:
+        # ignore if config wasn't found
+        pass
+if config == None:
+    raise FileNotFoundError("No config.json found")
 try:
     if config["mongo"]:
 

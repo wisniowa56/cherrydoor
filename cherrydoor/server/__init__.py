@@ -7,9 +7,12 @@ Creates app, api, socket and db instances and imports all routes.
 # built-in libraries import:
 import json
 import datetime as dt
+from hashlib import sha256, sha384
+import base64
+from pathlib import Path
 
 # flask-connected imports:
-from flask import Flask, escape
+from flask import Flask, escape, url_for
 from flask_login import current_user, LoginManager, UserMixin
 from flask_restful import Resource, Api, reqparse, inputs, abort
 from flask_socketio import SocketIO, emit, disconnect
@@ -23,16 +26,25 @@ from argon2 import PasswordHasher
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.4.8"
+__version__ = "0.5b1"
 __status__ = "Prototype"
-try:
-    with open("config.json", "r", encoding="utf-8") as f:  # load configuration file
-        config = json.load(f)  # convert confuguration to a dictionary using json.load()
-except FileNotFoundError:
-    # load configuration file from `/var/cherrydoor` if it exists
-    with open("/var/cherrydoor/config.json", "r", encoding="utf-8") as f:
-        # convert confuguration to a dictionary using json.load())
-        config = json.load(f)
+default_routes = [
+    "config.json",
+    "/var/cherrydoor/config.json",
+    f"{Path.home()}/.config/cherrydoor/config.json",
+]
+for route in default_routes:
+    try:
+        # load configuration file from one of the default routes
+        with open(route, "r", encoding="utf-8") as f:
+            # convert confuguration to a dictionary using json.load()
+            config = json.load(f)
+            break
+    except FileNotFoundError:
+        # ignore if config wasn't found
+        pass
+if config == None:
+    raise FileNotFoundError("No config.json found")
 
 
 class LoginForm(FlaskForm):
@@ -57,7 +69,7 @@ class LoginForm(FlaskForm):
 app = Flask(__name__, template_folder="../templates", static_folder="../static")
 # set up a secret key for cookie and session encryption based on config.json
 app.config["SECRET_KEY"] = config["secret-key"]
-
+app.config["TEMPLATES_AUTO_RELOAD"] = True
 # pymongo connection
 # configure database access uri
 try:
@@ -124,6 +136,8 @@ csp = {
     "img-src": ["'self'"],
     "connect-src": ["'self'"],
     "base-uri": ["'none'"],
+    "form-action": ["'self'"],
+    "require-sri-for": ["scripts", "styles"],
 }
 try:
     if config["https"]["enabled"]:
@@ -165,12 +179,14 @@ try:
     Talisman(
         app,
         force_https=config["https"]["enabled"],
+        force_https_permanent=config["https"]["enabled"],
         session_cookie_secure=config["https"]["enabled"],
         feature_policy=fp,
         content_security_policy=csp,
         content_security_policy_report_uri="/csp-reports",
         strict_transport_security=config["https"]["hsts-enabled"],
         strict_transport_security_preload=config["https"]["hsts-preload"],
+        #        content_security_policy_nonce_in=["script-src", "style-src"],
         referrer_policy="no-referrer",
     )
 except KeyError:
@@ -184,8 +200,8 @@ except KeyError:
 
 class User(UserMixin):
     """
-    User class used by flask_login
-    """
+	User class used by flask_login
+	"""
 
     def __init__(self, username):
         self.username = username
@@ -193,61 +209,78 @@ class User(UserMixin):
     @staticmethod
     def is_authenticated(self):
         """
-        Authentication status
-        """
+		Authentication status
+		"""
         return True
 
     @staticmethod
     def is_active(self):
         """
-        Shows that the user is logged in
-        """
+		Shows that the user is logged in
+		"""
         return True
 
     @staticmethod
     def is_anonymous(self):
         """
-        A logged in user is not anonymous
-        """
+		A logged in user is not anonymous
+		"""
         return False
 
     def get_id(self):
         """
-        Returns the id - in this case username
-        """
+		Returns the id - in this case username
+		"""
         return self.username
 
     def get_cards(self):
         """
-        Returns all mifare card ids associated with the account
-        """
+		Returns all mifare card ids associated with the account
+		"""
         return db.users.find_one({"username": self.username})["cards"]
 
     def add_card(self, card):
         """
-        adds a mifare card id to user profile
-        """
+		adds a mifare card id to user profile
+		"""
         db.users.update_one(
             {"username": self.username}, {"$push": {"cards": card}}, upsert=True
         )
 
     def delete_card(self, card):
         """
-        adds a mifare card id from user profile
-        """
+		adds a mifare card id from user profile
+		"""
         db.users.update_one({"username": self.username}, {"$pull": {"cards": card}})
 
 
 @login_manager.user_loader
 def load_user(username):
     """
-    A function for loading users from database by username
-    """
+	A function for loading users from database by username
+	"""
     u = db.users.find_one({"username": username})
     if not u:
         return None
     return User(username=u["username"])
 
+
+def sri_for(endpoint, **values):
+    input = url_for(endpoint, **values)
+    input = input.replace(app.static_url_path, app.static_folder)
+    hash = sha256()
+    with open(input, "rb") as f:
+        while True:
+            data = f.read(65536)
+            if not data:
+                break
+            hash.update(data)
+    hash = hash.digest()
+    hash_base64 = base64.b64encode(hash).decode()
+    return f"sha256-{hash_base64}"
+
+
+app.jinja_env.globals["sri_for"] = sri_for
 
 import cherrydoor.server.api
 import cherrydoor.server.routes

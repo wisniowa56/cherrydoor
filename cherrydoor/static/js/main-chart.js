@@ -8,17 +8,17 @@ $(document).ready(() => {
   var usageData = [];
 
   setInterval(() => socket.emit("stats"), 500);
-  socket.on("stats", function(json) {
+  socket.on("stats", function (json) {
     var tmpDict = {};
     json
-      .map(el => {
+      .map((el) => {
         return JSON.parse(el);
       })
-      .map(el => {
+      .map((el) => {
         el.timestamp = new Date(el.timestamp["$date"]);
         return el;
       })
-      .forEach(el => {
+      .forEach((el) => {
         date = `${el.timestamp.getFullYear()}-${el.timestamp.getMonth()}-${el.timestamp.getDate()}`;
         !!tmpDict[date]
           ? tmpDict[date].y++
@@ -45,9 +45,9 @@ $(document).ready(() => {
             pointHoverBackgroundColor: "rgba(255,255,255,1)",
             pointBorderWidth: 2,
             pointHoverRadius: 8,
-            pointHoverBorderWidth: 1
-          }
-        ]
+            pointHoverBorderWidth: 1,
+          },
+        ],
       },
 
       // Configuration options go here
@@ -55,12 +55,12 @@ $(document).ready(() => {
         responsive: true,
         maintainAspectRatio: false,
         legend: {
-          display: false
+          display: false,
         },
         layout: {
           padding: {
-            right: 10
-          }
+            right: 10,
+          },
         },
         scales: {
           xAxes: [
@@ -68,25 +68,25 @@ $(document).ready(() => {
               type: "time",
               distribution: "series",
               time: {
-                unit: "day"
+                unit: "day",
               },
               gridLines: {
-                display: false
-              }
-            }
+                display: false,
+              },
+            },
           ],
           yAxes: [
             {
               gridLines: {
                 display: true,
                 color: "#eee",
-                zeroLineColor: "#eee"
+                zeroLineColor: "#eee",
               },
               ticks: {
-                callback: function(value) {
+                callback: function (value) {
                   var ranges = [
                     { divider: 1e6, suffix: "M" },
-                    { divider: 1e4, suffix: "k" }
+                    { divider: 1e4, suffix: "k" },
                   ];
                   function formatNumber(n) {
                     for (var i = 0; i < ranges.length; i++) {
@@ -99,20 +99,20 @@ $(document).ready(() => {
                     return n;
                   }
                   return formatNumber(value);
-                }
-              }
-            }
-          ]
+                },
+              },
+            },
+          ],
         },
         tooltips: {
           callbacks: {
-            title: function(tooltipItem, data) {
+            title: function (tooltipItem, data) {
               return data["labels"][tooltipItem[0]["index"]];
             },
-            label: function(tooltipItem) {
+            label: function (tooltipItem) {
               //return data["datasets"][0]["data"][tooltipItem["index"]]["y"];
               return tooltipItem["yLabel"];
-            }
+            },
           },
           responsive: true,
           intersect: false,
@@ -128,9 +128,9 @@ $(document).ready(() => {
           borderColor: "rgba(220, 220, 220, 0.9)",
           borderWidth: 2,
           caretSize: 10,
-          caretPadding: 15
-        }
-      }
+          caretPadding: 15,
+        },
+      },
     });
   }
 });

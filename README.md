@@ -8,25 +8,24 @@
 </p>
 Prosta webaplikacja do zarządzania i przeglądania statystyk wykorzystania zamka RFID korzystająca z Flaska i MongoDB.
 
-## Obecny stan (v0.1)
-
-- Podstawa backendu działa
-- Działa REST API
-- Działa websocket
-- Jest działające logowanie
-- Działa większość frontendu - brakuje zarządzania administratorami i ustawień przerw
-
 ## Instalacja i uruchamianie:
 
-1. Sklonuj projekt `git clone https://github.com/wisniowa56/cherrydoor cherrydoor` i przejdź do powstałego folderu `cd cherrydoor`
-2. Uruchom skrypt instalacyjny: `bash install.sh`
-3. Jeśli nie jesteś pewien, czy korzystasz z najnowszej wersji aplikacji, wpisz `y` przy pytaniu o aktualizację
-4. Wpisz `y` by skonfigurować MongoDB, kolejne `y` by stworzyć pierwszego administratora. Wpisz jego nazwę i hasło.
-5. (opcjonalne, ale zalecane) Zmień klucz w [`config.json`](config.json) na losową wartość. Możesz ją wygenerować np. w Pythonie:
+1. Zaintaluj `Cherrydoor` korzystając z pip i pypi:
 
-```Python
->>> import os
->>> os.urandom(24)
+```bash
+pip3 install Cherrydoor
 ```
 
-5. Uruchom aplikację: `python3 main.py`
+Albo pobierz wheel danego wydania i zainstaluj:
+
+```bash
+pip3 install ./Cherrydoor-<version>-py3-none-any.whl
+```
+
+2. Doinstaluj dodatkowe zależności i skonfiguruj trochę rzeczy korzystając z wbudowanego skryptu instalacyjnego:
+
+```bash
+cherrydoor install
+```
+
+3. Program powinien być już uruchomiony przez systemd na porcie 5000. Możesz go restartować/zatrzymywać/itp. korzystając z `systemctl --user <komenda> cherrydoor`. Jeśli chcesz go uruchomić bez korzystania z usługi, skorzystaj ze skryptu `cherrydoor start`.

@@ -332,6 +332,7 @@ ASALocalRun/
 #Visual Studio Code
 .vscode
 
+.mypy_cache
 /csp-logs.json
 /config.json
 
@@ -340,3 +341,4 @@ build
 dist/
 
 Cherrydoor.egg-info/
+VERSION
