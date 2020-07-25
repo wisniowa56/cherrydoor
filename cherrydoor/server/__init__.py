@@ -26,7 +26,7 @@ from argon2 import PasswordHasher
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.5.dev"
+__version__ = "0.5b1"
 __status__ = "Prototype"
 default_routes = [
     "config.json",
