@@ -23,6 +23,12 @@
 			integrity="{{ sri_for('static', filename='css/sleek.min.css') }}"
 			crossorigin="anonymous"
 		/>
+		<link
+			rel="stylesheet"
+			href="{{ url_for('static', filename='css/all.css') }}"
+			integrity="{{ sri_for('static', filename='css/all.css') }}"
+			crossorigin="anonymous"
+		/>
 		<script
 			src="{{ url_for('static', filename='js/jquery-3.4.1.min.js') }}"
 			integrity="{{ sri_for('static', filename='js/jquery-3.4.1.min.js') }}"
@@ -42,6 +48,12 @@
 	</head>
 
 	<body>
-		{% block body %}{% endblock %}
+		<div class="page-contents">
+			{% block body %}{% endblock %}
+		</div>
+		<footer>
+			Ikony wykorzystane z
+			<a href="https://icons8.com/" target="_blank">Icons8</a>
+		</footer>
 	</body>
 </html>
