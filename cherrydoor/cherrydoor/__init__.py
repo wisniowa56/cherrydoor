@@ -21,7 +21,7 @@ def cherrydoor():
     )
     install_parser.add_argument(
         "--exit-on-fail",
-        description="If any step fails, stop the installer",
+        help="If any step fails, stop the installer",
         dest="fail",
         action="store_true",
     )
@@ -42,14 +42,14 @@ def cherrydoor():
             dest="install_steps",
             action="append_const",
             const=step,
-            description=description,
+            help=description,
         )
         install_steps_group.add_argument(
             f"--no-{step}",
             dest="install_steps_excluded",
             action="append_const",
             const=step,
-            description=f"don't {description}",
+            help=f"don't {description}",
         )
 
     start_parser = subparsers.add_parser(
