@@ -8,7 +8,7 @@ from cherrydoor.server import socket, emit, dt, db, current_user, disconnect
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.5b1"
+__version__ = "0.5.dev"
 __status__ = "Prototype"
 
 
@@ -105,19 +105,17 @@ def break_times(json=[]):
             db.settings.update(
                 {"setting": "break_times"}, {"$set": {"value": breaks}}, upsert=True,
             )
-            breaks_timestamps = [
-                [item[0].timestamp() * 1000, item[1].timestamp() * 1000]
+            breaks = [
+                [item[0].isoformat() + "Z", item[1].isoformat() + "Z"]
                 for item in breaks
             ]
-            return_breaks = jsn.dumps(
-                breaks_timestamps, indent=4, sort_keys=True, default=str
-            )
+            return_breaks = jsn.dumps(breaks, indent=4, sort_keys=True, default=str)
         emit("break_times", return_breaks)
         return return_breaks
     try:
         breaks = list(db.settings.find_one({"setting": "break_times"})["value"])
         breaks = [
-            [item[0].timestamp() * 1000, item[1].timestamp() * 1000] for item in breaks
+            [item[0].isoformat() + "Z", item[1].isoformat() + "Z"] for item in breaks
         ]
         return_breaks = jsn.dumps(breaks, indent=4, sort_keys=True, default=str)
     except KeyError:
