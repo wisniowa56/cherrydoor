@@ -38,10 +38,7 @@ socket.on("break_times", (json) => {
 		return;
 	}
 	var break_times = JSON.parse(json).map((break_time) => {
-		return [
-			moment(break_time[0]).tz("Europe/Warsaw"),
-			moment(break_time[1]).tz("Europe/Warsaw"),
-		];
+		return [new Date(break_time[0]), new Date(break_time[1])];
 	});
 	var breakTimesContainer = $("#breakTimesContainer");
 	breakTimesContainer.html("");
