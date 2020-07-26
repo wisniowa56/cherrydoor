@@ -7,7 +7,7 @@ __version__ = "0.5.2"
 __status__ = "Prototype"
 
 try:
-    __version__ = environ["CHERRYDOOR_VERSION"]
+    __version__ = environ["CHERRYDOOR_VERSION"].replace("v", "")
 except KeyError:
     pass
 if "CI" in environ:
