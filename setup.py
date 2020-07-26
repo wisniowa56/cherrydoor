@@ -14,7 +14,10 @@ if "CI" in environ:
     with open("VERSION", "w", encoding="utf-8") as f:
         f.write(__version__)
 with open("README.md", "r", encoding="utf-8") as f:
-    readme = f.read()
+    readme = f.read().replace(
+        "cherrydoor/static",
+        f"https://raw.githubusercontent.com/wisniowa56/cherrydoor/v{__version__}/cherrydoor/static/",
+    )
 
 setup(
     name="Cherrydoor",
