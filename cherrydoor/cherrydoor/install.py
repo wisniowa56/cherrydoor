@@ -69,9 +69,28 @@ def install(args):
         if step_enabled("config", args):
             # create a random secret key
             config["secret-key"] = os.urandom(24).hex()
-        # let user choose a password for the database
-        config["mongo"]["password"] = getpass("Wprowadź hasło do bazy danych: ")
-        service_config = f"""\
+            # let user choose a password for the database
+            if step_enabled("database", args):
+                config["mongo"]["password"] = getpass("Wprowadź hasło do bazy danych: ")
+            try:
+                # files configuration
+                if not os.path.exists(f"${Path.home()}"):
+                    os.makedirs(f"{Path.home()}/.config/cherrydoor")
+                with open(
+                    f"{Path.home()}/.config/cherrydoor/config.json",
+                    "w",
+                    encoding="utf-8",
+                ) as f:
+                    json.dump(config, f, ensure_ascii=False, indent=4)
+            except (IOError, PermissionError):
+                print(
+                    f"Nie udało się stworzyć plików w {Path.home()}/.config/cherrydoor. Spróbuj stworzyć ten folder manualnie i nadać mu właściwe uprawnienia",
+                    file=sys.stderr,
+                )
+                if args.fail:
+                    sys.exit(1)
+        if step_enabled("service", args):
+            service_config = f"""\
 [Unit]
 Description=Cherrydoor Service
 After=network.target
@@ -84,22 +103,6 @@ User=ubuntu
 [Install]
 WantedBy=multi-user.target
 """
-        try:
-            # files configuration
-            if not os.path.exists(f"${Path.home()}"):
-                os.makedirs(f"{Path.home()}/.config/cherrydoor")
-            with open(
-                f"{Path.home()}/.config/cherrydoor/config.json", "w", encoding="utf-8"
-            ) as f:
-                json.dump(config, f, ensure_ascii=False, indent=4)
-        except (IOError, PermissionError):
-            print(
-                f"Nie udało się stworzyć plików w {Path.home()}/.config/cherrydoor. Spróbuj stworzyć ten folder manualnie i nadać mu właściwe uprawnienia",
-                file=sys.stderr,
-            )
-            if args.fail:
-                sys.exit(1)
-        if step_enabled("service", args):
             try:
                 with open(f"{Path.home()}/systemd/user/cherrydoor.service", "w") as f:
                     f.write(service_config)
