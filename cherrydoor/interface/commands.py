@@ -6,7 +6,7 @@ from pymongo.errors import OperationFailure
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.5.2"
+__version__ = "0.5.3"
 __status__ = "Prototype"
 
 

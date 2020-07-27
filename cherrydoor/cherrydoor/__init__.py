@@ -19,7 +19,7 @@ def cherrydoor():
     install_parser = subparsers.add_parser(
         "install", help="Install some possible requirements"
     )
-    install_parser.set_defaults(install_steps_excluded=[], fail=False)
+    install_parser.set_defaults(install_steps_excluded=[], install_steps=[], fail=False)
     install_parser.add_argument(
         "--exit-on-fail",
         help="If any step fails, stop the installer",
