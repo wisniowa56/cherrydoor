@@ -28,7 +28,7 @@ class Commands:
             with interface:
                 print("[serial] Listening on serial interface")
                 # continuously read the interface until EXIT is sent
-                while message == [] or message[0] != "EXIT":
+                while message[0] != "EXIT":
                     message = read().upper().split()
                     # after a newline, do the specidied command
                     try:
