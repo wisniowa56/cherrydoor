@@ -124,22 +124,22 @@ class Commands:
         return auth
 
     def check_auth(self):
-        time = dt.datetime.now().time()
+        time = dt.datetime.now().replace(year=2020, month=2, day=2)
         try:
             # get the list of break times from database
-            breaks = list(
-                self.db.settings.find_one({"setting": "break_times"})["value"]
+            breaks = self.db.settings.count_documents(
+                {
+                    "setting": "break_times",
+                    "value.from": {"$lte": time},
+                    "value.to": {"$gte": time},
+                }
             )
             # get the current setting
             require_auth = self.db.settings.find_one({"setting": "require_auth"})
             # if the current setting was set manually - don't check the time
-            if bool(require_auth["manual"]):
+            if require_auth != None and bool(require_auth["manual"]):
                 return bool(require_auth["value"])
-            for item in breaks:
-                # if current time is in one of the time ranges, return False, so auth is not required
-                if time in DateTimeRange(item[0].time(), item[1].time()):
-                    return False
-            return True
+            return breaks <= 0
 
         except (KeyError, TypeError):
             # default to requiring auth
