@@ -83,7 +83,7 @@ def cherrydoor():
 
         def exit(interface_run, server):
             interface_run.terminate()
-            server.terminate()
+            # server.terminate()
 
         import atexit
 
