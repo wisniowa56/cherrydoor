@@ -7,12 +7,12 @@ __version__ = "0.5.2"
 __status__ = "Prototype"
 
 try:
-    __version__ = environ["CHERRYDOOR_VERSION"].replace("v", "")
+    __version__ = environ["CHERRYDOOR_VERSION"]
 except KeyError:
     pass
 if "CI" in environ:
     with open("VERSION", "w", encoding="utf-8") as f:
-        f.write(__version__)
+        f.write("v" if __version__[0] != "v" + __version__)
 with open("README.md", "r", encoding="utf-8") as f:
     readme = f.read().replace(
         "cherrydoor/static",
