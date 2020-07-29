@@ -23,4 +23,3 @@ for route in default_routes:
         pass
 if config == None:
     raise FileNotFoundError("No config.json found")
-
