@@ -12,7 +12,11 @@ except KeyError:
     pass
 if "CI" in environ:
     with open("VERSION", "w", encoding="utf-8") as f:
-        f.write("v" if __version__[0] != "v" + __version__)
+        if __version__[0] == "v":
+            f.write(__version__)
+        else:
+            f.write(f"v{__version__}")
+
 with open("README.md", "r", encoding="utf-8") as f:
     readme = f.read().replace(
         "cherrydoor/static",
