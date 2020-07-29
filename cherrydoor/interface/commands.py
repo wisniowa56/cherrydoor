@@ -26,7 +26,7 @@ class Commands:
         message = ["", ""]
         try:
             with interface:
-                print("Listening on serial interface")
+                print("[serial] Listening on serial interface")
                 # continuously read the interface until EXIT is sent
                 while message == [] or message[0] != "EXIT":
                     message = read().upper().split()
@@ -40,7 +40,7 @@ class Commands:
             self.start()
 
     def card(self, block0):
-        print("processing a card")
+        print("[serial] processing a card")
         try:
             # check if authentication with UID is required, or manufacturer code is fine
             self.require_auth = self.check_auth()
@@ -71,9 +71,9 @@ class Commands:
         # send the authentication result over the interface
         write(f"AUTH {1 if auth else 0}")
         print(
-            "authentication successful"
+            "[serial] authentication successful"
             if auth
-            else "unsuccessful authentication attempt"
+            else "[serial] unsuccessful authentication attempt"
         )
 
     def check_auth(self):
