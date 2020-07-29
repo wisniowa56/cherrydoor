@@ -4,7 +4,7 @@ import os
 import json
 from subprocess import call
 from argon2 import PasswordHasher
-from pymongo import MongoClient
+from pymongo import MongoClient, OperationFailure
 from pathlib import Path
 
 
@@ -129,18 +129,21 @@ WantedBy=multi-user.target
             f"mongodb://{config['mongo']['url']}/{config['mongo']['name']}"
         )[config["mongo"]["name"]]
         if step_enabled("database", args):
-            db.command(
-                "createUser",
-                config["mongo"]["username"],
-                pwd=config["mongo"]["password"],
-                roles=[
-                    {"role": "readWrite", "db": config["mongo"]["name"]},
-                    {"role": "clusterMonitor", "db": "admin"},
-                ],
-            )
-            db.create_collection("users")
-            db.create_collection("logs")
-            db.create_collection("settings")
+            try:
+                db.command(
+                    "createUser",
+                    config["mongo"]["username"],
+                    pwd=config["mongo"]["password"],
+                    roles=[
+                        {"role": "readWrite", "db": config["mongo"]["name"]},
+                        {"role": "clusterMonitor", "db": "admin"},
+                    ],
+                )
+                db.create_collection("users")
+                db.create_collection("logs")
+                db.create_collection("settings")
+            except OperationFailure:
+                pass
             user_indexes = db.users.index_information()
             if "username_index" not in user_indexes.keys():
                 db.users.create_index("username", name="username_index", unique=True)
