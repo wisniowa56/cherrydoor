@@ -81,13 +81,13 @@ def cherrydoor():
             },
         )
 
-        def exit():
+        def exit(interface_run, server):
             interface_run.terminate()
             server.terminate()
 
         import atexit
 
-        atexit.register(exit)
+        atexit.register(exit, interface_run, server)
         interface_run.start()
         server.run()
 
