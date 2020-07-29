@@ -82,8 +82,10 @@ def cherrydoor():
         )
 
         def exit(interface_run, server):
+            print("Closing server and serial connections")
             interface_run.terminate()
             # server.terminate()
+            sys.exit()
 
         import atexit
 

@@ -4,6 +4,7 @@
 from multiprocessing import Process
 from cherrydoor.server import app, socket, config
 from cherrydoor.interface.commands import Commands
+import sys
 
 interface = Commands()
 interface_run = Process(target=interface.start)
@@ -19,8 +20,9 @@ server = Process(
 
 
 def exit():
+    print("Closing server and serial connections")
     interface_run.terminate()
-    server.terminate()
+    sys.exit()
 
 
 if __name__ == "__main__":

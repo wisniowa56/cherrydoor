@@ -1,8 +1,10 @@
 import datetime as dt
 from time import sleep
 from datetimerange import DateTimeRange
-from cherrydoor.interface import read, write, db, config, interface, connectionException
+from cherrydoor.interface import config
+from pymongo import MongoClient
 from pymongo.errors import OperationFailure
+import serial
 
 __author__ = "opliko"
 __license__ = "MIT"
@@ -13,31 +15,75 @@ __status__ = "Prototype"
 class Commands:
     def __init__(self):
         self.commandFunctions = {"CARD": self.card}
+
+    def start(self):
+        try:
+            if config["mongo"]:
+                try:
+                    # set up PyMongo using credentials from config.json
+                    self.db = MongoClient(
+                        f"mongodb://{config['mongo']['url']}/{config['mongo']['name']}",
+                        username=config["mongo"]["username"],
+                        password=config["mongo"]["password"],
+                    ).cherrydoor
+                except KeyError:
+                    # if username or password aren't defined in config, don't use them at all
+                    self.db = MongoClient(
+                        f"mongodb://{config['mongo']['url']}/{config['mongo']['name']}"
+                    ).cherrydoor
+                try:
+                    self.db.client.server_info()
+                except Exception as e:
+                    print(
+                        f"Connection to MongoDB failed. Are you sure it's installed and correctly configured? Error: {e}"
+                    )
+        except KeyError:
+            print("No supported database present in config.json")
         try:
             self.require_auth = bool(
-                db.settings.find_one({"setting": "require_auth"})["value"]
+                self.db.settings.find_one({"setting": "require_auth"})["value"]
             )
             write(f"NTFY {4 if self.require_auth else 3}")
         except (KeyError, TypeError, OperationFailure):
             self.require_auth = True
+        self.interface = serial.Serial()
+        try:
+            self.interface.baudrate = int(config["interface"]["baudrate"])
+        except (KeyError, AttributeError):
+            # default to 115200 if no baudrate is found in config
+            self.interface.baudrate = 115200
+        try:
+            self.interface.port = config["interface"]["port"]
+        except (KeyError, AttributeError):
+            # default to /dev/serial0 (default for RaspberryPi UART)
+            self.interface.port = "/dev/serial0"
+        try:
+            self.encoding = config["interface"]["encoding"]
+        except KeyError:
+            # default to utf-8 if no encoding information found in config
+            self.encoding = "utf-8"
+        self.listen()
 
-    def start(self):
+    def listen(self):
         # message template - a two element list (command and argument)
         message = ["", ""]
         try:
-            with interface:
+            with self.interface:
                 print("[serial] Listening on serial interface")
                 # continuously read the interface until EXIT is sent
-                while message[0] != "EXIT":
-                    message = read().upper().split()
+                while message == [] or message[0] != "EXIT":
+                    message = self.read().upper().split()
                     # after a newline, do the specidied command
                     try:
                         self.commandFunctions[message[0]](message[1])
+                        message = []
                     except (KeyError, IndexError):
                         pass
-        except connectionException:
+                    if len(message) < 2:
+                        message = ["", ""]
+        except serial.serialutil.SerialException:
             sleep(10)
-            self.start()
+            self.listen()
 
     def card(self, block0):
         print("[serial] processing a card")
@@ -45,13 +91,13 @@ class Commands:
             # check if authentication with UID is required, or manufacturer code is fine
             self.require_auth = self.check_auth()
             # send a contol signal for LEDs
-            write(f"NTFY {4 if self.require_auth else 3}")
+            self.write(f"NTFY {4 if self.require_auth else 3}")
         except:
             # default to requiring authentication
             self.require_auth = True
         if self.require_auth:
             # check if card is associated with an user
-            auth = bool(db.users.count_documents({"cards": block0[:10]}))
+            auth = bool(self.db.users.count_documents({"cards": block0[:10]}))
         else:
             try:
                 # if authentication is not required check manufacturer code - 2 last digits of block0
@@ -59,7 +105,7 @@ class Commands:
             except KeyError:
                 auth = False
         # add attempt to logs
-        db.logs.insert(
+        self.db.logs.insert(
             {
                 "timestamp": dt.datetime.now(),
                 "card": block0[:10],
@@ -69,20 +115,23 @@ class Commands:
             }
         )
         # send the authentication result over the interface
-        write(f"AUTH {1 if auth else 0}")
+        self.write(f"AUTH {1 if auth else 0}")
         print(
             "[serial] authentication successful"
             if auth
             else "[serial] unsuccessful authentication attempt"
         )
+        return auth
 
     def check_auth(self):
         time = dt.datetime.now().time()
         try:
             # get the list of break times from database
-            breaks = list(db.settings.find_one({"setting": "break_times"})["value"])
+            breaks = list(
+                self.db.settings.find_one({"setting": "break_times"})["value"]
+            )
             # get the current setting
-            require_auth = db.settings.find_one({"setting": "require_auth"})
+            require_auth = self.db.settings.find_one({"setting": "require_auth"})
             # if the current setting was set manually - don't check the time
             if bool(require_auth["manual"]):
                 return bool(require_auth["value"])
@@ -95,3 +144,11 @@ class Commands:
         except (KeyError, TypeError):
             # default to requiring auth
             return True
+
+    def write(self, message):
+        self.interface.write(f"{message}\n".encode(self.encoding))
+        self.interface.flush()
+
+    def read(self):
+        message = self.interface.readline().decode(self.encoding)
+        return message
