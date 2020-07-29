@@ -60,7 +60,7 @@ def cherrydoor():
 
     args = parser.parse_args()
     if args.subcommand == "install":
-        from cherrydoor.cherrydoor.install import install
+        from cherrydoor.cli.install import install
 
         install(args)
 

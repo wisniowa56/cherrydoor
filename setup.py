@@ -40,7 +40,7 @@ setup(
     package_data={"": ["templates/*", "static/*/*", "static/images/*/*"]},
     zip_safe=False,
     scripts=["scripts/cherrydoor-install"],
-    entry_points={"console_scripts": ["cherrydoor = cherrydoor.cherrydoor:cherrydoor"]},
+    entry_points={"console_scripts": ["cherrydoor = cherrydoor.cli:cherrydoor"]},
     python_requires=">=3.7",
     install_requires=[
         "argon2-cffi>=19",
