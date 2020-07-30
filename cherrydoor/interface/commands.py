@@ -59,7 +59,8 @@ class Commands:
             self.require_auth = bool(
                 self.db.settings.find_one({"setting": "require_auth"})["value"]
             )
-            self.write(f"NTFY {4 if self.require_auth else 3}")
+            with self.interface:
+                self.write(f"NTFY {4 if self.require_auth else 3}")
         except (KeyError, TypeError, OperationFailure):
             self.require_auth = True
         self.listen()
