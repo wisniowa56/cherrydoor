@@ -39,8 +39,6 @@ class Commands:
                     )
         except KeyError:
             print("No supported database present in config.json")
-        except (KeyError, TypeError, OperationFailure):
-            self.require_auth = True
         self.interface = serial.Serial()
         try:
             self.interface.baudrate = int(config["interface"]["baudrate"])
@@ -62,6 +60,8 @@ class Commands:
                 self.db.settings.find_one({"setting": "require_auth"})["value"]
             )
             self.write(f"NTFY {4 if self.require_auth else 3}")
+        except (KeyError, TypeError, OperationFailure):
+            self.require_auth = True
         self.listen()
 
     def listen(self):
