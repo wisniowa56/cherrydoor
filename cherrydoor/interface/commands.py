@@ -39,11 +39,6 @@ class Commands:
                     )
         except KeyError:
             print("No supported database present in config.json")
-        try:
-            self.require_auth = bool(
-                self.db.settings.find_one({"setting": "require_auth"})["value"]
-            )
-            self.write(f"NTFY {4 if self.require_auth else 3}")
         except (KeyError, TypeError, OperationFailure):
             self.require_auth = True
         self.interface = serial.Serial()
@@ -62,6 +57,11 @@ class Commands:
         except KeyError:
             # default to utf-8 if no encoding information found in config
             self.encoding = "utf-8"
+        try:
+            self.require_auth = bool(
+                self.db.settings.find_one({"setting": "require_auth"})["value"]
+            )
+            self.write(f"NTFY {4 if self.require_auth else 3}")
         self.listen()
 
     def listen(self):
