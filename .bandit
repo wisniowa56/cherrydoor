@@ -1,3 +1,3 @@
 [bandit]
-skips: B106,B107
+skips: B106,B107,B322
 exclude: ./tests,./cherrydoor/cherrydoor,./scripts
