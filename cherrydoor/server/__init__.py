@@ -29,39 +29,39 @@ __license__ = "MIT"
 __version__ = "0.5.2"
 __status__ = "Prototype"
 default_routes = [
-	"config.json",
-	"/var/cherrydoor/config.json",
-	f"{Path.home()}/.config/cherrydoor/config.json",
+    "config.json",
+    "/var/cherrydoor/config.json",
+    f"{Path.home()}/.config/cherrydoor/config.json",
 ]
 for route in default_routes:
-	try:
-		# load configuration file from one of the default routes
-		with open(route, "r", encoding="utf-8") as f:
-			# convert confuguration to a dictionary using json.load()
-			config = json.load(f)
-			break
-	except FileNotFoundError:
-		# ignore if config wasn't found
-		pass
+    try:
+        # load configuration file from one of the default routes
+        with open(route, "r", encoding="utf-8") as f:
+            # convert confuguration to a dictionary using json.load()
+            config = json.load(f)
+            break
+    except FileNotFoundError:
+        # ignore if config wasn't found
+        pass
 if config == None:
-	raise FileNotFoundError("No config.json found")
+    raise FileNotFoundError("No config.json found")
 
 
 class LoginForm(FlaskForm):
-	"""create fields for login form with labels based on translations form config.json file"""
+    """create fields for login form with labels based on translations form config.json file"""
 
-	username = StringField(
-		config["login-translation"]["username"],
-		validators=[DataRequired()],
-		render_kw={"placeholder": config["login-translation"]["username"]},
-	)
-	password = PasswordField(
-		config["login-translation"]["password"],
-		validators=[DataRequired()],
-		render_kw={"placeholder": config["login-translation"]["password"]},
-	)
-	remember = BooleanField(config["login-translation"]["remember-me"])
-	submit = SubmitField(config["login-translation"]["log-in"])
+    username = StringField(
+        config["login-translation"]["username"],
+        validators=[DataRequired()],
+        render_kw={"placeholder": config["login-translation"]["username"]},
+    )
+    password = PasswordField(
+        config["login-translation"]["password"],
+        validators=[DataRequired()],
+        render_kw={"placeholder": config["login-translation"]["password"]},
+    )
+    remember = BooleanField(config["login-translation"]["remember-me"])
+    submit = SubmitField(config["login-translation"]["log-in"])
 
 
 # app creation
@@ -73,30 +73,30 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 # pymongo connection
 # configure database access uri
 try:
-	if config["mongo"]:
-		from flask_pymongo import PyMongo
+    if config["mongo"]:
+        from flask_pymongo import PyMongo
 
-		app.config[
-			"MONGO_URI"
-		] = f"mongodb://{config['mongo']['url']}/{config['mongo']['name']}"
-		try:
-			# set up PyMongo using credentials from config.json
-			db = PyMongo(
-				app,
-				username=config["mongo"]["username"],
-				password=config["mongo"]["password"],
-			).db
-		except KeyError:
-			# if username or password aren't defined in config, don't use them at all
-			db = PyMongo(app).db
-		try:
-			db.client.server_info()
-		except Exception as e:
-			print(
-				f"Connection to MongoDB failed. Are you sure it's installed and correctly configured? Error: {e}"
-			)
+        app.config[
+            "MONGO_URI"
+        ] = f"mongodb://{config['mongo']['url']}/{config['mongo']['name']}"
+        try:
+            # set up PyMongo using credentials from config.json
+            db = PyMongo(
+                app,
+                username=config["mongo"]["username"],
+                password=config["mongo"]["password"],
+            ).db
+        except KeyError:
+            # if username or password aren't defined in config, don't use them at all
+            db = PyMongo(app).db
+        try:
+            db.client.server_info()
+        except Exception as e:
+            print(
+                f"Connection to MongoDB failed. Are you sure it's installed and correctly configured? Error: {e}"
+            )
 except KeyError:
-	print("No supported database present in config.json")
+    print("No supported database present in config.json")
 # create login_manager for flask_login
 login_manager = LoginManager()
 # default view (page) used for logging in
@@ -110,12 +110,12 @@ login_manager.init_app(app)
 
 # create an argon2 hasher instance that will be called for all future operations
 hasher = PasswordHasher(
-	time_cost=4,
-	memory_cost=65536,
-	parallelism=8,
-	hash_len=16,
-	salt_len=16,
-	encoding="utf-8",
+    time_cost=4,
+    memory_cost=65536,
+    parallelism=8,
+    hash_len=16,
+    salt_len=16,
+    encoding="utf-8",
 )
 
 # create a restful api instance from flask_restful
@@ -129,155 +129,155 @@ socket = SocketIO(app)
 
 
 csp = {
-	"default-src": ["'none'"],
-	"script-src": ["'self'"],
-	"style-src": ["'self'"],
-	"font-src": ["'self'"],
-	"img-src": ["'self'"],
-	"connect-src": ["'self'"],
-	"base-uri": ["'none'"],
-	"form-action": ["'self'"],
-	"require-sri-for": ["scripts", "styles"],
+    "default-src": ["'none'"],
+    "script-src": ["'self'"],
+    "style-src": ["'self'"],
+    "font-src": ["'self'"],
+    "img-src": ["'self'"],
+    "connect-src": ["'self'"],
+    "base-uri": ["'none'"],
+    "form-action": ["'self'"],
+    "require-sri-for": ["scripts", "styles"],
 }
 try:
-	if config["https"]["enabled"]:
-		csp.update({"block-all-mixed-content": [], "upgrade-insecure-requests": []})
+    if config["https"]["enabled"]:
+        csp.update({"block-all-mixed-content": [], "upgrade-insecure-requests": []})
 except KeyError:
-	pass
+    pass
 fp = {
-	"accelerometer": "'none'",
-	"ambient-light-sensor": "'none'",
-	"autoplay": "'none'",
-	"battery": "'none'",
-	"camera": "'self'",
-	"display-capture": "'none'",
-	"document-domain": "'none'",
-	"encrypted-media": "'none'",
-	"execution-while-not-rendered": "'self'",
-	"execution-while-out-of-viewport": "'self'",
-	"fullscreen": "'self'",
-	"geolocation": "'none'",
-	"gyroscope": "'none'",
-	"layout-animations": "'self'",
-	"legacy-image-formats": "'self'",
-	"magnetometer": "'none'",
-	"microphone": "'none'",
-	"midi": "'none'",
-	"navigation-override": "'none'",
-	"oversized-images": "'none'",
-	"payment": "'none'",
-	"picture-in-picture": "'none'",
-	"publickey-credentials": "'self'",
-	"speaker": "'self'",
-	"sync-xhr": "'self'",
-	"usb": "'none'",
-	"vr": "'none'",
-	"wake-lock": "'none'",
-	"xr-spatial-tracking": "'none'",
+    "accelerometer": "'none'",
+    "ambient-light-sensor": "'none'",
+    "autoplay": "'none'",
+    "battery": "'none'",
+    "camera": "'self'",
+    "display-capture": "'none'",
+    "document-domain": "'none'",
+    "encrypted-media": "'none'",
+    "execution-while-not-rendered": "'self'",
+    "execution-while-out-of-viewport": "'self'",
+    "fullscreen": "'self'",
+    "geolocation": "'none'",
+    "gyroscope": "'none'",
+    "layout-animations": "'self'",
+    "legacy-image-formats": "'self'",
+    "magnetometer": "'none'",
+    "microphone": "'none'",
+    "midi": "'none'",
+    "navigation-override": "'none'",
+    "oversized-images": "'none'",
+    "payment": "'none'",
+    "picture-in-picture": "'none'",
+    "publickey-credentials": "'self'",
+    "speaker": "'self'",
+    "sync-xhr": "'self'",
+    "usb": "'none'",
+    "vr": "'none'",
+    "wake-lock": "'none'",
+    "xr-spatial-tracking": "'none'",
 }
 try:
-	Talisman(
-		app,
-		force_https=config["https"]["enabled"],
-		force_https_permanent=config["https"]["enabled"],
-		session_cookie_secure=config["https"]["enabled"],
-		feature_policy=fp,
-		content_security_policy=csp,
-		content_security_policy_report_uri="/csp-reports",
-		strict_transport_security=config["https"]["hsts-enabled"],
-		strict_transport_security_preload=config["https"]["hsts-preload"],
-		#        content_security_policy_nonce_in=["script-src", "style-src"],
-		referrer_policy="no-referrer",
-	)
+    Talisman(
+        app,
+        force_https=config["https"]["enabled"],
+        force_https_permanent=config["https"]["enabled"],
+        session_cookie_secure=config["https"]["enabled"],
+        feature_policy=fp,
+        content_security_policy=csp,
+        content_security_policy_report_uri="/csp-reports",
+        strict_transport_security=config["https"]["hsts-enabled"],
+        strict_transport_security_preload=config["https"]["hsts-preload"],
+        #        content_security_policy_nonce_in=["script-src", "style-src"],
+        referrer_policy="no-referrer",
+    )
 except KeyError:
-	Talisman(
-		app,
-		feature_policy=fp,
-		content_security_policy=csp,
-		content_security_policy_report_uri="/csp-reports",
-	)
+    Talisman(
+        app,
+        feature_policy=fp,
+        content_security_policy=csp,
+        content_security_policy_report_uri="/csp-reports",
+    )
 
 
 class User(UserMixin):
-	"""
+    """
 	User class used by flask_login
 	"""
 
-	def __init__(self, username):
-		self.username = username
+    def __init__(self, username):
+        self.username = username
 
-	@staticmethod
-	def is_authenticated(self):
-		"""
+    @staticmethod
+    def is_authenticated(self):
+        """
 		Authentication status
 		"""
-		return True
+        return True
 
-	@staticmethod
-	def is_active(self):
-	"""
-	Shows that the user is logged in
-	"""
-		return True
-
-	@staticmethod
-	def is_anonymous(self):
+    @staticmethod
+    def is_active(self):
+        """
+		Shows that the user is logged in
 		"""
-	A logged in user is not anonymous
-	"""
-		return False
+        return True
 
-	def get_id(self):
+    @staticmethod
+    def is_anonymous(self):
+        """
+		A logged in user is not anonymous
 		"""
-	Returns the id - in this case username
-	"""
-		return self.username
+        return False
 
-	def get_cards(self):
+    def get_id(self):
+        """
+		Returns the id - in this case username
 		"""
-	Returns all mifare card ids associated with the account
-	"""
-		return db.users.find_one({"username": self.username})["cards"]
+        return self.username
 
-	def add_card(self, card):
+    def get_cards(self):
+        """
+		Returns all mifare card ids associated with the account
 		"""
-	adds a mifare card id to user profile
-	"""
-		db.users.update_one(
-			{"username": self.username}, {"$push": {"cards": card}}, upsert=True
-		)
+        return db.users.find_one({"username": self.username})["cards"]
 
-	def delete_card(self, card):
+    def add_card(self, card):
+        """
+		adds a mifare card id to user profile
 		"""
-	adds a mifare card id from user profile
-	"""
-		db.users.update_one({"username": self.username}, {"$pull": {"cards": card}})
+        db.users.update_one(
+            {"username": self.username}, {"$push": {"cards": card}}, upsert=True
+        )
+
+    def delete_card(self, card):
+        """
+		removes a mifare card id from user profile
+		"""
+        db.users.update_one({"username": self.username}, {"$pull": {"cards": card}})
 
 
 @login_manager.user_loader
 def load_user(username):
-	"""
+    """
 	A function for loading users from database by username
 	"""
-	u = db.users.find_one({"username": username})
-	if not u:
-		return None
-	return User(username=u["username"])
+    u = db.users.find_one({"username": username})
+    if not u:
+        return None
+    return User(username=u["username"])
 
 
 def sri_for(endpoint, **values):
-	input = url_for(endpoint, **values)
-	input = input.replace(app.static_url_path, app.static_folder)
-	hash = sha256()
-	with open(input, "rb") as f:
-		while True:
-			data = f.read(65536)
-			if not data:
-				break
-			hash.update(data)
-	hash = hash.digest()
-	hash_base64 = base64.b64encode(hash).decode()
-	return f"sha256-{hash_base64}"
+    input = url_for(endpoint, **values)
+    input = input.replace(app.static_url_path, app.static_folder)
+    hash = sha256()
+    with open(input, "rb") as f:
+        while True:
+            data = f.read(65536)
+            if not data:
+                break
+            hash.update(data)
+    hash = hash.digest()
+    hash_base64 = base64.b64encode(hash).decode()
+    return f"sha256-{hash_base64}"
 
 
 app.jinja_env.globals["sri_for"] = sri_for
