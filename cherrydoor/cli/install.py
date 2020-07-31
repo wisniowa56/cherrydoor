@@ -96,7 +96,7 @@ def install(args):
 Description=Cherrydoor Service
 After=network.target
 [Service]
-ExecStart={os.path.realpath(__file__)} start
+ExecStart={os.path.realpath(__file__).replace("install.py", "__init__.py")} start
 Environment=PYTHONUNBUFFERED=1
 Restart=always
 Type=simple
