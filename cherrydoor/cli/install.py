@@ -104,7 +104,11 @@ User=ubuntu
 WantedBy=multi-user.target
 """
             try:
-                with open(f"{Path.home()}/systemd/user/cherrydoor.service", "w") as f:
+                if not os.path.exists(f"{Path.home()}/.config/systemd/user"):
+                    os.makedirs(f"{Path.home()}/.config/systemd/user")
+                with open(
+                    f"{Path.home()}/.config/systemd/user/cherrydoor.service", "w"
+                ) as f:
                     f.write(service_config)
                     print(
                         f"Plik konfiguracyjny znajduje się w folderze {Path.home()}/.config/cherrydoor"
