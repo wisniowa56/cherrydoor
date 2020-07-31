@@ -6,7 +6,6 @@ import argparse
 import sys
 import os
 import json
-from subprocess import call
 from argon2 import PasswordHasher
 from pymongo import MongoClient
 

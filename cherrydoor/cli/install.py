@@ -2,7 +2,7 @@ from getpass import getpass
 import sys
 import os
 import json
-from subprocess import call
+from subprocess import call  # nosec
 from argon2 import PasswordHasher
 from pymongo import MongoClient, OperationFailure
 from pathlib import Path
@@ -20,7 +20,7 @@ def install(args):
         if step_enabled("dependencies", args):
             # install MongoDB and some other things if they're not installed
             try:
-                call(["cherrydoor-install"], shell=False)
+                call(["cherrydoor-install"], shell=False)  # nosec
             except (PermissionError, FileNotFoundError):
                 print("unable to install dependencies")
                 if args.fail:
@@ -162,7 +162,7 @@ WantedBy=multi-user.target
         print("Instalacja skończona!")
         try:
             service_call_args = ["systemctl", "--user", "enable", "cherrydoor"]
-            call(service_call_args, shell=False)
+            call(service_call_args, shell=False)  # nosec
         except (IOError, PermissionError):
             pass
     else:
