@@ -4,7 +4,8 @@ import os
 import json
 from subprocess import call  # nosec
 from argon2 import PasswordHasher
-from pymongo import MongoClient, OperationFailure
+from pymongo import MongoClient
+from pymongo.errors import OperationFailure
 from pathlib import Path
 
 
