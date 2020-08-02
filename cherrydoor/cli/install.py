@@ -11,7 +11,7 @@ from pathlib import Path
 
 def step_enabled(step, args):
     return step not in args.install_steps_excluded and (
-        args.install_steps == None or step in args.install_steps
+        args.install_steps == [] or step in args.install_steps
     )
 
 
