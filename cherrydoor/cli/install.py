@@ -159,9 +159,11 @@ WantedBy=multi-user.target
                 db.users.create_index("username", name="username_index", unique=True)
             if "cards_index" not in user_indexes.keys():
                 db.user.create_index("cards", name="cards_index", sparse=True)
+        # nosec - it's python3, not 2 Bandit...
         if step_enabled("user", args) and input(
             "Czy chcesz stworzć nowego użytkownika-administratora? [y/n]"
         ).lower() in ["y", "yes", "tak", "t"]:
+            # nosec - it's python3, not 2 Bandit...
             username = input("Wprowadź nazwę użytkownika: ")
             password = hasher.hash(getpass("Hasło: "))
             db.users.insert({"username": username, "password": password, "cards": []})
