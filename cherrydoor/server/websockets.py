@@ -108,7 +108,7 @@ def break_times(json=[]):
                 return None
             db_breaks = [{"from": item[0], "to": item[1]} for item in breaks]
             db.settings.update(
-                {"setting": "break_times"}, {"$set": {"value": db_breaks}}, upsert=True,
+                {"setting": "break_times"}, {"$set": {"value": db_breaks}}, upsert=True
             )
             breaks = [
                 [item[0].isoformat() + "Z", item[1].isoformat() + "Z"]

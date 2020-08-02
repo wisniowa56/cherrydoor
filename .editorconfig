@@ -6,7 +6,7 @@ trim_trailing_whitespace = true
 insert_final_newline = true
 charset = utf-8
 [{*.py}]
-indent_style = tab
+indent_style = space
 indent_size = 4
 [{*.ts,*.js,*.json,*.cjs,*.svelte,*.html,*.css}]
 indent_style = tab

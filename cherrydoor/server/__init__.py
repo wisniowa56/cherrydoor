@@ -200,8 +200,8 @@ except KeyError:
 
 class User(UserMixin):
     """
-	User class used by flask_login
-	"""
+    User class used by flask_login
+    """
 
     def __init__(self, username):
         self.username = username
@@ -209,56 +209,78 @@ class User(UserMixin):
     @staticmethod
     def is_authenticated(self):
         """
-		Authentication status
-		"""
+        Authentication status
+        """
         return True
 
     @staticmethod
     def is_active(self):
         """
-		Shows that the user is logged in
-		"""
+        Shows that the user is logged in
+        """
         return True
 
     @staticmethod
     def is_anonymous(self):
         """
-		A logged in user is not anonymous
-		"""
+        A logged in user is not anonymous
+        """
         return False
 
     def get_id(self):
         """
-		Returns the id - in this case username
-		"""
+        Returns the id - in this case username
+        """
         return self.username
 
     def get_cards(self):
         """
-		Returns all mifare card ids associated with the account
-		"""
-        return db.users.find_one({"username": self.username})["cards"]
+        Returns all mifare card ids associated with the account
+        """
+        return db.users.find_one({"username": self.username}, {"_id": 0, "cards": 1})[
+            "cards"
+        ]
 
     def add_card(self, card):
         """
-		adds a mifare card id to user profile
-		"""
+        Adds a mifare card id to user profile
+        """
         db.users.update_one(
             {"username": self.username}, {"$push": {"cards": card}}, upsert=True
         )
 
     def delete_card(self, card):
         """
-		removes a mifare card id from user profile
-		"""
+        Removes a mifare card id from user profile
+        """
         db.users.update_one({"username": self.username}, {"$pull": {"cards": card}})
+
+    def check_privilege(privilege="admin"):
+        """
+        Checks if the user has a specified privilege.
+        Defaults to checking for administrative privileges
+        """
+        return (
+            privilege
+            in db.user.find_one(
+                {"username": self.username}, {"_id": 0, "privileges": 1}
+            )["privileges"]
+        )
+
+    def get_privileges():
+        """
+        Returns all privileges user has
+        """
+        return db.user.find_one(
+            {"username": self.username}, {"_id": 0, "privileges": 1}
+        )["privileges"]
 
 
 @login_manager.user_loader
 def load_user(username):
     """
-	A function for loading users from database by username
-	"""
+    A function for loading users from database by username
+    """
     u = db.users.find_one({"username": username})
     if not u:
         return None
