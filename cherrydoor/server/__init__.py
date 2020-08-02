@@ -71,7 +71,6 @@ app = Flask(__name__, template_folder="../templates", static_folder="../static")
 # set up a secret key for cookie and session encryption based on config.json
 app.config["SECRET_KEY"] = config["secret-key"]
 app.config["TEMPLATES_AUTO_RELOAD"] = True
-app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
 # pymongo connection
 # configure database access uri
 try:
@@ -129,6 +128,7 @@ parser = reqparse.RequestParser()
 # create socketio instance
 socket = SocketIO(app)
 
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
 
 csp = {
     "default-src": ["'none'"],
