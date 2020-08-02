@@ -145,8 +145,13 @@ WantedBy=multi-user.target
                     ],
                 )
                 db.create_collection("users")
-                db.create_collection("logs")
+                db.create_collection(
+                    "logs", options={"size": 1073742000, "capped": True}
+                )
                 db.create_collection("settings")
+                db.create_collection(
+                    "terminal", options={"size": 1048576, "capped": True, "max": 10000}
+                )
             except OperationFailure:
                 pass
             user_indexes = db.users.index_information()

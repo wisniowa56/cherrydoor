@@ -66,9 +66,9 @@ def cherrydoor():
     # if start argument was passed or no arguments were used, start the server
     if args.subcommand == "start" or not len(sys.argv) > 1:
         from cherrydoor.server import app, socket, config
-        from cherrydoor.interface.commands import Commands
+        from cherrydoor.interface.serial import Serial
 
-        interface = Commands()
+        interface = Serial()
         interface_run = Process(target=interface.start)
         server = Process(
             target=socket.run,
