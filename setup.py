@@ -3,7 +3,7 @@ from os import environ
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.6.b2"
+__version__ = "0.6.b3"
 __status__ = "Prototype"
 
 try:
@@ -44,7 +44,9 @@ setup(
     python_requires=">=3.7",
     install_requires=[
         "argon2-cffi>=19",
-        "DateTimeRange>=0.6" "Flask>=1",
+        "DateTimeRange>=0.6",
+        "Flask>=1",
+        "Werkzeug>1",
         "Flask-WTF>=0.14",
         "Flask-Login>=0.4",
         "Flask-PyMongo>=2.3",
