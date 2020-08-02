@@ -8,7 +8,7 @@ from cherrydoor.server import socket, emit, dt, db, current_user, disconnect
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.5.dev"
+__version__ = "0.6.b0"
 __status__ = "Prototype"
 
 
@@ -95,15 +95,20 @@ def break_times(json=[]):
             try:
                 breaks = [
                     [
-                        dt.datetime.fromisoformat(item[0].replace("Z", "")),
-                        dt.datetime.fromisoformat(item[1].replace("Z", "")),
+                        dt.datetime.fromisoformat(item[0].replace("Z", "")).replace(
+                            year=2020, month=2, day=2
+                        ),
+                        dt.datetime.fromisoformat(item[1].replace("Z", "")).replace(
+                            year=2020, month=2, day=2
+                        ),
                     ]
                     for item in json
                 ]
             except IndexError:
                 return None
+            db_breaks = [{"from": item[0], "to": item[1]} for item in breaks]
             db.settings.update(
-                {"setting": "break_times"}, {"$set": {"value": breaks}}, upsert=True,
+                {"setting": "break_times"}, {"$set": {"value": db_breaks}}, upsert=True
             )
             breaks = [
                 [item[0].isoformat() + "Z", item[1].isoformat() + "Z"]
@@ -115,7 +120,8 @@ def break_times(json=[]):
     try:
         breaks = list(db.settings.find_one({"setting": "break_times"})["value"])
         breaks = [
-            [item[0].isoformat() + "Z", item[1].isoformat() + "Z"] for item in breaks
+            [item["from"].isoformat() + "Z", item["to"].isoformat() + "Z"]
+            for item in breaks
         ]
         return_breaks = jsn.dumps(breaks, indent=4, sort_keys=True, default=str)
     except KeyError:

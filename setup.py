@@ -3,7 +3,7 @@ from os import environ
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.5.3"
+__version__ = "0.6.b0"
 __status__ = "Prototype"
 
 try:
@@ -12,9 +12,16 @@ except KeyError:
     pass
 if "CI" in environ:
     with open("VERSION", "w", encoding="utf-8") as f:
-        f.write(__version__)
+        if __version__[0] == "v":
+            f.write(__version__)
+        else:
+            f.write(f"v{__version__}")
+
 with open("README.md", "r", encoding="utf-8") as f:
-    readme = f.read()
+    readme = f.read().replace(
+        "cherrydoor/static",
+        f"https://raw.githubusercontent.com/wisniowa56/cherrydoor/v{__version__}/cherrydoor/static/",
+    )
 
 setup(
     name="Cherrydoor",
@@ -33,7 +40,7 @@ setup(
     package_data={"": ["templates/*", "static/*/*", "static/images/*/*"]},
     zip_safe=False,
     scripts=["scripts/cherrydoor-install"],
-    entry_points={"console_scripts": ["cherrydoor = cherrydoor.cherrydoor:cherrydoor"]},
+    entry_points={"console_scripts": ["cherrydoor = cherrydoor.cli:cherrydoor"]},
     python_requires=">=3.7",
     install_requires=[
         "argon2-cffi>=19",
@@ -44,7 +51,8 @@ setup(
         "Flask-RESTful>=0.3",
         "Flask-SocketIO>=4.2",
         "flask-talisman>=0.7",
-        "pyserial>=3.4",
+        "aioserial>=3.4",
+        "motor>=2.1.0",
         "pymongo>=3.10",
         "eventlet",
     ],

@@ -14,7 +14,7 @@ from cherrydoor.server import (
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.5.3"
+__version__ = "0.6.b0"
 __status__ = "Prototype"
 
 parser.add_argument("time_from", help="start of time range")

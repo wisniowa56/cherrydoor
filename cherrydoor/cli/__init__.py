@@ -6,7 +6,6 @@ import argparse
 import sys
 import os
 import json
-from subprocess import call
 from argon2 import PasswordHasher
 from pymongo import MongoClient
 
@@ -60,16 +59,16 @@ def cherrydoor():
 
     args = parser.parse_args()
     if args.subcommand == "install":
-        from cherrydoor.cherrydoor.install import install
+        from cherrydoor.cli.install import install
 
         install(args)
 
     # if start argument was passed or no arguments were used, start the server
     if args.subcommand == "start" or not len(sys.argv) > 1:
         from cherrydoor.server import app, socket, config
-        from cherrydoor.interface.commands import Commands
+        from cherrydoor.interface.serial import Serial
 
-        interface = Commands()
+        interface = Serial()
         interface_run = Process(target=interface.start)
         server = Process(
             target=socket.run,
@@ -81,13 +80,15 @@ def cherrydoor():
             },
         )
 
-        def exit():
+        def exit(interface_run, server):
+            print("Closing server and serial connections")
             interface_run.terminate()
-            server.terminate()
+            # server.terminate()
+            sys.exit()
 
         import atexit
 
-        atexit.register(exit)
+        atexit.register(exit, interface_run, server)
         interface_run.start()
         server.run()
 

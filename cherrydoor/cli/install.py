@@ -2,9 +2,10 @@ from getpass import getpass
 import sys
 import os
 import json
-from subprocess import call
+from subprocess import call  # nosec
 from argon2 import PasswordHasher
 from pymongo import MongoClient
+from pymongo.errors import OperationFailure
 from pathlib import Path
 
 
@@ -20,7 +21,7 @@ def install(args):
         if step_enabled("dependencies", args):
             # install MongoDB and some other things if they're not installed
             try:
-                call(["cherrydoor-install"], shell=False)
+                call(["cherrydoor-install"], shell=False)  # nosec
             except (PermissionError, FileNotFoundError):
                 print("unable to install dependencies")
                 if args.fail:
@@ -69,14 +70,33 @@ def install(args):
         if step_enabled("config", args):
             # create a random secret key
             config["secret-key"] = os.urandom(24).hex()
-        # let user choose a password for the database
-        config["mongo"]["password"] = getpass("Wprowadź hasło do bazy danych: ")
-        service_config = f"""\
+            # let user choose a password for the database
+            if step_enabled("database", args):
+                config["mongo"]["password"] = getpass("Wprowadź hasło do bazy danych: ")
+            try:
+                # files configuration
+                if not os.path.exists(f"${Path.home()}"):
+                    os.makedirs(f"{Path.home()}/.config/cherrydoor")
+                with open(
+                    f"{Path.home()}/.config/cherrydoor/config.json",
+                    "w",
+                    encoding="utf-8",
+                ) as f:
+                    json.dump(config, f, ensure_ascii=False, indent=4)
+            except (IOError, PermissionError):
+                print(
+                    f"Nie udało się stworzyć plików w {Path.home()}/.config/cherrydoor. Spróbuj stworzyć ten folder manualnie i nadać mu właściwe uprawnienia",
+                    file=sys.stderr,
+                )
+                if args.fail:
+                    sys.exit(1)
+        if step_enabled("service", args):
+            service_config = f"""\
 [Unit]
 Description=Cherrydoor Service
 After=network.target
 [Service]
-ExecStart={os.path.realpath(__file__)} start
+ExecStart={os.path.realpath(__file__).replace("install.py", "__init__.py")} start
 Environment=PYTHONUNBUFFERED=1
 Restart=always
 Type=simple
@@ -84,24 +104,12 @@ User=ubuntu
 [Install]
 WantedBy=multi-user.target
 """
-        try:
-            # files configuration
-            if not os.path.exists(f"${Path.home()}"):
-                os.makedirs(f"{Path.home()}/.config/cherrydoor")
-            with open(
-                f"{Path.home()}/.config/cherrydoor/config.json", "w", encoding="utf-8"
-            ) as f:
-                json.dump(config, f, ensure_ascii=False, indent=4)
-        except (IOError, PermissionError):
-            print(
-                f"Nie udało się stworzyć plików w {Path.home()}/.config/cherrydoor. Spróbuj stworzyć ten folder manualnie i nadać mu właściwe uprawnienia",
-                file=sys.stderr,
-            )
-            if args.fail:
-                sys.exit(1)
-        if step_enabled("service", args):
             try:
-                with open(f"{Path.home()}/systemd/user/cherrydoor.service", "w") as f:
+                if not os.path.exists(f"{Path.home()}/.config/systemd/user"):
+                    os.makedirs(f"{Path.home()}/.config/systemd/user")
+                with open(
+                    f"{Path.home()}/.config/systemd/user/cherrydoor.service", "w"
+                ) as f:
                     f.write(service_config)
                     print(
                         f"Plik konfiguracyjny znajduje się w folderze {Path.home()}/.config/cherrydoor"
@@ -126,18 +134,26 @@ WantedBy=multi-user.target
             f"mongodb://{config['mongo']['url']}/{config['mongo']['name']}"
         )[config["mongo"]["name"]]
         if step_enabled("database", args):
-            db.command(
-                "createUser",
-                config["mongo"]["username"],
-                pwd=config["mongo"]["password"],
-                roles=[
-                    {"role": "readWrite", "db": config["mongo"]["name"]},
-                    {"role": "clusterMonitor", "db": "admin"},
-                ],
-            )
-            db.create_collection("users")
-            db.create_collection("logs")
-            db.create_collection("settings")
+            try:
+                db.command(
+                    "createUser",
+                    config["mongo"]["username"],
+                    pwd=config["mongo"]["password"],
+                    roles=[
+                        {"role": "readWrite", "db": config["mongo"]["name"]},
+                        {"role": "clusterMonitor", "db": "admin"},
+                    ],
+                )
+                db.create_collection("users")
+                db.create_collection(
+                    "logs", options={"size": 1073742000, "capped": True}
+                )
+                db.create_collection("settings")
+                db.create_collection(
+                    "terminal", options={"size": 1048576, "capped": True, "max": 10000}
+                )
+            except OperationFailure:
+                pass
             user_indexes = db.users.index_information()
             if "username_index" not in user_indexes.keys():
                 db.users.create_index("username", name="username_index", unique=True)
@@ -152,7 +168,7 @@ WantedBy=multi-user.target
         print("Instalacja skończona!")
         try:
             service_call_args = ["systemctl", "--user", "enable", "cherrydoor"]
-            call(service_call_args, shell=False)
+            call(service_call_args, shell=False)  # nosec
         except (IOError, PermissionError):
             pass
     else:
