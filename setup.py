@@ -3,7 +3,7 @@ from os import environ
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.6.b0"
+__version__ = "0.6.b1"
 __status__ = "Prototype"
 
 try:
@@ -51,7 +51,7 @@ setup(
         "Flask-RESTful>=0.3",
         "Flask-SocketIO>=4.2",
         "flask-talisman>=0.7",
-        "aioserial>=3.4",
+        "aioserial>=1.3.0",
         "motor>=2.1.0",
         "pymongo>=3.10",
         "eventlet",
