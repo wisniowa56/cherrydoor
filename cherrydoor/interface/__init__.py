@@ -3,7 +3,7 @@ from pathlib import Path
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.5.2"
+__version__ = "0.6.b0"
 __status__ = "Prototype"
 
 default_routes = [
