@@ -2,6 +2,7 @@ import asyncio
 from datetime import datetime
 from math import ceil
 from time import sleep
+import sys
 
 from motor import motor_asyncio as motor
 import aioserial
@@ -19,9 +20,10 @@ class Serial:
         self.encoding = config.get("interface", {}).get("encoding", "utf-8")
         self.manual_auth = False
         self.is_break = False
-        self.command_funcions = {"CARD": self.card}
+        self.command_funcions = {"CARD": self.card, "EXIT": sys.exit}
         self.terminal_change_stream = None
         self.break_times = []
+        self.delay = 0
 
     def start(self):
         try:
@@ -79,6 +81,8 @@ class Serial:
                 "manufacturer-code", "18"
             ) or await self.authenticate(block0[:10])
             auth_mode = "Manufacturer code"
+        if self.delay:
+            await asyncio.sleep(self.delay)
         await self.writeline(f"AUTH {1 if result else 0}")
         self.loop.create_task(self.log_entry(block0, auth_mode, result))
         print(f"Authentication {'successful' if result else 'unsuccessful'}")
@@ -110,17 +114,27 @@ class Serial:
             pipeline=[
                 {
                     "$match": {
-                        "fullDocument.setting": "break_times",
+                        "fullDocument.setting": {"$in": ["break_times", "delay"]},
                         "operationType": {"$in": ["insert", "update", "replace"]},
                     }
                 },
-                {"$project": {"value": "$fullDocument.value"}},
+                {
+                    "$project": {
+                        "value": "$fullDocument.value",
+                        "setting": "$fullDocument.setting",
+                    }
+                },
             ],
             full_document="updateLookup",
         ) as self.settings_change_stream:
             async for change in self.settings_change_stream:
-                self.break_times = change.get("value", [])
-                print(f"new break times: {self.break_times}")
+                setting = change.get("setting", "")
+                if setting == "break_times":
+                    self.break_times = change.get("value", [])
+                    print(f"new break times: {self.break_times}")
+                elif setting == "delay":
+                    self.delay = change.get("value", 0)
+                    print(f"new response delay: {self.delay}s")
 
     async def breaks(self):
         while True:
