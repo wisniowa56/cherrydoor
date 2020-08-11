@@ -70,6 +70,7 @@ class Serial:
             process = self.command_funcions.get(command[0], None)
             if process != None:
                 await process(command[1])
+            await asyncio.sleep(0.5)
 
     async def card(self, block0):
         print("processing a card")
