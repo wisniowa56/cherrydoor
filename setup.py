@@ -3,7 +3,7 @@ from os import environ
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.6.b4"
+__version__ = "0.6.b5"
 __status__ = "Prototype"
 
 try:
