@@ -1,4 +1,14 @@
+"""
+Serial communication and card authentication
+"""
+
+__author__ = "opliko"
+__license__ = "MIT"
+__version__ = "0.7"
+__status__ = "Prototype"
+
 import asyncio
+import logging
 from datetime import datetime
 from math import ceil
 from time import sleep
@@ -7,62 +17,100 @@ import sys
 from motor import motor_asyncio as motor
 import aioserial
 
-from cherrydoor.interface import config
 
-__author__ = "opliko"
-__license__ = "MIT"
-__version__ = "0.6.0"
-__status__ = "Prototype"
+def get_config():
+    from cherrydoor.config import load_config
+
+    config, _ = load_config()
+    return config
 
 
 class Serial:
-    def __init__(self):
-        self.encoding = config.get("interface", {}).get("encoding", "utf-8")
+    def __init__(self, motor=None, loop=None, config=get_config()):
+        self.config = config
+        self.encoding = self.config.get("interface", {}).get("encoding", "utf-8")
         self.manual_auth = False
         self.is_break = False
         self.command_funcions = {"CARD": self.card, "EXIT": sys.exit}
-        self.terminal_change_stream = None
         self.break_times = []
         self.delay = 0
+        self.loop = loop
+        self.logger = logging.getLogger("SERIAL")
+        self.db = motor
+        self.settings_change_stream = None
 
-    def start(self):
+    def start(self, run=False):
         try:
-            self.loop = asyncio.get_event_loop()
-            self.db = motor.AsyncIOMotorClient(
-                f"mongodb://{config.get('mongo', {}).get('url', 'localhost:27017')}/{config.get('mongo', {}).get('name', 'cherrydoor')}",
-                username=config.get("mongo", {}).get("username", None),
-                password=config.get("mongo", {}).get("password", None),
-                io_loop=self.loop,
-            )[config.get("mongo", {}).get("name", "cherrydoor")]
-            self.serial_init()
+            if self.loop == None:
+                self.loop = asyncio.get_event_loop()
+            if self.db == None:
+                self.db = motor.AsyncIOMotorClient(
+                    f"mongodb://{self.config.get('mongo', {}).get('url', 'localhost:27017')}/{self.config.get('mongo', {}).get('name', 'cherrydoor')}",
+                    username=self.config.get("mongo", {}).get("username", None),
+                    password=self.config.get("mongo", {}).get("password", None),
+                    io_loop=self.loop,
+                )[self.config.get("mongo", {}).get("name", "cherrydoor")]
+            self.serial_init(self.config)
             self.loop.create_task(self.commands())
             self.loop.create_task(self.settings_listener())
             self.loop.create_task(self.breaks())
-            self.loop.create_task(self.terminal_listener())
-            print("Listening on serial interface")
-            self.loop.run_forever()
+            self.logger.info(f"Listening on {self.config.get('port', '/dev/serial0')}")
+            if run:
+                self.loop.run_forever()
+            else:
+                return self.loop
         except KeyboardInterrupt:
             pass
         finally:
-            if self.terminal_change_stream is not None:
-                self.terminal_change_stream.close()
-            if self.settings_change_stream is not None:
-                self.settings_change_stream.close()
+            self.cleanup()
+
+    async def aiohttp_startup(self, app):
+        app["create_aiohttp_tasks"] = asyncio.create_task(
+            self.create_aiohttp_tasks(app)
+        )
+
+    async def create_aiohttp_tasks(self, app):
+        await self.async_serial_init()
+        app["serial_listener"] = asyncio.create_task(self.commands())
+        app["settings_listener"] = asyncio.create_task(self.settings_listener())
+        app["breaks_listener"] = asyncio.create_task(self.breaks())
+        self.logger.info(
+            f"Listening on {app.get('self.config', {}).get('interface', {}).get('port', '/dev/serial0')}"
+        )
+
+    async def cleanup(self, app=None):
+        if self.settings_change_stream != None:
+            await self.settings_change_stream.close()
+        await self.serial.close()
 
     def serial_init(self):
         try:
             self.serial = aioserial.AioSerial(
                 loop=self.loop,
-                port=config.get("interface", {}).get("port", "/dev/serial0"),
-                baudrate=config.get("interface", {}).get("baudrate", 115200),
+                port=self.config.get("interface", {}).get("port", "/dev/serial0"),
+                baudrate=self.config.get("interface", {}).get("baudrate", 115200),
             )
         except aioserial.serialutil.SerialException:
             sleep(2)
             self.serial_init()
 
+    async def async_serial_init(self):
+        try:
+            self.serial = aioserial.AioSerial(
+                loop=self.loop,
+                port=self.config.get("interface", {}).get("port", "/dev/serial0"),
+                baudrate=self.config.get("interface", {}).get("baudrate", 115200),
+            )
+        except aioserial.serialutil.SerialException as e:
+            await asyncio.sleep(1)
+            await self.async_serial_init()
+
     async def commands(self):
         while True:
-            line = await self.serial.readline_async()
+            try:
+                line = await self.serial.readline_async()
+            except aioserial.serialutil.SerialException:
+                await self.async_serial_init()
             command = line.decode("utf-8", errors="ignore").rstrip().split(" ")
             self.loop.create_task(self.log_command(command))
             if len(command) < 2:
@@ -78,7 +126,7 @@ class Serial:
             result = await self.authenticate(block0[:10])
             auth_mode = "UID"
         else:
-            result = block0[-2:] == config.get(
+            result = block0[-2:] == self.config.get(
                 "manufacturer-code", "18"
             ) or await self.authenticate(block0[:10])
             auth_mode = "Manufacturer code"
@@ -90,7 +138,7 @@ class Serial:
 
     async def authenticate(self, card):
         result = await self.db.users.count_documents(
-            {"cards": str(card)}
+            {"permissions": {"$in": ["admin", "enter"]}, "cards": str(card)}
             # prepare for implementation of a privilege system:
             # {"cards": str(card), "privileges": {"$in": ["enter", "admin"]}}
         )
@@ -153,8 +201,11 @@ class Serial:
                 await self.writeline(f"NTFY {4 if self.is_break else 3}")
 
     async def writeline(self, text):
-        await self.serial.write_async(f"{text}\n".encode(self.encoding))
-        self.serial.flush()
+        try:
+            await self.serial.write_async(f"{text}\n".encode(self.encoding))
+            self.serial.flush()
+        except aioserial.serialutil.SerialException:
+            await self.async_serial_init()
 
     async def log_entry(self, block0, auth_mode, success):
         await self.db.logs.insert_one(
@@ -176,25 +227,6 @@ class Serial:
                 "timestamp": datetime.now(),
             }
         )
-
-    async def terminal_listener(self):
-        async with self.db.terminal.watch(
-            pipeline=[
-                {
-                    "$match": {
-                        "fullDocument.source": {"$ne": "serial"},
-                        "operationType": "insert",
-                    }
-                },
-            ],
-            full_document="updateLookup",
-        ) as self.terminal_change_stream:
-            async for change in self.terminal_change_stream:
-                document = change.get("fullDocument", {})
-                command = " ".join(
-                    [change.get("command", ""), *change.get("arguments", [])]
-                )
-                await self.writeline(command)
 
 
 if __name__ == "__main__":
