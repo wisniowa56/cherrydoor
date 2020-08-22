@@ -1,3 +1,11 @@
+"""
+Install the app for the first time
+"""
+
+__author__ = "opliko"
+__license__ = "MIT"
+__version__ = "0.7b0"
+__status__ = "Prototype"
 from getpass import getpass
 import sys
 import os
