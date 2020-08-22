@@ -3,7 +3,7 @@ from os import environ
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.6.b5"
+__version__ = "0.7.0b0"
 __status__ = "Prototype"
 
 try:
@@ -48,11 +48,16 @@ setup(
         "motor>=2.1",
         "confuse>=1.3",
         "pybranca>=0.3",
+        "msgpack>=1.0",
         "aiohttp-csrf>=0.0.2",
-        "aiohttp-rest-api>=0.0.6",
+        "aiohttp-jinja2>=1.2",
+        "aiohttp-rest-api-redoc>=0.2.3",
         "aiohttp-security>=0.4.0",
         "aiohttp-session>=2.9.0",
         "aiohttp-session-mongo>=0.0.1",
+        "secure>=0.2.1",
+        "sentry-sdk>=0.16.5",
+        "packaging>=20",
     ],
     extras_require={"speedups": ["aiodns>=1.1", "Brotli", "cchardet",]},
     classifiers=[
