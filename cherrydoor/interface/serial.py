@@ -9,13 +9,15 @@ __status__ = "Prototype"
 
 import asyncio
 import logging
+import sys
 from datetime import datetime
 from math import ceil
 from time import sleep
-import sys
 
-from motor import motor_asyncio as motor
 import aioserial
+from motor import motor_asyncio as motor
+
+from cherrydoor.util import aenumerate
 
 
 def get_config():
@@ -123,12 +125,12 @@ class Serial:
     async def card(self, block0):
         print("processing a card")
         if await self.auth_required():
-            result = await self.authenticate(block0[:10])
+            result = await self.authenticate(await self.extract_uid(block0))
             auth_mode = "UID"
         else:
             result = block0[-2:] == self.config.get(
                 "manufacturer-code", "18"
-            ) or await self.authenticate(block0[:10])
+            ) or await self.authenticate(await self.extract_uid(block0))
             auth_mode = "Manufacturer code"
         if self.delay:
             await asyncio.sleep(self.delay)
@@ -211,7 +213,7 @@ class Serial:
         await self.db.logs.insert_one(
             {
                 "timestamp": datetime.now(),
-                "card": block0[:10],
+                "card": await self.extract_uid(block0),
                 "manufacturer_code": block0[-2:],
                 "auth_mode": auth_mode,
                 "success": success,
@@ -227,6 +229,19 @@ class Serial:
                 "timestamp": datetime.now(),
             }
         )
+
+    async def extract_uid(self, block0):
+        if isinstance(block0, str):
+            block0 = bytearray.fromhex(block0)
+        uid = bytearray()
+        uid_len = 4 + 3 * (block0[0] == 0x88) + 3 * (block0[5] == 0x88)
+        async for i, byte in aenumerate(block0):
+            if (uid_len in [7, 10] and i in [0, 4]) or (uid_len == 10 and i in [5, 9]):
+                continue
+            uid.append(byte)
+            if len(uid) == uid_len:
+                break
+        return uid
 
 
 if __name__ == "__main__":
