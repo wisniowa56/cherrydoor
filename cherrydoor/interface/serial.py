@@ -62,6 +62,7 @@ class Serial:
             else:
                 return self.loop
         except KeyboardInterrupt:
+            self.logger.info("Keyboard interrupt")
             pass
         finally:
             self.cleanup()
@@ -92,7 +93,11 @@ class Serial:
                 port=self.config.get("interface", {}).get("port", "/dev/serial0"),
                 baudrate=self.config.get("interface", {}).get("baudrate", 115200),
             )
-        except aioserial.serialutil.SerialException:
+        except aioserial.serialutil.SerialException as e:
+            self.logger.debug(
+                "unable to connect to serial, trying again in 2 seconds. Exception: %s",
+                str(e),
+            )
             sleep(2)
             self.serial_init()
 
@@ -104,6 +109,10 @@ class Serial:
                 baudrate=self.config.get("interface", {}).get("baudrate", 115200),
             )
         except aioserial.serialutil.SerialException as e:
+            self.logger.debug(
+                "unable to connect to serial, trying again in 2 seconds. Exception: %s",
+                str(e),
+            )
             await asyncio.sleep(1)
             await self.async_serial_init()
 
@@ -111,7 +120,11 @@ class Serial:
         while True:
             try:
                 line = await self.serial.readline_async()
-            except aioserial.serialutil.SerialException:
+            except aioserial.serialutil.SerialException as e:
+                self.logger.debug(
+                    "disconnected from serial while trying to read. Exception: %s",
+                    str(e),
+                )
                 await self.async_serial_init()
             command = line.decode("utf-8", errors="ignore").rstrip().split(" ")
             self.loop.create_task(self.log_command(command))
@@ -123,7 +136,7 @@ class Serial:
             await asyncio.sleep(0.5)
 
     async def card(self, block0):
-        print("processing a card")
+        self.logger.debug("processing a card")
         if await self.auth_required():
             result = await self.authenticate(await self.extract_uid(block0))
             auth_mode = "UID"
@@ -136,7 +149,9 @@ class Serial:
             await asyncio.sleep(self.delay)
         await self.writeline(f"AUTH {1 if result else 0}")
         self.loop.create_task(self.log_entry(block0, auth_mode, result))
-        print(f"Authentication {'successful' if result else 'unsuccessful'}")
+        self.logger.debug(
+            f"Authentication {'successful' if result else 'unsuccessful'}"
+        )
 
     async def authenticate(self, card):
         result = await self.db.users.count_documents(
@@ -153,7 +168,7 @@ class Serial:
         try:
             self.manual_auth = auth.get("manual", False)
         except AttributeError:
-            self.manual_auth = False
+            return not self.is_break
         if self.manual_auth:
             return auth.get("value", True)
         return not self.is_break
@@ -206,7 +221,8 @@ class Serial:
         try:
             await self.serial.write_async(f"{text}\n".encode(self.encoding))
             self.serial.flush()
-        except aioserial.serialutil.SerialException:
+        except aioserial.serialutil.SerialException as e:
+            self.logger.debug("Serial exception while trying to write. %s", str(e))
             await self.async_serial_init()
 
     async def log_entry(self, block0, auth_mode, success):
@@ -232,7 +248,25 @@ class Serial:
 
     async def extract_uid(self, block0):
         if isinstance(block0, str):
-            block0 = bytearray.fromhex(block0)
+            try:
+                if len(block0) % 2 != 0:
+                    self.logger.debug(
+                        "padding block0 with 0 before manufacturere code. Contents before modification: %s",
+                        block0,
+                    )
+                    block0 = block0[:-2] + "0" + block0[-2:]
+                block0 = bytearray.fromhex(block0)
+            except ValueError as e:
+                self.logger.error(
+                    "Invalid block0 string - %s. block0: %s", str(e), block0
+                )
+                return block0
+        elif not isinstance(block0, bytearray):
+            self.logger.error(
+                "%s is not a valid type for block0 (valid types are string and bytearray)",
+                type(block0).__name__,
+            )
+            return None
         uid = bytearray()
         uid_len = 4 + 3 * (block0[0] == 0x88) + 3 * (block0[5] == 0x88)
         async for i, byte in aenumerate(block0):
@@ -241,7 +275,7 @@ class Serial:
             uid.append(byte)
             if len(uid) == uid_len:
                 break
-        return uid
+        return uid.hex()
 
 
 if __name__ == "__main__":
