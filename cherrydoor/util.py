@@ -13,6 +13,9 @@ from aiohttp import web
 
 
 def redirect(router, route_name):
+    """Retrun a redirect to a specified route (by name)
+
+    """
     try:
         location = router.get(route_name, {}).url_for()
         return web.HTTPFound(location)
@@ -49,6 +52,6 @@ def get_datetime(time, default):
 async def aenumerate(sequence, start=0):
     """Asynchronously enumerate an iterator from a given start value"""
     n = start
-    for elem in asequence:
+    for elem in sequence:
         yield n, elem
         n += 1

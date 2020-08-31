@@ -1,30 +1,34 @@
 {% extends "layout.html" %} {% block head %}
 <link
 	rel="stylesheet"
-	href="{{ url_for('static', filename='css/login.css') }}"
-	integrity="sri_for('static', filename='css/login.css') "
+	href="{{ static('css/login.css') }}"
+	integrity="sri('css/login.css') "
 />
 {% endblock %} {% block body %}
 <div class="container">
 	<div class="row">
 		<div class="login-form">
-			<form method="POST" action="{{ url_for('login') }}">
-				{{ form.csrf_token }}
-				<h2 class="text-center">{{ form.submit.label }}</h2>
-				<div class="form-group">
-					{{ form.username(class_="form-control"+error) }}
-				</div>
-				<div class="form-group">
-					{{ form.password(class_="form-control"+error) }}
-				</div>
-				<div class="form-group">
-					{{ form.submit(class_="btn btn-primary btn-block") }}
-				</div>
-				<div class="clearfix">
-					{{ form.remember(size=5) }} {{ form.remember.label }}
-				</div>
+			<form method="POST" action="{{ url('login') }}">
+				<input
+					type="hidden"
+					name="{{ csrf_field_name }}"
+					value="{{ csrf_token }}"
+				/>
+				<input
+					type="string"
+					name="username"
+					aria-label="username input"
+					placeholder="username"
+				/>
+				<input
+					type="password"
+					name="password"
+					aria-label="passwod input"
+					placeholder="password"
+				/>
+				<input type="checkbox" name="remember" aria-label="remember-me" />
+				<input type="submit" />
 			</form>
-			<br />
 		</div>
 	</div>
 </div>

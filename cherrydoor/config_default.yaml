@@ -13,3 +13,5 @@ interface:
   encoding: utf-8
 manufacturer_code: "18"
 max_session_age: 31536000
+https: false
+log_level: ERROR

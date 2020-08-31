@@ -1,16 +1,30 @@
-import confuse
+"""
+Load configuration
+"""
+
+__author__ = "opliko"
+__license__ = "MIT"
+__version__ = "0.7b0"
+__status__ = "Prototype"
+
 import argparse
+from uuid import uuid4
+
+import confuse
+
 
 # add otpional type, because confuse doesn't have it yet
-def optional(type):
+def optional(type, default=None):
     template = confuse.as_template(type)
-    template.default = None
+    template.default = default
     return template
 
 
 template = {
+    "version": optional(confuse.OneOf([str, int]), __version__),
     "host": str,
-    "port": int,
+    "port": optional(int),
+    "path": optional(confuse.Filename()),
     "mongo": {
         "url": str,
         "name": str,
@@ -18,12 +32,17 @@ template = {
         "password": optional(str),
     },
     "interface": {
-        "port": confuse.OneOf([confuse.Filename(), confuse.String(pattern="COM\d+$")]),
+        "port": confuse.OneOf([confuse.String(pattern="COM\d+$"), confuse.Filename()]),
         "baudrate": int,
-        "encoding": str,
+        "encoding": optional(str, "utf-8"),
     },
     "manufacturer_code": confuse.String(pattern="^[a-fA-F0-9]{2}$"),
-    "secret_key": str,
+    "secret_key": optional(str),
+    "max_session_age": confuse.OneOf([int, None]),
+    "https": optional(bool, False),
+    "sentry_dsn": optional(str),
+    "sentry_csp_url": optional(str),
+    "log_level": optional(str),
 }
 
 config = confuse.LazyConfig("cherrydoor", __name__)
@@ -76,22 +95,37 @@ def add_args(parser):
             "help": "encoding used by arduino (default utf-8 is probably the best idea)",
             "dest": "interface.encoding",
         },
-        "manufacturer_code": {
+        "manufacturer-code": {
             "type": str,
             "help": "Last two digits of block 0 of cards you want to allow during breaks",
             "dest": "manufacturer_code",
         },
-        "secret_key": {
+        "secret-key": {
             "type": str,
             "help": "secret used for csrf and other stuff. Ideally a totally random value",
             "dest": "secret_key",
+        },
+        "max-session-age": {
+            "type": int,
+            "help": "maximum amount of time a session can be active",
+            "dest": "max_session_age",
+        },
+        "https": {
+            "type": bool,
+            "help": "whether the app is using https (modifies some security headers)",
+            "dest": "https",
+        },
+        "log-level": {
+            "type": str,
+            "help": "Log level shown (defaults to WARN)",
+            "dest": "log_level",
         },
     }
     config_group = parser.add_argument_group(
         title="config", description="configuration options"
     )
     config_group.set_defaults(env=True, config=None)
-    cofig_group.add_argument(
+    config_group.add_argument(
         "--no-env",
         help="don't use environmental variables for cofiguration",
         dest="env",
@@ -103,12 +137,12 @@ def add_args(parser):
         type=argparse.FileType("r"),
         dest="config",
     )
-    for (setting, attributes) in args_template:
+    for (setting, attributes) in args_template.items():
         config_group.add_argument(
             f"--{setting}",
-            help=attributes.help,
-            type=attributes.type,
-            dest=attributes.dest,
+            help=attributes.get("help", ""),
+            type=attributes.get("type", str),
+            dest=attributes.get("dest", None),
         )
 
     return parser
@@ -117,16 +151,17 @@ def add_args(parser):
 def load_config(args=None):
     if args != None:
         if args.config != None:
-            config.set_file(args.config)
+            config.set_file(args.config.name)
         if args.env:
             config.add(load_env())
         config.set_args(args, dots=True)
     valid_config = config.get(template)
-    return valid_config
+    if valid_config.get("secret_key", None) == None:
+        valid_config["secret_key"] = str(uuid4())
+    return valid_config, config
 
 
 def load_env():
     from os import environ
 
-    confuse.ConfigSource.of(environ)
-
+    return confuse.ConfigSource.of(dict(environ))

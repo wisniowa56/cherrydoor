@@ -6,15 +6,15 @@ __author__ = "opliko"
 __license__ = "MIT"
 __status__ = "Prototype"
 
-import asyncio
 import argparse
-import sys
+import asyncio
 import logging
+import sys
 
 from aiohttp import web
 
-from cherrydoor.config import load_config, add_args
 from cherrydoor.__version__ import __version__
+from cherrydoor.config import add_args, load_config
 
 
 def cherrydoor():
@@ -121,9 +121,15 @@ def cherrydoor():
     add_args(start_parser)
     args = parser.parse_args()
     config, _ = load_config(args)
+    log_level = getattr(logging, config.get("log_level", "WARN").upper())
+    if not isinstance(log_level, int):
+        log_level = logging.WARN
+        logging.warn(
+            "Invalid log level %s - defaulting to WARN",
+            config.get("log_level", "WARN").upper(),
+        )
     logging.basicConfig(
-        level=config.get("log_level", logging.WARN),
-        format="%(asctime)s:%(name)s:%(levelname)s: %(message)s",
+        level=log_level, format="%(asctime)s:%(name)s:%(levelname)s: %(message)s",
     )
     if args.subcommand == "install":
         from cherrydoor.cli.install import install
@@ -146,7 +152,10 @@ def cherrydoor():
         app.on_cleanup.append(interface.cleanup)
 
         web.run_app(
-            app, host=config.get("host", "127.0.0.1"), port=config.get("port", 5000)
+            app,
+            host=config.get("host", "127.0.0.1"),
+            port=config.get("port", 5000),
+            path=config.get("path", None),
         )
 
 

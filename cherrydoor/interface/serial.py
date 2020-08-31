@@ -56,7 +56,9 @@ class Serial:
             self.loop.create_task(self.commands())
             self.loop.create_task(self.settings_listener())
             self.loop.create_task(self.breaks())
-            self.logger.info(f"Listening on {self.config.get('port', '/dev/serial0')}")
+            self.logger.info(
+                f"Listening on {self.config.get('interface', {}).get('port', '/dev/serial0')}"
+            )
             if run:
                 self.loop.run_forever()
             else:
@@ -78,7 +80,7 @@ class Serial:
         app["settings_listener"] = asyncio.create_task(self.settings_listener())
         app["breaks_listener"] = asyncio.create_task(self.breaks())
         self.logger.info(
-            f"Listening on {app.get('self.config', {}).get('interface', {}).get('port', '/dev/serial0')}"
+            f"Listening on {self.config.get('interface', {}).get('port', '/dev/serial0')}"
         )
 
     async def cleanup(self, app=None):

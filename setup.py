@@ -1,5 +1,6 @@
-from setuptools import setup, find_packages
 from os import environ
+
+from setuptools import find_packages, setup
 
 __author__ = "opliko"
 __license__ = "MIT"
@@ -49,7 +50,7 @@ setup(
         "confuse>=1.3",
         "pybranca>=0.3",
         "msgpack>=1.0",
-        "aiohttp-csrf>=0.0.2",
+        "aiohttp-csrf-fixed>=0.0.3",
         "aiohttp-jinja2>=1.2",
         "aiohttp-rest-api-redoc>=0.2.3",
         "aiohttp-security>=0.4.0",
@@ -58,6 +59,7 @@ setup(
         "secure>=0.2.1",
         "sentry-sdk>=0.16.5",
         "packaging>=20",
+        "aiojobs>=0.2.2",
     ],
     extras_require={"speedups": ["aiodns>=1.1", "Brotli", "cchardet",]},
     classifiers=[
