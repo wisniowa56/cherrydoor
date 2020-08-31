@@ -69,15 +69,21 @@ def setup(app):
 @middleware
 async def set_secure_headers(request, handler):
     nonce = b64encode(uuid4().bytes)
-    get_env(request.app).globals["csp_nonce"] = nonce
-    secure_headers = deepcopy(request.app["secure_headers"])
-    secure_headers.csp.script_src(
+    script_src = [
         SecurePolicies.CSP().Values.self_,
         "blob:",
         SecurePolicies.CSP().Values.nonce(nonce),
-    ).style_src(
-        SecurePolicies.CSP().Values.self_, "https://fonts.googleapis.com/css",
-    )
+    ]
+    style_src = [
+        SecurePolicies.CSP().Values.self_,
+        "https://fonts.googleapis.com/css",
+    ]
+    if request.path == "/api/v1/docs":
+        script_src.append(SecurePolicies.CSP().Values.unsafe_inline)
+        style_src.append(SecurePolicies.CSP().Values.unsafe_inline)
+    get_env(request.app).globals["csp_nonce"] = nonce
+    secure_headers = deepcopy(request.app["secure_headers"])
+    secure_headers.csp.script_src(*script_src).style_src(*style_src)
     resp = await handler(request)
     secure_headers.aiohttp(resp)
     return resp

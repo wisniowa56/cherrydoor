@@ -45,16 +45,18 @@ async def user_exists(app, username):
     return count > 0
 
 
-async def create_user(app, username, password=None, permissions=[], cards=[]):
-    result = await db.users.with_options(
-        write_concern=WriteConcern(w="majority")
-    ).insert_one(
-        {
-            "username": username,
-            "password": hashed_password,
-            "permissions": permissions,
-            "cards": cards,
-        }
+async def create_user(app, username, hashed_password=None, permissions=[], cards=[]):
+    result = (
+        await app["db"]
+        .users.with_options(write_concern=WriteConcern(w="majority"))
+        .insert_one(
+            {
+                "username": username,
+                "password": hashed_password,
+                "permissions": permissions,
+                "cards": cards,
+            }
+        )
     )
     return str(result.inserted_id)
 
@@ -223,3 +225,22 @@ async def delete_cards_from_user(app, uid, cards):
         return_document=ReturnDocument.AFTER,
     )
     return user
+
+
+async def create_users(app, users):
+    return (
+        await app["db"]
+        .with_options(write_concern=WriteConcern(w="majority"))
+        .insert_many(
+            [
+                {
+                    "username": user.get("username"),
+                    "password": user.get("password", None),
+                    "permissions": user.get("permissions", []),
+                    "cards": user.get("cards", []),
+                }
+                for user in users
+            ]
+        )
+    )
+

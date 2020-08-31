@@ -20,6 +20,7 @@ from argon2.exceptions import VerificationError
 from cherrydoor.database import (
     change_user_password,
     create_user,
+    create_users,
     find_user_by_uid,
     find_user_by_username,
     find_user_by_token,
@@ -123,6 +124,13 @@ async def register_user(app, username, password=None, permissions=["enter"], car
         uid = await create_user(app, username, password, permissions, cards)
         return True, uid
     return False, None
+
+
+async def register_users(app, users):
+    for user in users:
+        if user.get("password", False):
+            user["password"] = hasher.hash(user["password"])
+    await create_users(app, users)
 
 
 async def api_auth(request, permissions=[]):

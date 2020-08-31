@@ -29,7 +29,7 @@ class FindUserEndpoint(AioHTTPRestEndpoint):
     async def get(self, request: Request) -> Response:
         """
         ---
-        summary: Find a user
+        summary: Find user
         description:
         security:
             - Bearer Authentication: [users_read]
