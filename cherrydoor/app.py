@@ -44,6 +44,7 @@ from cherrydoor.database import init_db, setup_db
 from cherrydoor.secure import set_secure_headers
 from cherrydoor.secure import setup as secure_setup
 from cherrydoor.views import routes as views
+from cherrydoor.socketio import sio
 
 CSRF_FIELD_NAME = "_csrf_token"
 CSRF_SESSION_NAME = "csrf_token"
@@ -116,6 +117,7 @@ def setup_app(loop=asyncio.get_event_loop(), config=load_config()[0]):
     get_env(app).globals["csrf_field_name"] = CSRF_FIELD_NAME
     get_env(app).filters["vue"] = vue
     setup_routes(app)
+    sio.attach(app)
     return app
 
 

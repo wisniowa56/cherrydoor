@@ -218,4 +218,3 @@ class DoorEndpoint(AioHTTPRestEndpoint):
         return respond_with_json(
             {"Ok": True, "Error": None, "status_code": 200, "token": token}
         )
-

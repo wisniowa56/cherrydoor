@@ -103,7 +103,7 @@ class Serial:
             sleep(2)
             self.serial_init()
 
-    async def async_serial_init(self):
+    async def async_serial_init(self, n=1):
         try:
             self.serial = aioserial.AioSerial(
                 loop=self.loop,
@@ -111,12 +111,18 @@ class Serial:
                 baudrate=self.config.get("interface", {}).get("baudrate", 115200),
             )
         except aioserial.serialutil.SerialException as e:
-            self.logger.debug(
-                "unable to connect to serial, trying again in 2 seconds. Exception: %s",
-                str(e),
-            )
-            await asyncio.sleep(1)
-            await self.async_serial_init()
+            if n <= 20:
+                self.logger.debug(
+                    "unable to connect to serial, trying again in 2 seconds. Exception: %s",
+                    str(e),
+                )
+            elif n == 21:
+                self.logger.debug(
+                    "unable to connect to serial for more than 40 seconds, logging for this issue stopped until the attempts to connect are successful. Exception: %s",
+                    str(e),
+                )
+            await asyncio.sleep(1 + (n * (n < 25) or 24))
+            await self.async_serial_init(n + 1)
 
     async def commands(self):
         while True:

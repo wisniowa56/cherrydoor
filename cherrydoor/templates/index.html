@@ -1,7 +1,49 @@
 {% extends "layout.html" %} {% block head %}
-<script src="https://unpkg.com/vue@next"></script>
-{% endblock %} {% block body %}
-<h1>Logged in!</h1>
-{% endblock %} {% block body_scripts %}
-<script nonce="{{ csp_nonce }}"></script>
+<script nonce="{{ csp_nonce }}" type="module">
+	window.user = {};
+	window.user.permissions = {{ permissions | tojson}};
+</script>
+<script type="importmap" nonce="{{ csp_nonce }}">
+	{ "imports": {
+		"vue": "{{ static("js/vue.js") }}",
+		"vue-router": "{{ static("js/vue-router.js") }}",
+	} }
+</script>
+<script
+	async
+	src="{{ static('js/chart2.min.js') }}"
+	integrity="{{ sri('js/chart2.min.js') }}"
+></script>
+<script
+	async
+	src="{{ static('js/vue-chartjs.min.js') }}"
+	integrity="{{ sri('js/vue-chartjs.min.js') }}"
+></script>
+<script
+	async
+	src="{{ static('js/socket.io.slim.js') }}"
+	integrity="{{ sri('js/socket.io.slim.js') }}"
+></script>
+<script
+	defer
+	type="module"
+	src="{{ static('js/index.js') }}"
+	integrity="{{ sri('js/index.js') }}"
+></script>
+<link
+	rel="stylesheet"
+	href="{{ static('css/index.css') }}"
+	integrity="{{ sri('css/index.css') }}"
+/>
+{% endblock %} {% block main %}
+<header-bar v-bind:pagename="$route.name"></header-bar>
+<main>
+	<router-view v-slot="{ Component }">
+		<transition>
+			<keep-alive>
+				<component :is="Component" />
+			</keep-alive>
+		</transition>
+	</router-view>
+</main>
 {% endblock %}

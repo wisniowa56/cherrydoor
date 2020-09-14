@@ -1,0 +1,234 @@
+@charset "UTF-8";
+
+/*
+=====
+Checkbox
+=====
+*/
+
+.checkbox {
+	--uiCheckboxSize: var(--toggleSize, 1.25rem);
+	--uiCheckboxBorderWidth: var(--toggleBorderWidth, 1px);
+
+	display: var(--toggleDisplay, inline-flex);
+	position: relative;
+}
+
+.checkbox-input {
+	/*
+    The pattern by Sara Soueidan https://www.sarasoueidan.com/blog/inclusively-hiding-and-styling-checkboxes-and-radio-buttons/
+  */
+	width: var(--uiCheckboxSize);
+	height: var(--uiCheckboxSize);
+	opacity: 0;
+
+	position: absolute;
+	top: 0;
+	left: 0;
+	margin: 0;
+}
+
+/*
+ 1. Calculation of the gap for the custom checkbox
+*/
+
+.checkbox-label {
+	display: inline-flex;
+	min-height: var(--uiCheckboxSize);
+	padding-left: calc(var(--uiCheckboxSize) + var(--toggleIndent, 0.4em));
+}
+
+.checkbox-input:not(:disabled) ~ .checkbox-label {
+	cursor: pointer;
+}
+
+/*
+1. Ems helps to calculate size of the checkbox
+*/
+
+.checkbox-label::before,
+.checkbox-label::after {
+	content: "";
+	box-sizing: border-box;
+	width: 1em;
+	height: 1em;
+	font-size: var(--uiCheckboxSize); /* 1 */
+
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+.checkbox-label::before {
+	border: var(--uiCheckboxBorderWidth) solid var(--secondary);
+	z-index: 2;
+}
+
+.checkbox-input:not(:disabled) ~ .checkbox-label::after {
+	background-color: var(--primary);
+	opacity: 0;
+}
+
+.checkbox-input:not(:disabled):checked ~ .checkbox-label::after {
+	opacity: 1;
+}
+
+.checkbox-text {
+	margin-top: auto;
+	margin-bottom: auto;
+}
+
+/*
+The arrow size and position depends from sizes of square because I needed an arrow correct positioning from the top left corner of the element toggle
+
+1. Ems helps to calculate size and position of the arrow
+*/
+
+.checkbox-input:not(:disabled) ~ .checkbox-label .checkbox-text::before {
+	content: "";
+	width: 0;
+	height: 0;
+	font-size: var(--uiCheckboxSize); /* 1 */
+
+	border-left-width: 0;
+	border-bottom-width: 0;
+	border-left-style: solid;
+	border-bottom-style: solid;
+	border-color: var(--toggleArrowColor, #fff);
+
+	position: absolute;
+	top: 0.5428em;
+	left: 0.25em;
+	z-index: 3;
+
+	transform-origin: left top;
+	transform: rotate(-40deg) skew(10deg);
+}
+
+.checkbox-input:not(:disabled):checked ~ .checkbox-label .checkbox-text::before {
+	--uiCheckboxArrowWidth: var(--toggleArrowWidth, 2px);
+
+	width: 0.4em;
+	height: 0.2em;
+	border-left-width: var(--uiCheckboxArrowWidth);
+	border-bottom-width: var(--uiCheckboxArrowWidth);
+}
+
+/*
+States
+*/
+
+/* focus state */
+
+.checkbox-input:focus {
+	outline: var(--toggleOutlineWidthFocus, 3px) solid var(--bg, currentColor);
+	outline-offset: var(--toggleOutlineOffsetFocus, 5px);
+}
+
+/* disabled state */
+
+.checkbox-input:disabled ~ .checkbox-label {
+	opacity: var(--toggleOpacityDisabled, 0.24);
+	cursor: var(--toggleCursorDisabled, not-allowed);
+}
+
+/*
+=====
+PRESENTATION STYLES
+=====
+*/
+
+/*
+The demo skin
+*/
+
+.checkbox-label::before,
+.checkbox-label::after {
+	border-radius: var(--toggleBorderRadius, 2px);
+}
+
+/*
+The animation of switching states
+*/
+
+.checkbox-input:not(:disabled) ~ .checkbox-label::before,
+.checkbox-input:not(:disabled) ~ .checkbox-label::after {
+	transition: opacity 0.3s ease-out;
+}
+
+.checkbox-text::before {
+	opacity: 0;
+}
+
+.checkbox-input:not(:disabled):checked ~ .checkbox-label .checkbox-text::before {
+	opacity: 1;
+	transition: opacity 0.1s ease-out 0.2s, width 0.1s ease-out 0.3s, height 0.1s ease-out 0.2s;
+}
+
+input,
+button {
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	align-items: center;
+	border: 1px solid transparent;
+	border-radius: 4px;
+	box-shadow: none;
+	display: inline-flex;
+	font-size: 1rem;
+	justify-content: flex-start;
+	line-height: 1;
+	padding-bottom: calc(0.5em - 1px);
+	padding-left: calc(0.75em - 1px);
+	padding-right: calc(0.75em - 1px);
+	padding-top: calc(0.5em - 1px);
+	position: relative;
+	vertical-align: top;
+	background-color: var(--layer);
+	border-color: var(--secondary);
+	border-radius: 4px;
+	color: var(--text);
+	box-shadow: inset 0 0.4rem 0.2rem rgba(var(--secondary-rgb), 0.05);
+	max-width: 100%;
+	width: 100%;
+	margin-top: 1vh;
+	margin-bottom: 1vh;
+	font-family: "Poppins", sans-serif;
+}
+input::placeholder {
+	color: var(--secondary);
+}
+label {
+	color: var(--text);
+	display: block;
+	font-size: 1rem;
+	font-weight: 700;
+	font-family: "Poppins", sans-serif;
+}
+input:hover,
+textarea:hover,
+button:hover {
+	border-color: var(--gradient-end);
+	box-shadow: 0 0 0 0.125rem rgba(var(--gradient-end-rgb), 0.25);
+}
+
+input:focus,
+button:focus {
+	outline: none;
+	border-color: var(--primary);
+	box-shadow: 0 0 0 0.125rem rgba(var(--primary-rgb), 0.25);
+}
+button,
+input,
+select,
+textarea {
+	margin: 0;
+}
+
+button {
+	background-color: var(--primary);
+	color: var(--layer);
+	font-size: 1rem;
+	line-height: 1.5rem;
+	white-space: nowrap;
+	text-align: center;
+}

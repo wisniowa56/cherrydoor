@@ -274,4 +274,3 @@ redoc_routes = [
     get("/api/v1", api_redirect_route),
     get("/api/v1/", api_redirect_route),
 ]
-

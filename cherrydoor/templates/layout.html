@@ -11,11 +11,30 @@
 			rel="shortcut icon"
 			href="{{ static('images/logo/logo-48px.png') }}"
 		/>
+
+		<!-- Compiled and minified CSS
+		<link
+			rel="stylesheet"
+			href="{{ static('css/materialize.min.css') }}"
+			integrity="{{ sri('css/materialize.min.css') }}"
+		/>
+		<script
+			defer
+			src="{{ static('js/materialize.min.js') }}"
+			integrity="{{ sri('js/materialize.min.js') }}"
+		></script>-->
+
+		<link
+			rel="stylesheet"
+			href="{{ static('css/all.css') }}"
+			integrity="{{ sri('css/all.css') }}"
+		/>
+
 		{% block head %}{% endblock %}
 	</head>
 
 	<body>
-		<div class="page-contents">{% block body %}{% endblock %}</div>
+		<div class="app" id="app">{% block main %}{% endblock %}</div>
 		<footer>
 			Ikony wykorzystane z
 			<a href="https://icons8.com/" target="_blank">Icons8</a>

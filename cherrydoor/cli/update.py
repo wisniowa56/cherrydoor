@@ -1,10 +1,12 @@
-from sys import executable
-from os.path import basename
-from subprocess import check_call  # nosec
+from glob import iglob
 from importlib import import_module, invalidate_caches
 from importlib.util import find_spec
-from glob import iglob
+from os.path import basename
+from subprocess import check_call  # nosec
+from sys import executable
+
 from packaging.version import parse as parse_version
+
 from cherrydoor.config import load_config
 
 

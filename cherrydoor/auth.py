@@ -170,7 +170,7 @@ async def check_api_permissions(request, permissions):
         reason = f"Insufficient permissions. Permissions required: {list(permissions)}"
         raise HTTPForbidden(
             reason=reason,
-            body=json.dumps({"Ok": False, "Error": reason, "status_code": 403}),
+            body=dumps({"Ok": False, "Error": reason, "status_code": 403}),
             content_type="application/json",
         )
 
@@ -189,8 +189,8 @@ async def check_if_self(request, uid):
 
 
 async def get_permissions(request):
-    uid = await authorized_userid(request)
-    permission_list = await list_permissions(request.app, uid)
+    username = await authorized_userid(request)
+    permission_list = await list_permissions(request.app, username)
     is_admin = "admin" in permission_list
     user_permissions = {
         permission: (is_admin or permission in permission_list)

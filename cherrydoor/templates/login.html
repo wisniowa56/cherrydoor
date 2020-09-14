@@ -2,34 +2,69 @@
 <link
 	rel="stylesheet"
 	href="{{ static('css/login.css') }}"
-	integrity="sri('css/login.css') "
+	integrity="{{ sri('css/login.css') }}"
 />
-{% endblock %} {% block body %}
-<div class="container">
-	<div class="row">
-		<div class="login-form">
-			<form method="POST" action="{{ url('login') }}">
-				<input
-					type="hidden"
-					name="{{ csrf_field_name }}"
-					value="{{ csrf_token }}"
-				/>
-				<input
-					type="string"
-					name="username"
-					aria-label="username input"
-					placeholder="username"
-				/>
-				<input
-					type="password"
-					name="password"
-					aria-label="passwod input"
-					placeholder="password"
-				/>
-				<input type="checkbox" name="remember" aria-label="remember-me" />
-				<input type="submit" />
-			</form>
-		</div>
+{% endblock %} {% block main %}
+<div class="login-form">
+	<div id="login-logo-container" class="logo-container">
+		<img
+			class="logo"
+			id="login-logo"
+			src="{{ static('images/logo/logo.svg') }}"
+		/>
 	</div>
+	<form method="POST" action="{{ url('login') }}">
+		<input
+			type="hidden"
+			name="{{ csrf_field_name }}"
+			id="{{ csrf_field_name }}"
+			value="{{ csrf_token }}"
+		/>
+		<div class="input-field">
+			<label for="username">Nazwa użytkownika</label>
+			<input
+				type="text"
+				name="username"
+				id="username"
+				placeholder="Jan Kowalski"
+				aria-label="username input"
+			/>
+		</div>
+		<div class="input-field">
+			<label for="password">Hasło <small>minimum 8 znaków</small></label>
+			<input
+				type="password"
+				name="password"
+				id="password"
+				placeholder="••••••••"
+				pattern="^.{4,}$"
+				aria-label="passwod input"
+			/>
+		</div>
+		<div class="page__checkbox input-field">
+			<label class="checkbox">
+				<input
+					type="checkbox"
+					name="remember"
+					id="remember"
+					aria-label="zapamiętaj mnie"
+					class="checkbox-input"
+				/>
+				<span class="checkbox-label">
+					<span class="checkbox-text">Zapamiętaj mnie</span>
+				</span>
+			</label>
+		</div>
+		<div class="input-field col s12">
+			<button
+				class="btn waves-effect waves-light right"
+				type="submit"
+				name="action"
+				id="action"
+			>
+				Zaloguj się
+			</button>
+		</div>
+	</form>
 </div>
 {% endblock %}

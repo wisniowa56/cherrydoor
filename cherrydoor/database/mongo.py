@@ -32,8 +32,8 @@ async def close_db(app):
     app["db"].close()
 
 
-async def list_permissions(app, uid):
-    user = await app["db"].users.find_one({"_id": uid}, {"permissions": 1, "_id": 0})
+async def list_permissions(app, username):
+    user = await app["db"].users.find_one({"username": username}, {"permissions": 1, "_id": 0})
     if user != None:
         return user.get("permissions", [])
     else:
@@ -243,4 +243,3 @@ async def create_users(app, users):
             ]
         )
     )
-

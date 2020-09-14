@@ -60,6 +60,7 @@ setup(
         "sentry-sdk>=0.16.5",
         "packaging>=20",
         "aiojobs>=0.2.2",
+        "python-socketio>=4.6.0",
     ],
     extras_require={"speedups": ["aiodns>=1.1", "Brotli", "cchardet",]},
     classifiers=[
