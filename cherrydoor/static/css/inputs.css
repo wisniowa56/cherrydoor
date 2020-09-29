@@ -69,7 +69,7 @@ Checkbox
 	opacity: 0;
 }
 
-.checkbox-input:not(:disabled):checked ~ .checkbox-label::after {
+.checkbox-input:checked ~ .checkbox-label::after {
 	opacity: 1;
 }
 
@@ -209,6 +209,12 @@ textarea:hover,
 button:hover {
 	border-color: var(--gradient-end);
 	box-shadow: 0 0 0 0.125rem rgba(var(--gradient-end-rgb), 0.25);
+}
+
+input:disabled,
+textarea:disabled,
+button:disabled {
+	filter: saturate(0.25) contrast(0.5);
 }
 
 input:focus,

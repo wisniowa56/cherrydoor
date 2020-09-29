@@ -1,9 +1,44 @@
 const UsageChart = {
-	extends: VueChartJs.Line,
-	//mixins: [VueChartJs.mixins.reactiveData],
-	//inject: ["socket"],
+	data() {
+		return {
+			chartData: {},
+		};
+	},
+	template: `
+<div class="chart-container">
+		<canvas id="usage-chart"></canvas>
+</div>
+`,
 	mounted() {
-		this.renderChart({}, {});
+		this.ctx = document.getElementById("usage-chart").getContext("2d");
+		/*this.chart = new Chart(this.ctx, {
+			type: "line",
+			responsive: true,
+			maintainAspectRatio: false,
+			data: {
+				datasets: [
+					{
+						label: "Ilość wejść w danym dniu",
+						data: [12, 19, 3, 5, 2, 3],
+					},
+				],
+			},
+			options: {
+				scales: {
+					y: {
+						beginAtZero: true,
+					},
+					x: {
+						type: "time",
+						time: {
+							unit: "day",
+							rount: "day",
+							isoWeekday: true,
+						},
+					},
+				},
+			},
+		});*/
 	},
 };
 

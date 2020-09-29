@@ -1,7 +1,7 @@
 {% extends "layout.html" %} {% block head %}
 <script nonce="{{ csp_nonce }}" type="module">
 	window.user = {};
-	window.user.permissions = {{ permissions | tojson}};
+	window.user.permissions = {{ permissions | tojson }};
 </script>
 <script type="importmap" nonce="{{ csp_nonce }}">
 	{ "imports": {
@@ -11,8 +11,8 @@
 </script>
 <script
 	async
-	src="{{ static('js/chart2.min.js') }}"
-	integrity="{{ sri('js/chart2.min.js') }}"
+	src="{{ static('js/chart.min.js') }}"
+	integrity="{{ sri('js/chart.min.js') }}"
 ></script>
 <script
 	async

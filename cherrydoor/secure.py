@@ -24,7 +24,11 @@ def setup(app):
         .connect_src(SecurePolicies.CSP().Values.self_)
         .frame_src(SecurePolicies.CSP().Values.none)
         .img_src(SecurePolicies.CSP().Values.self_, "data:", "https:")
-        .font_src(SecurePolicies.CSP().Values.self_, "https://fonts.gstatic.com/s/")
+        .font_src(
+            SecurePolicies.CSP().Values.self_,
+            "https://fonts.gstatic.com/s/",
+            "https://fonts.googleapis.com/css2",
+        )
         .manifest_src(SecurePolicies.CSP().Values.self_)
         .worker_src(SecurePolicies.CSP().Values.self_, "blob:")
     )
@@ -68,15 +72,19 @@ def setup(app):
 
 @middleware
 async def set_secure_headers(request, handler):
-    nonce = b64encode(uuid4().bytes)
+    nonce = b64encode(uuid4().bytes).decode("utf-8")
     script_src = [
         SecurePolicies.CSP().Values.self_,
         "blob:",
-        SecurePolicies.CSP().Values.nonce(nonce),
+        #   SecurePolicies.CSP().Values.nonce(nonce),
+        f"'nonce-{nonce}'",
+        "https://unpkg.com",
+        SecurePolicies.CSP().Values.unsafe_eval,
     ]
     style_src = [
         SecurePolicies.CSP().Values.self_,
-        "https://fonts.googleapis.com/css",
+        SecurePolicies.CSP().Values.unsafe_inline,
+        "https://fonts.googleapis.com/css2",
     ]
     if request.path == "/api/v1/docs":
         script_src.append(SecurePolicies.CSP().Values.unsafe_inline)

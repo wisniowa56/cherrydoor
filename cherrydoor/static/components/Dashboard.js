@@ -3,7 +3,8 @@ const Dashboard = {
 		return {};
 	},
 	template: `
-<usage-chart></usage-chart
+<usage-chart class="card col-3 row-2"></usage-chart>
+<door-status class="card row-2"></door-status>
 `,
 };
 
