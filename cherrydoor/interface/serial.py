@@ -229,7 +229,7 @@ class Serial:
         try:
             await self.serial.write_async(f"{text}\n".encode(self.encoding))
             self.serial.flush()
-        except aioserial.serialutil.SerialException as e:
+        except (aioserial.serialutil.SerialException, AttributeError) as e:
             self.logger.debug("Serial exception while trying to write. %s", str(e))
             await self.async_serial_init()
 
