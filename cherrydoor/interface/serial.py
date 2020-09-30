@@ -75,12 +75,12 @@ class Serial:
     async def card(self, block0):
         print("processing a card")
         if await self.auth_required():
-            result = await self.authenticate(self.extract_uid(block0))
+            result = await self.authenticate(await self.extract_uid(block0))
             auth_mode = "UID"
         else:
             result = block0[-2:] == config.get(
                 "manufacturer-code", "18"
-            ) or await self.authenticate(self.extract_uid(block0))
+            ) or await self.authenticate(await self.extract_uid(block0))
             auth_mode = "Manufacturer code"
         if self.delay:
             await asyncio.sleep(self.delay)
@@ -160,7 +160,7 @@ class Serial:
         await self.db.logs.insert_one(
             {
                 "timestamp": datetime.now(),
-                "card": self.extract_uid(block0),
+                "card": await self.extract_uid(block0),
                 "manufacturer_code": block0[-2:],
                 "auth_mode": auth_mode,
                 "success": success,
