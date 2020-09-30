@@ -75,12 +75,12 @@ class Serial:
     async def card(self, block0):
         print("processing a card")
         if await self.auth_required():
-            result = await self.authenticate(block0[:10])
+            result = await self.authenticate(self.extract_uid(block0))
             auth_mode = "UID"
         else:
             result = block0[-2:] == config.get(
                 "manufacturer-code", "18"
-            ) or await self.authenticate(block0[:10])
+            ) or await self.authenticate(self.extract_uid(block0))
             auth_mode = "Manufacturer code"
         if self.delay:
             await asyncio.sleep(self.delay)
@@ -160,7 +160,7 @@ class Serial:
         await self.db.logs.insert_one(
             {
                 "timestamp": datetime.now(),
-                "card": block0[:10],
+                "card": self.extract_uid(block0),
                 "manufacturer_code": block0[-2:],
                 "auth_mode": auth_mode,
                 "success": success,
@@ -195,8 +195,45 @@ class Serial:
                     [change.get("command", ""), *change.get("arguments", [])]
                 )
                 await self.writeline(command)
+    async def extract_uid(self, block0):
+        if isinstance(block0, str):
+            try:
+                if len(block0) % 2 != 0:
+                    self.logger.debug(
+                        "padding block0 with 0 before manufacturere code. Contents before modification: %s",
+                        block0,
+                    )
+                    block0 = block0[:-2] + "0" + block0[-2:]
+                block0 = bytearray.fromhex(block0)
+            except ValueError as e:
+                self.logger.error(
+                    "Invalid block0 string - %s. block0: %s", str(e), block0
+                )
+                return block0
+        elif not isinstance(block0, bytearray):
+            self.logger.error(
+                "%s is not a valid type for block0 (valid types are string and bytearray)",
+                type(block0).__name__,
+            )
+            return None
+        uid = bytearray()
+        uid_len = 4 + 3 * (block0[0] == 0x88) + 3 * (block0[5] == 0x88)
+        async for i, byte in aenumerate(block0):
+            if (uid_len in [7, 10] and i in [0, 4]) or (uid_len == 10 and i in [5, 9]):
+                continue
+            uid.append(byte)
+            if len(uid) == uid_len:
+                break
+        return uid.hex()
 
+async def aenumerate(sequence, start=0):
+    """Asynchronously enumerate an iterator from a given start value"""
+    n = start
+    for elem in sequence:
+        yield n, elem
+        n += 1
 
+              
 if __name__ == "__main__":
     serial = Serial()
     serial.start()
