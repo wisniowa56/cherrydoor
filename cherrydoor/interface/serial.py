@@ -335,10 +335,29 @@ class Serial:
         uid = bytearray()
         uid_len = 4 + 3 * (block0[0] == 0x88) * (1 + (block0[5] == 0x88))
         for i, byte in enumerate(block0):
-            if (uid_len in [7, 10] and i in [0, 4]) or (uid_len == 10 and i in [5, 9]):
+            if (uid_len in [7, 10] and i in [0, 4]) or (
+                uid_len == 10 and i in [5, 9, 14]
+            ):
+                if byte != 0x88:
+                    bcc = block0[i - 1] ^ block0[i - 2] ^ block0[i - 3] ^ block0[i - 4]
+                    if byte != bcc:
+                        self.logger.error(
+                            "Invalid bcc in uid %s, recieved bcc: %s, expected bcc: %s",
+                            uid,
+                            byte,
+                            bcc,
+                        )
+                        self.logger.debug(
+                            "Whole block0 invalid bcc was found in: %s, position: %s",
+                            block0,
+                            i,
+                        )
+                        return None
+                    elif len(uid) >= uid_len:
+                        break
                 continue
             uid.append(byte)
-            if len(uid) >= uid_len:
+            if len(uid) > uid_len:
                 break
         return uid.hex()
 
