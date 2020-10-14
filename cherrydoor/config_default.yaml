@@ -1,0 +1,17 @@
+name: cherrydoor
+version: 0.7
+
+host: 127.0.0.1
+port: 5000
+mongo:
+  url: localhost:27017
+  name: cherrydoor
+  username: cherrydoor
+interface:
+  port: /dev/serial0
+  baudrate: 115200
+  encoding: utf-8
+manufacturer_code: "18"
+max_session_age: 31536000
+https: false
+log_level: ERROR

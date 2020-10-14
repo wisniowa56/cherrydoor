@@ -1,12 +1,21 @@
-from getpass import getpass
-import sys
-import os
+"""
+Install the app for the first time
+"""
+
+__author__ = "opliko"
+__license__ = "MIT"
+__version__ = "0.7b0"
+__status__ = "Prototype"
 import json
+import os
+import sys
+from getpass import getpass
+from pathlib import Path
 from subprocess import call  # nosec
+
 from argon2 import PasswordHasher
 from pymongo import MongoClient
 from pymongo.errors import OperationFailure
-from pathlib import Path
 
 
 def step_enabled(step, args):
@@ -158,12 +167,12 @@ WantedBy=multi-user.target
             if "username_index" not in user_indexes.keys():
                 db.users.create_index("username", name="username_index", unique=True)
             if "cards_index" not in user_indexes.keys():
-                db.user.create_index("cards", name="cards_index", sparse=True)
-        # nosec - it's python3, not 2 Bandit...
+                db.users.create_index("cards", name="cards_index", sparse=True)
+        # nosec - it's python3, not 2, Bandit...
         if step_enabled("user", args) and input(
             "Czy chcesz stworzć nowego użytkownika-administratora? [y/n]"
         ).lower() in ["y", "yes", "tak", "t"]:
-            # nosec - it's python3, not 2 Bandit...
+            # nosec - it's python3, not 2, Bandit...
             username = input("Wprowadź nazwę użytkownika: ")
             password = hasher.hash(getpass("Hasło: "))
             db.users.insert({"username": username, "password": password, "cards": []})

@@ -1,36 +1,31 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Run server"""
-from multiprocessing import Process
-from cherrydoor.interface.serial import Serial
+import asyncio
+import logging
 import sys
-from time import sleep
 
-interface = Serial()
-interface_run = Process(target=interface.start)
-
-
-def exit():
-    print("Closing server and serial connections")
-    interface_run.terminate()
-    sys.exit()
-
+from aiohttp import web
 
 if __name__ == "__main__":
-    import atexit
+    from cherrydoor.app import setup_app
+    from cherrydoor.interface.serial import Serial
 
-    interface_run.start()
-    sleep(2)
-    atexit.register(exit)
-    from cherrydoor.server import app, socket, config
-
-    server = Process(
-        target=socket.run,
-        kwargs={
-            "app": app,
-            "log_output": True,
-            "host": config["host"],
-            "port": config["port"],
-        },
+    config = {}
+    logging.basicConfig(
+        level=config.get("log_level", logging.DEBUG),
+        format="%(asctime)s:%(name)s:%(levelname)s: %(message)s",
     )
-    server.run()
+    loop = asyncio.get_event_loop()
+    app = setup_app(loop, config)
+    interface = Serial(app["db"], loop)
+    app["serial"] = interface
+    app.on_startup.append(interface.aiohttp_startup)
+    app.on_cleanup.append(interface.cleanup)
+
+    web.run_app(
+        app,
+        host=config.get("host", "127.0.0.1"),
+        port=config.get("port", 5000),
+        path=config.get("path", None),
+    )
