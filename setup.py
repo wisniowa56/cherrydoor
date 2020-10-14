@@ -67,6 +67,7 @@ setup(
             "aiodns>=1.1",
             "Brotli",
             "cchardet",
+            "uvloop>=0.14",
         ]
     },
     classifiers=[
