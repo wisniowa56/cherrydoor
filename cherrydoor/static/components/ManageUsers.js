@@ -26,7 +26,11 @@ const ManageUsers = {
 			if (data != null) {
 				this.$data.original_users = JSON.parse(JSON.stringify(data.users));
 				data.users.forEach((user) => {
-					user.edit = { permissions: false, cards: [false], username: false };
+					user.edit = {
+						permissions: false,
+						cards: user.cards.map((x) => false),
+						username: false,
+					};
 				});
 				this.$data.users = data.users;
 			}
@@ -86,12 +90,24 @@ const ManageUsers = {
 		},
 		getCard(userIndex, cardIndex) {
 			this.socket.emit("get_card", (data) => {
-				this.$data.users[userIndex].cards[cardIndex] = data.uid;
+				if (userIndex === null) {
+					this.$data.new_user.cards[cardIndex] = data.uid;
+				} else {
+					this.$data.users[userIndex].cards[cardIndex] = data.uid;
+				}
 			});
 		},
 		deleteUser(username) {
 			if (confirm(`czy na pewno chcesz usunąć użytkownika ${username}?`)) {
 				this.socket.emit("delete_user", { username: username });
+			}
+		},
+		addCard(index = null) {
+			if (index === null) {
+				this.$data.new_user.cards.push("");
+			} else {
+				this.$data.users[index].cards.push("");
+				this.$data.users[index].edit.cards.push(true);
 			}
 		},
 	},
@@ -107,6 +123,7 @@ const ManageUsers = {
 			<button
 				@click="usr.edit.username = true"
 				class="edit-button edit-username btn waves-effect waves-light right"
+				v-if="!usr.edit.username"
 			>
 				Edit
 			</button>
@@ -134,6 +151,7 @@ const ManageUsers = {
 			<button
 			class="edit-button edit-permissions btn waves-effect waves-light right"
 			@click="usr.edit.permissions = true"
+			v-if="!usr.edit.permissions"
 		>
 			Edit permissions
 		</button>
@@ -151,9 +169,10 @@ const ManageUsers = {
 						class="edit-button edit-card btn waves-effect waves-light right"
 						@click="usr.edit.cards[index]=true"
 						aria-label="Edit card"
+						v-if="!usr.edit.cards[index]"
 					>
-						Edit</button
-					><button
+						Edit</button>
+					<button
 						class="edit-button reader-input btn waves-effect waves-light"
 						@click="getCard(i, index)"
 						aria-label="Get card from reader"
@@ -161,6 +180,9 @@ const ManageUsers = {
 						Get card from reader
 					</button>
 				</div>
+			</li>
+			<li>
+				<button class="new-card plus-button" @click="addCard(i)">Add card</button>
 			</li>
 		</ul>
 		<button
@@ -197,14 +219,29 @@ const ManageUsers = {
 			</div>
 		</div>
 		<ul class="user-cards new-user">
-			<li v-for="card in new_user.cards">
-				<input class="card-uid new-user" v-model="card" disabled />
+			<li v-for="(card, index) in new_user.cards">
+			<div class="input-editable">
+				<input
+					class="card-uid new-user"
+					v-model="new_user.cards[index]"
+				/>
+				<button
+					class="edit-button reader-input btn waves-effect waves-light"
+					@click="getCard(null, index)"
+					aria-label="Get card from reader"
+				>
+				Get card from reader
+			</button>
+		</div>
+			</li>
+			<li>
+				<button class="new-card plus-button" @click="addCard()">Add card</button>
 			</li>
 		</ul>
 		<button class="new-user plus-button" @click="addUser()">Add user</button>
 	</li>
 	<li>
-		<button class="submit-user btn" @click="submitUsers()">Zapisz</button>
+		<button class="submit-user btn" @click="submitUsers()">Save</button>
 	</li>
 </ul>
 `,
