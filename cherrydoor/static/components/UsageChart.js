@@ -7,6 +7,7 @@ const UsageChart = {
 	template: `
 <div class="chart-container">
 		<canvas id="usage-chart"></canvas>
+		<h1>W trakcie prac :V</h1>
 </div>
 `,
 	mounted() {

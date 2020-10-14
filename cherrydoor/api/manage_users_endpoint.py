@@ -22,8 +22,7 @@ from cherrydoor.util import get_datetime
 
 class ManageUsersEndpoint(AioHTTPRestEndpoint):
     def connected_routes(self) -> List[str]:
-        """
-        """
+        """"""
         return ["/users"]
 
     @atomic

@@ -21,8 +21,7 @@ from cherrydoor.util import get_datetime
 
 class ManageUserEndpoint(AioHTTPRestEndpoint):
     def connected_routes(self) -> List[str]:
-        """
-        """
+        """"""
         return [
             "/user",
         ]
@@ -162,7 +161,7 @@ class ManageUserEndpoint(AioHTTPRestEndpoint):
         user = modify_user(
             request.app,
             user["_id"],
-            new_username=data.get("new_username", None),
+            username=data.get("new_username", None),
             cards=data.get("cards", None),
             card=data.get("card", None),
             permissions=data.get("permissions", None),
@@ -489,8 +488,7 @@ class ManageUserEndpoint(AioHTTPRestEndpoint):
 
 class ManageUserUrlEndpoint(AioHTTPRestEndpoint):
     def connected_routes(self) -> List[str]:
-        """
-        """
+        """"""
         return [
             "/user/{username}",
             "/user/username/{username}",
@@ -637,7 +635,7 @@ class ManageUserUrlEndpoint(AioHTTPRestEndpoint):
         user = modify_user(
             request.app,
             user["_id"],
-            new_username=data.get("new_username", None),
+            username=data.get("new_username", None),
             cards=data.get("cards", None),
             card=data.get("card", None),
             permissions=data.get("permissions", None),

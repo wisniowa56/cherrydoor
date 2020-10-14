@@ -62,7 +62,13 @@ setup(
         "aiojobs>=0.2.2",
         "python-socketio>=4.6.0",
     ],
-    extras_require={"speedups": ["aiodns>=1.1", "Brotli", "cchardet",]},
+    extras_require={
+        "speedups": [
+            "aiodns>=1.1",
+            "Brotli",
+            "cchardet",
+        ]
+    },
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Education",

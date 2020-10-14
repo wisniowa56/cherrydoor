@@ -14,8 +14,7 @@ from cherrydoor.util import get_datetime
 
 class StatsEndpoint(AioHTTPRestEndpoint):
     def connected_routes(self) -> List[str]:
-        """
-        """
+        """"""
         return ["/stats"]
 
     async def get(self, request: Request) -> Response:

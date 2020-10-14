@@ -110,7 +110,10 @@ async def check_credentials(app, username, password=None):
                         rehash_password(app, user.get("_id", ""), password)
                     )
                 return True, str(user.get("_id", None))
-        except (VerificationError, AttributeError):
+        except (
+            VerificationError,
+            AttributeError,
+        ):
             pass
     return False, None
 

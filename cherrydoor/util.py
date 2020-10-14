@@ -13,9 +13,7 @@ from aiohttp import web
 
 
 def redirect(router, route_name):
-    """Retrun a redirect to a specified route (by name)
-
-    """
+    """Retrun a redirect to a specified route (by name)"""
     try:
         location = router.get(route_name, {}).url_for()
         return web.HTTPFound(location)

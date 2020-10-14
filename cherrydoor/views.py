@@ -26,7 +26,7 @@ routes = web.RouteTableDef()
 @routes.get("/", name="index")
 @routes.get("/dashboard", name="dashboard")
 @routes.get("/users", name="users")
-@routes.get("/cards", name="cards")
+@routes.get("/settings", name="settings")
 @routes.get("/console", name="console")
 @aiohttp_jinja2.template("index.html")
 async def index(request: web.Request):

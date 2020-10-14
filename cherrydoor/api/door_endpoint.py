@@ -12,8 +12,7 @@ from cherrydoor.auth import check_api_permissions
 
 class DoorEndpoint(AioHTTPRestEndpoint):
     def connected_routes(self) -> List[str]:
-        """
-        """
+        """"""
         return ["/door"]
 
     @atomic

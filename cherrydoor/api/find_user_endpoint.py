@@ -16,8 +16,7 @@ allowed_search_parameters = ["username", "api_key", "card"]
 
 class FindUserEndpoint(AioHTTPRestEndpoint):
     def connected_routes(self) -> List[str]:
-        """
-        """
+        """"""
         return [
             "/user",
             "/user/{username}",

@@ -234,7 +234,7 @@ main {
 
 .manage-users {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 	list-style: none;
 	gap: 1vw;
 }
@@ -259,4 +259,14 @@ li.user input {
 
 .user-cards {
 	list-style: none;
+}
+
+.break-input {
+	min-width: 50vw;
+	height: 70vh;
+	display: block;
+}
+.save-button {
+	width: 10vw;
+	display: block;
 }

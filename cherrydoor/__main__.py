@@ -9,7 +9,6 @@ __status__ = "Prototype"
 import argparse
 import asyncio
 import logging
-import sys
 
 from aiohttp import web
 
@@ -90,7 +89,8 @@ def cherrydoor():
         action="store_true",
     )
     update_steps_group = update_parser.add_argument_group(
-        "steps", "update steps you want to run (if none are selected all will be run)",
+        "steps",
+        "update steps you want to run (if none are selected all will be run)",
     )
     update_steps = {
         "pip": "install the newest version of Cherrydoor via pip",
@@ -129,7 +129,8 @@ def cherrydoor():
             config.get("log_level", "WARN").upper(),
         )
     logging.basicConfig(
-        level=log_level, format="%(asctime)s:%(name)s:%(levelname)s: %(message)s",
+        level=log_level,
+        format="%(asctime)s:%(name)s:%(levelname)s: %(message)s",
     )
     if args.subcommand == "install":
         from cherrydoor.cli.install import install
@@ -144,6 +145,12 @@ def cherrydoor():
         from cherrydoor.app import setup_app
         from cherrydoor.interface.serial import Serial
 
+        try:
+            import uvloop
+
+            uvloop.install()
+        except ModuleNotFoundError:
+            pass
         loop = asyncio.get_event_loop()
         app = setup_app(loop, config)
         interface = Serial(app["db"], loop)

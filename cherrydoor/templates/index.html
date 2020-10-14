@@ -24,6 +24,14 @@
 	src="{{ static('js/socket.io.slim.js') }}"
 	integrity="{{ sri('js/socket.io.slim.js') }}"
 ></script>
+<!--
+	Doesn't work with vue3 for now :(
+<script
+	async
+	src="{{ static('components/VueTimepicker.js') }}"
+	integrity="{{ sri('components/VueTimepicker.js') }}"
+></script>
+-->
 <script
 	defer
 	type="module"
@@ -34,6 +42,11 @@
 	rel="stylesheet"
 	href="{{ static('css/index.css') }}"
 	integrity="{{ sri('css/index.css') }}"
+/>
+<link
+	rel="stylesheet"
+	href="{{ static('css/vue-timepicker.css') }}"
+	integrity="{{ sri('css/vue-timepicker.css') }}"
 />
 {% endblock %} {% block main %}
 <header-bar v-bind:pagename="$route.name"></header-bar>

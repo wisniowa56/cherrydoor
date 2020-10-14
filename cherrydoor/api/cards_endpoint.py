@@ -22,8 +22,7 @@ allowed_search_parameters = ["username", "api_key", "card"]
 
 class FindUserEndpoint(AioHTTPRestEndpoint):
     def connected_routes(self) -> List[str]:
-        """
-        """
+        """"""
         return [
             "/card",
             "/card/{uid}",
@@ -99,7 +98,9 @@ class FindUserEndpoint(AioHTTPRestEndpoint):
         else:
             cards = list(parameters.get("cards", []))
         user = await find_user_by_cards(
-            request.app, cards, ["username", "cards", "permissions"],
+            request.app,
+            cards,
+            ["username", "cards", "permissions"],
         )
         if user == None:
             raise HTTPNotFound(

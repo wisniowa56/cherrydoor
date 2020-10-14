@@ -4,7 +4,7 @@ from math import ceil
 from bson.objectid import ObjectId
 from bson import SON
 from motor.motor_asyncio import AsyncIOMotorClient
-from pymongo import WriteConcern, IndexModel, ASCENDING, DESCENDING
+from pymongo import WriteConcern, IndexModel, ASCENDING, DESCENDING, ReturnDocument
 
 from cherrydoor.util import round_time
 
@@ -33,7 +33,9 @@ async def close_db(app):
 
 
 async def list_permissions(app, username):
-    user = await app["db"].users.find_one({"username": username}, {"permissions": 1, "_id": 0})
+    user = await app["db"].users.find_one(
+        {"username": username}, {"permissions": 1, "_id": 0}
+    )
     if user != None:
         return user.get("permissions", [])
     else:
@@ -90,9 +92,9 @@ async def find_user_by_cards(app, cards, fields=["username"]):
     if not isinstance(cards, list):
         cards = [cards]
     projection = {}
-    for field in return_fields:
+    for field in fields:
         projection[field] = 1
-    if "_id" not in return_fields:
+    if "_id" not in fields:
         projection["_id"] = 0
     return await app["db"].users.find_one({"cards": cards}, projection)
 
@@ -163,25 +165,41 @@ async def get_grouped_logs(app, datetime_from, datetime_to, granularity):
     return logs
 
 
-async def modify_user(app, uid, **kwargs):
-    overwrite_keys = ["new_username", "cards", "permissions"]
+async def modify_user(app, uid=None, current_username=None, **kwargs):
+    overwrite_keys = ["username", "cards", "permissions"]
     append_keys = ["card", "permission"]
-    user = await app["db"].users.find_one_and_update(
-        {"_id": uid},
-        [
+    pipeline = []
+    if bool(set(overwrite_keys) & set(kwargs.keys())):
+        pipeline.append(
             {
                 "$set": {
-                    key: value for key, value in kwargs.items() if key in overwrite_keys
+                    key: value
+                    for key, value in kwargs.items()
+                    if key in overwrite_keys and len(value) > 0
                 }
-            },
+            }
+        )
+    if bool(set(append_keys) & set(kwargs.keys())):
+        pipeline.append(
             {
                 "$set": {
                     key: {"$concatArrays": [f"${key}", [value]]}
                     for key, value in kwargs.items()
-                    if key in append_keys
+                    if key in append_keys and len(value) > 0
                 }
-            },
-        ],
+            }
+        )
+    if len(pipeline) <= 0:
+        return None
+    user = await app["db"].users.find_one_and_update(
+        {
+            "_id"
+            if uid != None
+            else "username": uid
+            if uid != None
+            else current_username
+        },
+        pipeline,
         projection={"_id": 0, "username": 1, "permissions": 1, "cards": 1},
         return_document=ReturnDocument.AFTER,
     )
@@ -192,15 +210,18 @@ async def modify_user(app, uid, **kwargs):
 
 
 async def user_exists(app, **kwargs):
-    return app["db"].count_documents({key: value for key, value in kwargs.items()}) > 0
+    return (
+        app["db"].users.count_documents({key: value for key, value in kwargs.items()})
+        > 0
+    )
 
 
 async def delete_user(app, uid=None, username=None):
     if uid:
-        return await app["db"].delete_one({"_id": uid})
+        return await app["db"].users.delete_one({"_id": uid})
 
     elif username:
-        return await app["db"].delete_one({"username": username})
+        return await app["db"].users.delete_one({"username": username})
     else:
         return False
 
@@ -218,7 +239,7 @@ async def add_cards_to_user(app, uid, cards):
 async def delete_cards_from_user(app, uid, cards):
     if not isinstance(cards, list):
         cards = [cards]
-    user = await app["db"].find_one_and_update(
+    user = await app["db"].users.find_one_and_update(
         {"_id": uid},
         {"$pullAll": {"cards": cards}},
         projection={"_id": 0, "username": 1, "permissions": 1, "cards": 1},
@@ -230,7 +251,7 @@ async def delete_cards_from_user(app, uid, cards):
 async def create_users(app, users):
     return (
         await app["db"]
-        .with_options(write_concern=WriteConcern(w="majority"))
+        .users.with_options(write_concern=WriteConcern(w="majority"))
         .insert_many(
             [
                 {
@@ -243,3 +264,37 @@ async def create_users(app, users):
             ]
         )
     )
+
+
+async def get_users(app, return_fields=["username", "permissions", "cards"]):
+    projection = {}
+    for field in return_fields:
+        projection[field] = 1
+    if "_id" not in return_fields:
+        projection["_id"] = 0
+    return app["db"].users.find({}, projection=projection)
+
+
+async def set_default_permissions(app, username):
+    user = await app["db"].users.find_one_and_update(
+        {"username": username},
+        {"$set": {"permissions": ["enter"]}},
+        projection={"_id": 0, "username": 1, "permissions": 1, "cards": 1},
+        return_document=ReturnDocument.AFTER,
+    )
+    return user
+
+
+async def get_settings(app):
+    breaks = (await app["db"].settings.find_one({"setting": "break_times"})).get(
+        "value", []
+    )
+    return {"breaks": breaks}
+
+
+async def save_settings(app, settings):
+    # TODO optimize into a single query
+    for setting, value in settings.items():
+        await app["db"].settings.find_one_and_update(
+            {"setting": setting}, {"$set": {"value": value}}
+        )

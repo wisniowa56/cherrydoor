@@ -9,9 +9,9 @@ import HamburgerMenu from "../components/HamburgerMenu.js";
 import UsageChart from "../components/UsageChart.js";
 import DoorStatus from "../components/DoorStatus.js";
 import ManageUsers from "../components/ManageUsers.js";
+import Settings from "../components/Settings.js";
 
 const socket = io();
-
 const App = {
 	data() {
 		return {};
@@ -21,11 +21,28 @@ const App = {
 	},
 };
 
-const Cards = {};
 const Console = {};
 const User = {};
 
 const app = Vue.createApp(App);
+app.mixin({
+	methods: {
+		ObjEqual(a, b) {
+			if (a === b) return true;
+			if (!(a instanceof Object) || !(b instanceof Object)) return false;
+
+			var keys = keyList(a);
+			var length = keys.length;
+
+			for (var i = 0; i < length; i++) if (!(keys[i] in b)) return false;
+
+			for (var i = 0; i < length; i++)
+				if (a[keys[i]] !== b[keys[i]]) return false;
+
+			return length === keyList(b).length;
+		},
+	},
+});
 
 app.component("navbar", Navbar);
 app.component("header-bar", Header);
@@ -49,9 +66,9 @@ const router = createRouter({
 			component: Users,
 		},
 		{
-			path: "/cards",
-			name: "cards",
-			component: Cards,
+			path: "/settings",
+			name: "settings",
+			component: Settings,
 		},
 		{
 			path: "/console",
