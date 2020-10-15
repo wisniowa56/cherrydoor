@@ -176,7 +176,7 @@ class Serial:
             auth_mode = "Manufacturer code"
         if self.delay:
             await asyncio.sleep(self.delay)
-        await self.writeline(f"DOOR {int(result)}")
+        await self.writeline(f"AUTH {int(result)}")
         self.loop.create_task(self.log_entry(block0, auth_mode, result))
         self.logger.debug(
             f"Authentication {'successful' if result else 'unsuccessful'}"
