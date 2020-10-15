@@ -14,7 +14,7 @@ else
 	$SUDO apt-get install -y mongodb-org;
 	$SUDO service mongod start;
 fi;
-if hash pip3 &>/dev/null; then;
+if hash pip3 &>/dev/null; then echo -e "pip zainstalowane";
 else
 	echo -e "\e[93mpip3 niezainstalowane. Instalowanie...\e[39m" &&
 	$SUDO apt-get install python3-pip;

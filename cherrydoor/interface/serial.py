@@ -292,11 +292,15 @@ class Serial:
         TODO #54 create and use a new status command instead of a ping/pong
         """
         while True:
-            if self.ping_counter > 0:
+            if self.ping_counter > 0 and self.ping_counter < 10:
                 self.logger.debug("Unsuccessful ping")
-            if self.ping_counter > 10:
+            elif self.ping_counter < 20:
                 self.logger.error(
                     "Pings were unsuccessful for more than 5 seconds - there is most likely an error on the other side of the serial connection"
+                )
+            elif self.ping_counter == 20:
+                self.logger.error(
+                    "Pings were unsuccessful for a long time - stopping logging"
                 )
             await self.writeline("PING")
             self.ping_counter += 1
