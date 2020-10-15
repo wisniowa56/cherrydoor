@@ -120,7 +120,10 @@ async def get_card(sid):
         authenticate_socket(sid, "cards"), authenticate_socket(sid, "users_read")
     )
     await sio.environ[sid]["aiohttp.request"].app["serial"].card_event.wait()
-    return {"uid": sio.environ[sid]["aiohttp.request"].app["serial"].last_uid}
+    try:
+        return {"uid": sio.environ[sid]["aiohttp.request"].app["serial"].last_uid}
+    except KeyError:
+        pass
 
 
 @sio.on("modify_users")
