@@ -198,7 +198,7 @@ class Serial:
                     self.config.get("manufacturer-code", "18"),
                 )
                 result = await self.authenticate(uid)
-                auth_mode = "UID"
+                auth_mode = "UID" if result else auth_mode
         if self.delay:
             await asyncio.sleep(self.delay)
         await self.writeline(f"AUTH {int(result)}")
@@ -364,8 +364,10 @@ class Serial:
         uid = bytearray()
         uid_len = 4 + 3 * (block0[0] == 0x88) * (1 + (block0[5] == 0x88))
         for i, byte in enumerate(block0):
-            if (uid_len in [7, 10] and i in [0, 4]) or (
-                uid_len == 10 and i in [5, 9, 14]
+            if (
+                i == 4
+                or (uid_len in [7, 10] and i == 0)
+                or (uid_len == 10 and i in [5, 9, 14])
             ):
                 if byte != 0x88:
                     bcc = block0[i - 1] ^ block0[i - 2] ^ block0[i - 3] ^ block0[i - 4]
