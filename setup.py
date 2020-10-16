@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.7.0b7"
+__version__ = "0.7.0b8"
 __status__ = "Prototype"
 
 try:
