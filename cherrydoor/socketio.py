@@ -114,6 +114,13 @@ async def door_socket(sid, data):
         return {"Ok": True}
 
 
+@sio.on("reset")
+async def reset(sid):
+    await authenticate_socket(sid, "admin")
+    interface = sio.environ[sid]["aiohttp.request"].app["serial"]
+    await interface.reset()
+
+
 @sio.on("get_card")
 async def get_card(sid):
     await asyncio.gather(

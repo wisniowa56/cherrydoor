@@ -17,6 +17,14 @@ from time import sleep
 import aioserial
 from motor import motor_asyncio as motor
 
+try:
+    import RPi.GPIO as GPIO
+
+    gpio_enabled = True
+    GPIO.setmode(GPIO.BCM)
+except ModuleNotFoundError:
+    gpio_enabled = False
+
 
 def get_config():
     from cherrydoor.config import load_config
@@ -42,6 +50,9 @@ class Serial:
         self.settings_change_stream = None
         self.door_open = False
         self.ping_counter = 0
+        if gpio_enabled:
+            self.reset_pin = config.get("reset_pin", 27)
+            GPIO.setup(self.reset_pin, GPIO.OUT)
 
     def start(self, run=False):
         try:
@@ -96,6 +107,8 @@ class Serial:
         if self.settings_change_stream != None:
             await self.settings_change_stream.close()
         await self.serial.close()
+        if gpio_enabled:
+            GPIO.cleanup()
 
     def serial_init(self):
         """
@@ -114,6 +127,12 @@ class Serial:
             )
             sleep(2)
             self.serial_init()
+
+    async def reset(self):
+        if gpio_enabled:
+            GPIO.output(self.reset_pin, GPIO.LOW)
+            await asyncio.sleep(1)
+            GPIO.output(self.reset_pin, GPIO.HIGH)
 
     async def async_serial_init(self, n=1):
         """
@@ -170,10 +189,16 @@ class Serial:
             result = await self.authenticate(uid)
             auth_mode = "UID"
         else:
-            result = block0[-2:] == self.config.get(
-                "manufacturer-code", "18"
-            ) or await self.authenticate(uid)
+            result = block0[-2:] == self.config.get("manufacturer-code", "18")
             auth_mode = "Manufacturer code"
+            if result == False:
+                self.logger.debug(
+                    "manufacturer code doesn't match - card: %s, expected %s",
+                    block0[-2:],
+                    self.config.get("manufacturer-code", "18"),
+                )
+                result = await self.authenticate(uid)
+                auth_mode = "UID"
         if self.delay:
             await asyncio.sleep(self.delay)
         await self.writeline(f"AUTH {int(result)}")

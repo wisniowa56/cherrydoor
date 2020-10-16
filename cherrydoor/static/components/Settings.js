@@ -18,6 +18,11 @@ const Settings = {
 				});
 			} catch (e) {}
 		},
+		reset() {
+			try {
+				this.socket.emit("reset");
+			} catch (e) {}
+		},
 	},
 	inject: ["socket"],
 	template: `
@@ -25,6 +30,9 @@ const Settings = {
 	<label for="breaks">Przerwy <small>json, lista obiektów z właściwościami "from" i "to", format "HH:MM"</small></label>
 	<textarea class="break-input" v-model="breaks" placeholder="[]"></textarea>
 	<button @click="save()" class="save-button">Zapisz</button>
+</div>
+<div class="card">
+	<button @click="reset()" class="reset-button">Zresetuj Arduino</button>
 </div>
 `,
 };
