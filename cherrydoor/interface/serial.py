@@ -270,7 +270,7 @@ class Serial:
                 ) and time < break_time.get("to", datetime.min)
             if previous != self.is_break and not self.manual_auth:
                 self.logger.debug("break time: %s", self.is_break)
-                await self.writeline(f"NTFY {4 if self.is_break else 3}")
+                await self.writeline(f"NTFY {3 if self.is_break else 4}")
 
     async def open(self, open: bool) -> None:
         """
