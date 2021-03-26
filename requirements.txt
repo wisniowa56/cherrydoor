@@ -38,7 +38,7 @@ pymongo==3.11.0
 pyparsing==2.4.7
 pyserial==3.4
 python-engineio==3.11.2
-PyYAML==5.3.1
+PyYAML==5.4
 secure==0.2.1
 sentry-sdk==0.16.5
 six==1.14.0
