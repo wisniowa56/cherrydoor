@@ -31,12 +31,16 @@ jobs:
         if: ${{ !contains(github.ref, 'master') }}
         id: version
         uses: oplik0/gh-action-buildnum@v1
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         with:
           gist_token: ${{ secrets.GIST_TOKEN }}
           version_key: ${{ github.ref }}
           set_env: true
       - name: Automatically set dev version
         if: ${{ !contains(github.ref, 'master') }}
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: |
           echo ::set-env name=CHERRYDOOR_VERSION::$(echo $(echo "$GITHUB_REF" | egrep -woi "([0-9\.{dev}\-]+)" && echo "$BUILDNUM_FOR_VERSION") | tr -d " ")
       - name: Build and publish
@@ -47,6 +51,8 @@ jobs:
           python setup.py sdist bdist_wheel
           twine upload --skip-existing dist/*
       - name: Set published version for release
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: echo ::set-env name=PUBLISHED_VERSION::$(cat VERSION)
       - name: Geneate changelog
         id: changelog
