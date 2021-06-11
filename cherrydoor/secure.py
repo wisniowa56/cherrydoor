@@ -79,6 +79,7 @@ async def set_secure_headers(request, handler):
         #   SecurePolicies.CSP().Values.nonce(nonce),
         f"'nonce-{nonce}'",
         "https://unpkg.com",
+        "'unsafe-inline'",
         SecurePolicies.CSP().Values.unsafe_eval,
     ]
     style_src = [
