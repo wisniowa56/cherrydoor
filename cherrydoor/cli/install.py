@@ -4,7 +4,7 @@ Install the app for the first time
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.7b0"
+__version__ = "0.8.b0"
 __status__ = "Prototype"
 import json
 import os

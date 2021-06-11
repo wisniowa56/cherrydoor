@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.7.0b9"
+__version__ = "0.8.b0"
 __status__ = "Prototype"
 
 try:
@@ -43,7 +43,7 @@ setup(
     entry_points={"console_scripts": ["cherrydoor = cherrydoor.__main__:cherrydoor"]},
     python_requires=">=3.7",
     install_requires=[
-        "aiohttp>=3.6",
+        "aiohttp==3.6.3",
         "aioserial>=1.3",
         "argon2-cffi>=19",
         "motor>=2.1",

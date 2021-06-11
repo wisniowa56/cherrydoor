@@ -4,7 +4,7 @@ Create and validate Branca-based API tokens
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.7b0"
+__version__ = "0.8.b0"
 __status__ = "Prototype"
 
 import logging
