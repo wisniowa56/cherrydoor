@@ -47,6 +47,8 @@ jobs:
           python setup.py sdist bdist_wheel
           twine upload --skip-existing dist/*
       - name: Set published version for release
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         run: echo ::set-env name=PUBLISHED_VERSION::$(cat VERSION)
       - name: Geneate changelog
         id: changelog
