@@ -173,14 +173,14 @@ class Serial:
                 )
                 await self.async_serial_init()
                 continue
-            command = line.decode("utf-8", errors="ignore").rstrip().split(" ")
+            command = line.decode("utf-8", errors="ignore").rstrip().lstrip().split(" ")
             self.loop.create_task(self.log_command(command))
-            if len(command) < 2:
+            if len(command) < 1:
                 continue
-            process = self.command_funcions.get(command[0], None)
+            process = self.command_funcions.get(command[0].upper(), None)
             if process != None:
                 await process(command[1])
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(0.1)
 
     async def card(self, block0):
         self.logger.debug("processing a card")
@@ -318,7 +318,7 @@ class Serial:
         TODO #54 create and use a new status command instead of a ping/pong
         """
         while True:
-            if self.ping_counter > 1 and self.ping_counter < 10:
+            if self.ping_counter >= 1 and self.ping_counter < 10:
                 self.logger.debug("Unsuccessful ping")
             elif self.ping_counter >= 10 and self.ping_counter < 20:
                 self.logger.error(
