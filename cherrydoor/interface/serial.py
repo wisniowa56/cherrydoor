@@ -175,12 +175,12 @@ class Serial:
                 continue
             command = line.decode("utf-8", errors="ignore").rstrip().split(" ")
             self.loop.create_task(self.log_command(command))
-            if len(command) == 0 or len(command[0]) < 2:
+            if len(command) == 0 or len(command[0]) < 4:
                 continue
             process = self.command_funcions.get(command[0], None)
             if process != None:
-                await process(command[1] if len(command) > 0 else None)
-                await asyncio.sleep(0.2)
+                await process(command[1] if len(command) > 1 else None)
+                await asyncio.sleep(0.1)
 
     async def card(self, block0):
         self.logger.debug("processing a card")

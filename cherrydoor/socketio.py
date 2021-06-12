@@ -82,7 +82,11 @@ async def send_status(app):
 async def send_console(app):
     async with app["db"].terminal.watch(
         pipeline=[
-            {"$match": {"operationType": {"$in": ["insert", "update", "replace"]},}},
+            {
+                "$match": {
+                    "operationType": {"$in": ["insert", "update", "replace", "rename"]},
+                }
+            },
             {
                 "$project": {
                     "command": "$fullDocument.command",
