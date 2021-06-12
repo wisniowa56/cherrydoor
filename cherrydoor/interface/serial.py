@@ -177,7 +177,7 @@ class Serial:
             self.loop.create_task(self.log_command(command))
             if len(command) < 1:
                 continue
-            process = self.command_funcions.get(command[0].upper(), None)
+            process = self.command_funcions.get(command[0], None)
             if process != None:
                 await process(command[1])
             await asyncio.sleep(0.5)
