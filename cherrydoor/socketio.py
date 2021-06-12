@@ -85,8 +85,9 @@ async def send_console(app):
             {"$match": {"operationType": {"$in": ["insert", "update", "replace"]},}},
             {
                 "$project": {
-                    "value": "$fullDocument.value",
-                    "setting": "$fullDocument.setting",
+                    "command": "$fullDocument.command",
+                    "arguments": "$fullDocument.arguments",
+                    "timestamp": "$fullDocument.timestamp",
                 }
             },
         ],
