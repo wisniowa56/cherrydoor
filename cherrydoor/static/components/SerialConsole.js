@@ -20,6 +20,13 @@ const SerialConsole = {
 					data.command
 				} ${data.arguments.join(" ")}`;
 				this.send_to_terminal = command;
+				const container = document.getElementById("container");
+				if (
+					container.scrollHeight - container.scrollTop <
+					container.clientHeight * 1.5
+				) {
+					container.scrollTop = container.scrollHeight;
+				}
 			}
 		});
 		this.socket.emit("enter_room", { room: "serial_console" });

@@ -6,6 +6,7 @@
 	padding: 0.5em 1.5em 1em 1em;
 	max-height: calc(96vh - max(200px, 25vh));
 	overflow-anchor: none;
+	overflow-y: auto;
 }
 #container output {
 	clear: both;
