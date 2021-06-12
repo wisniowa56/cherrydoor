@@ -59,6 +59,7 @@ async def authenticate_socket(sid, permission):
 
 async def setup_socket_tasks(app):
     app["emit_status"] = sio.start_background_task(send_status, app)
+    app["emit_serial"] = sio.start_background_task(send_console, app)
     logger.debug("Finished setting up socket.io tasks")
 
 
@@ -76,6 +77,26 @@ async def send_status(app):
         except Exception as e:
             logger.debug("failed to emit status. Exception: %s", e)
         await asyncio.sleep(1)
+
+
+async def send_console(app):
+    async with app["db"].terminal.watch(
+        pipeline=[
+            {"$match": {"operationType": {"$in": ["insert", "update", "replace"]},}},
+            {
+                "$project": {
+                    "value": "$fullDocument.value",
+                    "setting": "$fullDocument.setting",
+                }
+            },
+        ],
+        full_document="updateLookup",
+    ) as terminal_change_stream:
+        async for change in terminal_change_stream:
+            try:
+                await sio.emit("serial_command", data=change, room="serial_console")
+            except Exception as e:
+                logger.exception("failed to emit serial result. Exception: %s", e)
 
 
 async def send_new_logs(app):
@@ -186,6 +207,15 @@ async def settings(sid, data):
     await send_settings(sid, data, broadcast=False)
 
 
+@sio.on("serial_command")
+async def serial_command(sid, data):
+    await authenticate_socket(sid, "admin")
+    app = sio.get_environ(sid)["aiohttp.request"].app
+    command = data.get("command", False)
+    if command:
+        await app["serial"].writeline(command)
+
+
 async def send_users(sid, data={}, broadcast=False):
     app = sio.get_environ(sid)["aiohttp.request"].app
     users = await (await get_users(app, ["username", "permissions", "cards"])).to_list(
@@ -213,6 +243,7 @@ rooms = {
     "door": {"permissions": ["enter"], "function": None},
     "users": {"permissions": ["users_manage", "users_read"], "function": send_users},
     "settings": {"permissions": ["admin"], "function": send_settings},
+    "serial_console": {"permissions": ["admin"], "function": None},
 }
 
 

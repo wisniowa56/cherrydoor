@@ -2,6 +2,7 @@ import * as Vue from "./vue-dev.js";
 import { createRouter, createWebHistory } from "./vue-router.js";
 import Dashboard from "../components/Dashboard.js";
 import Users from "../components/Users.js";
+import SerialConsole from "../components/SerialConsole.js";
 import Header from "../components/Header.js";
 import Navbar from "../components/Navbar.js";
 import HamburgerMenu from "../components/HamburgerMenu.js";
@@ -10,6 +11,7 @@ import UsageChart from "../components/UsageChart.js";
 import DoorStatus from "../components/DoorStatus.js";
 import ManageUsers from "../components/ManageUsers.js";
 import Settings from "../components/Settings.js";
+import vShell from "../components/v-shell.js";
 
 const socket = io();
 const App = {
@@ -21,7 +23,6 @@ const App = {
 	},
 };
 
-const Console = {};
 const User = {};
 
 const app = Vue.createApp(App);
@@ -50,6 +51,7 @@ app.component("hamburger-menu", HamburgerMenu);
 app.component("usage-chart", UsageChart);
 app.component("door-status", DoorStatus);
 app.component("manage-users", ManageUsers);
+app.component("v-shell", vShell);
 
 const router = createRouter({
 	history: createWebHistory(),
@@ -73,7 +75,7 @@ const router = createRouter({
 		{
 			path: "/console",
 			name: "console",
-			component: Console,
+			component: SerialConsole,
 		},
 		{
 			path: "/user",
