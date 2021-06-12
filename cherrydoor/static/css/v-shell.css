@@ -4,6 +4,8 @@
 	font-size: 11pt;
 	font-family: Inconsolata, monospace;
 	padding: 0.5em 1.5em 1em 1em;
+	max-height: calc(96vh - max(200px, 25vh));
+	overflow-anchor: none;
 }
 #container output {
 	clear: both;
@@ -26,6 +28,7 @@ img {
 	box-orient: horizontal;
 	box-align: stretch;
 	clear: both;
+	overflow-anchor: auto;
 }
 .input-line > div:nth-child(2) {
 	-webkit-box-flex: 1;

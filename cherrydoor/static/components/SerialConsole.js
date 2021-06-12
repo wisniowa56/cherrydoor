@@ -27,6 +27,13 @@ const SerialConsole = {
 	methods: {
 		prompt(value) {
 			this.socket.emit("serial_command", { command: value });
+			const container = document.getElementById("container");
+			if (
+				container.scrollHeight - container.scrollTop <
+				container.clientHeight * 1.5
+			) {
+				container.scrollTop = container.scrollHeight;
+			}
 		},
 	},
 	template: `
