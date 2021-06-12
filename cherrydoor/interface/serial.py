@@ -318,11 +318,11 @@ class Serial:
         TODO #54 create and use a new status command instead of a ping/pong
         """
         while True:
-            if self.ping_counter > 0 and self.ping_counter < 10:
+            if self.ping_counter > 1 and self.ping_counter < 10:
                 self.logger.debug("Unsuccessful ping")
-            elif self.ping_counter < 20:
+            elif self.ping_counter >= 10 and self.ping_counter < 20:
                 self.logger.error(
-                    "Pings were unsuccessful for more than 5 seconds - there is most likely an error on the other side of the serial connection"
+                    "Pings were unsuccessful for more than 10 seconds - there is most likely an error on the other side of the serial connection"
                 )
             elif self.ping_counter == 20:
                 self.logger.error(
@@ -330,7 +330,7 @@ class Serial:
                 )
             await self.writeline("PING")
             self.ping_counter += 1
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(1)
 
     async def pong(self, status=0):
         """
@@ -338,8 +338,7 @@ class Serial:
         TODO create and use a new status command instead of a ping/pong
         """
         self.ping_counter = 0
-        status = int(status)
-        self.door_open = status > 0
+        self.door_open = int(status) > 0
 
     def extract_uid(self, block0):
         if isinstance(block0, str):
