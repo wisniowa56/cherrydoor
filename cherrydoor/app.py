@@ -72,12 +72,7 @@ def setup_app(loop=asyncio.get_event_loop(), config=load_config()[0]):
     app.on_startup.append(setup_db)
     # set up aiohttp-session with aiohttp-session-mongo for storage
     setup_session(
-        app,
-        MongoStorage(
-            db["sessions"],
-            max_age=None,
-            cookie_name="session_id",
-        ),
+        app, MongoStorage(db["sessions"], max_age=None, cookie_name="session_id",),
     )
     # set up aiohttp-security
     setup_security(

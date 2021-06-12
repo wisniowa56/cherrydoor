@@ -14,6 +14,7 @@ from aiohttp.web import middleware
 from aiohttp_jinja2 import get_env
 import secure
 
+
 def setup(app):
     server = secure.Server().set("Secure")
     csp_value = (
@@ -31,11 +32,7 @@ def setup(app):
         .manifest_src("'self'")
         .worker_src("'self'", "blob:")
     )
-    feature_value = (
-        secure.PermissionsPolicy()
-        .geolocation("'none'")
-        .vibrate("'none'")
-    )
+    feature_value = secure.PermissionsPolicy().geolocation("'none'").vibrate("'none'")
     if app["config"].get("https", False):
         csp_value = csp_value.upgrade_insecure_requests()
         hsts_value = (
@@ -47,7 +44,9 @@ def setup(app):
     else:
         hsts_value = None
     if app["config"].get("sentry_csp_url", False):
-        csp_value = csp_value.custom_directive("report-uri", app["config"]["sentry_csp_url"])
+        csp_value = csp_value.custom_directive(
+            "report-uri", app["config"]["sentry_csp_url"]
+        )
     else:
         csp_value = csp_value.custom_directive("report-uri", "/csp")
 
@@ -63,7 +62,7 @@ def setup(app):
         hsts=hsts_value,
         xfo=xfo_value,
         referrer=referrer_value,
-        permissions=feature_value,
+        # permissions=feature_value,
         cache=cache_value,
     )
 
@@ -78,7 +77,6 @@ async def set_secure_headers(request, handler):
         f"'nonce-{nonce}'",
         "https://unpkg.com",
         "'unsafe-eval'",
-
     ]
     style_src = [
         "'self'",
@@ -86,7 +84,7 @@ async def set_secure_headers(request, handler):
         "https://fonts.googleapis.com/css2",
     ]
     if request.path == "/api/v1/docs":
-        script_src.append("'unsafe-inline'")
+        script_src[2] = "'unsafe-inline'"
         style_src.append("'unsafe-inline'")
     get_env(request.app).globals["csp_nonce"] = nonce
     secure_headers = deepcopy(request.app["secure_headers"])

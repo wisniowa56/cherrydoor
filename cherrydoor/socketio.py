@@ -32,12 +32,15 @@ internal_logger = logging.getLogger("SOCKET.IO-INTERNALS")
 internal_logger.setLevel(logging.ERROR)
 
 sio = socketio.AsyncServer(
-    async_mode="aiohttp", logger=internal_logger, engineio_logger=internal_logger
+    async_mode="aiohttp",
+    cors_allowed_origins="*",
+    logger=internal_logger,
+    engineio_logger=internal_logger,
 )
 
 
 async def authenticate_socket(sid, permission):
-    request = sio.environ[sid]["aiohttp.request"]
+    request = sio.get_environ(sid)["aiohttp.request"]
     async with sio.session(sid) as session:
         if not isinstance(session.get("permissions", None), list):
             session["permissions"] = await get_permissions(request)
@@ -79,11 +82,7 @@ async def send_new_logs(app):
     # TODO actually finish this function
     async with app["db"].logs.watch(
         pipeline=[
-            {
-                "$match": {
-                    "operationType": {"$in": ["insert", "update", "replace"]},
-                }
-            },
+            {"$match": {"operationType": {"$in": ["insert", "update", "replace"]},}},
             {
                 "$project": {
                     "value": "$fullDocument.value",
@@ -96,9 +95,7 @@ async def send_new_logs(app):
         async for change in logs_change_stream:
             try:
                 await sio.emit(
-                    "new_logs",
-                    {},
-                    room="logs",
+                    "new_logs", {}, room="logs",
                 )
             except Exception as e:
                 logger.debug("failed to emit status. Exception: %s", e)
@@ -109,7 +106,7 @@ async def door_socket(sid, data):
     await authenticate_socket(sid, "enter")
 
     if isinstance(data, dict) and isinstance(data.get("open", None), bool):
-        interface = sio.environ[sid]["aiohttp.request"].app["serial"]
+        interface = sio.get_environ(sid)["aiohttp.request"].app["serial"]
         await interface.open(data.get("open", False))
         return {"Ok": True}
 
@@ -117,7 +114,7 @@ async def door_socket(sid, data):
 @sio.on("reset")
 async def reset(sid):
     await authenticate_socket(sid, "admin")
-    interface = sio.environ[sid]["aiohttp.request"].app["serial"]
+    interface = sio.get_environ(sid)["aiohttp.request"].app["serial"]
     await interface.reset()
 
 
@@ -126,9 +123,9 @@ async def get_card(sid):
     await asyncio.gather(
         authenticate_socket(sid, "cards"), authenticate_socket(sid, "users_read")
     )
-    await sio.environ[sid]["aiohttp.request"].app["serial"].card_event.wait()
+    await sio.get_environ(sid)["aiohttp.request"].app["serial"].card_event.wait()
     try:
-        return {"uid": sio.environ[sid]["aiohttp.request"].app["serial"].last_uid}
+        return {"uid": sio.get_environ(sid)["aiohttp.request"].app["serial"].last_uid}
     except KeyError:
         pass
 
@@ -138,7 +135,7 @@ async def modify_users(sid, data):
     await asyncio.gather(
         authenticate_socket(sid, "users_read"), authenticate_socket(sid, "users_manage")
     )
-    app = sio.environ[sid]["aiohttp.request"].app
+    app = sio.get_environ(sid)["aiohttp.request"].app
     edits = []
     for user in data.get("users", []):
         user.pop("edit", None)
@@ -158,7 +155,7 @@ async def create_users(sid, data):
     await asyncio.gather(
         authenticate_socket(sid, "users_read"), authenticate_socket(sid, "users_manage")
     )
-    app = sio.environ[sid]["aiohttp.request"].app
+    app = sio.get_environ(sid)["aiohttp.request"].app
     if len(data.get("users", [])) > 0:
         for user in data["users"]:
             user["password"] = hasher.hash(user["password"])
@@ -169,7 +166,7 @@ async def create_users(sid, data):
 @sio.on("delete_user")
 async def delete_user(sid, data):
     await authenticate_socket(sid, "users_manage")
-    app = sio.environ[sid]["aiohttp.request"].app
+    app = sio.get_environ(sid)["aiohttp.request"].app
     await delete_user_from_db(app, username=data.get("username", None))
     await send_users(sid, broadcast=False)
 
@@ -177,7 +174,7 @@ async def delete_user(sid, data):
 @sio.on("settings")
 async def settings(sid, data):
     await authenticate_socket(sid, "admin")
-    app = sio.environ[sid]["aiohttp.request"].app
+    app = sio.get_environ(sid)["aiohttp.request"].app
     if data.get("breaks", False):
         for time in data["breaks"]:
             time["from"] = dt(
@@ -190,10 +187,11 @@ async def settings(sid, data):
 
 
 async def send_users(sid, data={}, broadcast=False):
-    app = sio.environ[sid]["aiohttp.request"].app
+    app = sio.get_environ(sid)["aiohttp.request"].app
     users = await (await get_users(app, ["username", "permissions", "cards"])).to_list(
         None
     )
+    logger.debug("socket got a message")
     # ensure all sent users have permissions
     users = await asyncio.gather(*map(lambda user: map_permissions(app, user), users))
     room = "users" if broadcast else sid
@@ -201,7 +199,7 @@ async def send_users(sid, data={}, broadcast=False):
 
 
 async def send_settings(sid, data={}, broadcast=False):
-    app = sio.environ[sid]["aiohttp.request"].app
+    app = sio.get_environ(sid)["aiohttp.request"].app
     settings = await get_settings(app)
     for break_time in settings["breaks"]:
         break_time["from"] = break_time.get("from").strftime("%H:%M")

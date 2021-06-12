@@ -56,20 +56,13 @@ setup(
         "aiohttp-security>=0.4.0",
         "aiohttp-session>=2.9.0",
         "aiohttp-session-mongo>=0.0.1",
-        "secure>=0.2.1",
+        "secure>=0.3.0",
         "sentry-sdk>=0.16.5",
         "packaging>=20",
         "aiojobs>=0.2.2",
         "python-socketio>=4.6.0",
     ],
-    extras_require={
-        "speedups": [
-            "aiodns>=1.1",
-            "Brotli",
-            "cchardet",
-            "uvloop>=0.14",
-        ]
-    },
+    extras_require={"speedups": ["aiodns>=1.1", "Brotli", "cchardet", "uvloop>=0.14",]},
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Education",
