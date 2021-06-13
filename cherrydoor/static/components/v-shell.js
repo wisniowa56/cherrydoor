@@ -91,7 +91,7 @@ const vShell = {
 	},
 	watch: {
 		shell_input(val) {
-			this.output(val);
+			this.output(val, false);
 			this.$parent.send_to_terminal = "";
 		},
 	},
@@ -187,12 +187,12 @@ const vShell = {
 
 			// Clear/setup line for next input.
 		},
-		output(html) {
+		output(html, clear = true) {
 			this.$refs.output.insertAdjacentHTML(
 				"beforeEnd",
 				"<pre>" + html + "</pre>"
 			);
-			this.value = "";
+			if (clear) this.value = "";
 		},
 	},
 	mounted() {
