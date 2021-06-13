@@ -93,9 +93,8 @@ async def send_console(app):
                     "arguments": "$fullDocument.arguments",
                     "timestamp": {
                         "$dateToString": {
-                            "format": "%H:%M:%S:%L%z",
+                            "format": "%H:%M:%S:%L",
                             "date": "$fullDocument.timestamp",
-                            "timezone": "Europe/Warsaw",
                         }
                     },
                 }

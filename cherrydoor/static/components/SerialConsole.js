@@ -14,18 +14,18 @@ const SerialConsole = {
 	},
 	inject: ["user", "socket"],
 	mounted() {
+		const container = document.getElementById("container");
 		this.socket.on("serial_command", (data) => {
 			if (data != null) {
-				const command = `(${data.timestamp} < ${
+				const command = `(${data.timestamp}) < ${
 					data.command
 				} ${data.arguments.join(" ")}`;
 				this.send_to_terminal = command;
-				const container = document.getElementById("container");
 				if (
 					container.scrollHeight - container.scrollTop <
 					container.clientHeight * 1.5
 				) {
-					container.scrollTop = container.scrollHeight;
+					container.scrollTop = container.scrollHeight + 100;
 				}
 			}
 		});
@@ -39,7 +39,7 @@ const SerialConsole = {
 				container.scrollHeight - container.scrollTop <
 				container.clientHeight * 1.5
 			) {
-				container.scrollTop = container.scrollHeight;
+				container.scrollTop = container.scrollHeight + 100;
 			}
 		},
 	},
