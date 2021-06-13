@@ -25,7 +25,9 @@ const SerialConsole = {
 					container.scrollHeight - container.scrollTop <
 					container.clientHeight * 1.5
 				) {
-					container.scrollTop = container.scrollHeight + 100;
+					setTimeout(() => {
+						container.scrollTop = container.scrollHeight;
+					}, 100);
 				}
 			}
 		});
@@ -39,7 +41,9 @@ const SerialConsole = {
 				container.scrollHeight - container.scrollTop <
 				container.clientHeight * 1.5
 			) {
-				container.scrollTop = container.scrollHeight + 100;
+				setTimeout(() => {
+					container.scrollTop = container.scrollHeight;
+				}, 100);
 			}
 		},
 	},

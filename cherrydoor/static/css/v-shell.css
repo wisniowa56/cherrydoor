@@ -4,6 +4,7 @@
 	font-size: 11pt;
 	font-family: Inconsolata, monospace;
 	padding: 0.5em 1.5em 1em 1em;
+	height: calc(96vh - max(200px, 25vh));
 	max-height: calc(97vh - max(200px, 25vh));
 	overflow-anchor: none;
 	overflow-y: auto;
