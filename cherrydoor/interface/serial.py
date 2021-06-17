@@ -10,7 +10,7 @@ __status__ = "Prototype"
 import asyncio
 import logging
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from math import ceil
 from time import sleep
 
@@ -51,7 +51,7 @@ class Serial:
         self.door_open = False
         self.ping_counter = 0
         if gpio_enabled:
-            self.reset_pin = config.get("reset_pin", 27)
+            self.reset_pin = config.get("reset_pin", 2)
             GPIO.setup(self.reset_pin, GPIO.OUT)
 
     def start(self, run=False):
@@ -342,10 +342,18 @@ class Serial:
             status = 0
         self.ping_counter = 0
         self.door_open = int(status) > 0
+
     async def periodic_reset(self):
+        await self.reset()
         while True:
-            await self.reset()
-            await asyncio.sleep(3600)
+            card_used = await self.db.logs.find_one(
+                {"timestamp": {"$gt": datetime.now() - timedelta(hours=1)}}
+            )
+            if card_used == None:
+                await self.reset()
+                await asyncio.sleep(3600)
+            else:
+                await asyncio.sleep(600)
 
     def extract_uid(self, block0):
         if isinstance(block0, str):
