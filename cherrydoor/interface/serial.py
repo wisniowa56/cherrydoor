@@ -96,6 +96,7 @@ class Serial:
         app["settings_listener"] = asyncio.create_task(self.settings_listener())
         app["breaks_listener"] = asyncio.create_task(self.breaks())
         app["serial_ping"] = asyncio.create_task(self.ping())
+        app["periodic_reset"] = asyncio.create_task(self.periodic_reset())
         self.logger.info(
             f"Listening on {self.config.get('interface', {}).get('port', '/dev/serial0')}"
         )
@@ -341,6 +342,10 @@ class Serial:
             status = 0
         self.ping_counter = 0
         self.door_open = int(status) > 0
+    async def periodic_reset(self):
+        while True:
+            await self.reset()
+            await asyncio.sleep(3600)
 
     def extract_uid(self, block0):
         if isinstance(block0, str):
