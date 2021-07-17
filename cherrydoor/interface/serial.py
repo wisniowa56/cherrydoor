@@ -125,7 +125,6 @@ class Serial:
         app["settings_listener"] = asyncio.create_task(self.settings_listener())
         app["breaks_listener"] = asyncio.create_task(self.breaks())
         app["serial_ping"] = asyncio.create_task(self.ping())
-        app["periodic_reset"] = asyncio.create_task(self.periodic_reset())
         self.logger.info(
             "Listening on %s",
             self.config.get("interface", {}).get("port", "/dev/serial0"),
@@ -458,9 +457,12 @@ class Serial:
 
         Parameters
         ----------
-        block0 : str
+        block0 : str or bytearray
             first block of the card (hexadecimal)
-
+        Returns
+        -------
+        UID : str
+            UID of the card (hexadecimal)
         """
         if isinstance(block0, str):
             try:
