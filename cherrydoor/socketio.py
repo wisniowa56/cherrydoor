@@ -113,7 +113,11 @@ async def send_new_logs(app):
     # TODO actually finish this function
     async with app["db"].logs.watch(
         pipeline=[
-            {"$match": {"operationType": {"$in": ["insert", "update", "replace"]},}},
+            {
+                "$match": {
+                    "operationType": {"$in": ["insert", "update", "replace"]},
+                }
+            },
             {
                 "$project": {
                     "value": "$fullDocument.value",
@@ -126,7 +130,9 @@ async def send_new_logs(app):
         async for change in logs_change_stream:
             try:
                 await sio.emit(
-                    "new_logs", {}, room="logs",
+                    "new_logs",
+                    {},
+                    room="logs",
                 )
             except Exception as e:
                 logger.debug("failed to emit status. Exception: %s", e)

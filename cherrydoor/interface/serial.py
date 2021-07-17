@@ -1,6 +1,4 @@
-"""
-Serial communication and card authentication
-"""
+"""Serial communication and card authentication."""
 
 __author__ = "opliko"
 __license__ = "MIT"
@@ -10,15 +8,15 @@ __status__ = "Prototype"
 import asyncio
 import logging
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from math import ceil
-from time import sleep
+from typing import Union
 
 import aioserial
 from motor import motor_asyncio as motor
 
 try:
-    import RPi.GPIO as GPIO
+    import RPi.GPIO as GPIO  # pylint: disable=import-outside-toplevel,import-error
 
     gpio_enabled = True
     GPIO.setmode(GPIO.BCM)
@@ -27,14 +25,28 @@ except ModuleNotFoundError:
 
 
 def get_config():
-    from cherrydoor.config import load_config
+    """Load AttrDict with configuration."""
+    from cherrydoor.config import load_config  # pylint: disable=import-outside-toplevel
 
     config, _ = load_config()
     return config
 
 
 class Serial:
+    """implementation of everything that requires a serial connection."""
+
     def __init__(self, motor=None, loop=None, config=get_config()):
+        """Initialize variables and setup logging.
+
+        Parameters
+        ----------
+        motor : Motor
+            motor instance to use
+        loop : asyncio.EventLoop
+            event loop
+        config : AttrDict
+            app configuration
+        """
         self.config = config
         self.encoding = self.config.get("interface", {}).get("encoding", "utf-8")
         self.manual_auth = False
@@ -55,89 +67,106 @@ class Serial:
             GPIO.setup(self.reset_pin, GPIO.OUT)
 
     def start(self, run=False):
+        """Start all tasks, initialize serial connection, database (if required) and start event loop.
+
+        Parameters
+        ----------
+        run : bool
+            if True, run event loop from here, if False, just return it
+        """
         try:
-            if self.loop == None:
+            if self.loop is None:
                 self.loop = asyncio.get_event_loop()
-            if self.db == None:
+            if self.db is None:
                 self.db = motor.AsyncIOMotorClient(
                     f"mongodb://{self.config.get('mongo', {}).get('url', 'localhost:27017')}/{self.config.get('mongo', {}).get('name', 'cherrydoor')}",
                     username=self.config.get("mongo", {}).get("username", None),
                     password=self.config.get("mongo", {}).get("password", None),
                     io_loop=self.loop,
                 )[self.config.get("mongo", {}).get("name", "cherrydoor")]
-            self.serial_init(self.config)
+            self.serial_init()
             self.loop.create_task(self.commands())
             self.loop.create_task(self.settings_listener())
             self.loop.create_task(self.breaks())
             self.logger.info(
-                f"Listening on {self.config.get('interface', {}).get('port', '/dev/serial0')}"
+                "Listening on %s",
+                self.config.get("interface", {}).get("port", "/dev/serial0"),
             )
             if run:
                 self.loop.run_forever()
-            else:
-                return self.loop
+            return self.loop
         except KeyboardInterrupt:
             self.logger.info("Keyboard interrupt")
-            pass
         finally:
             self.cleanup()
 
     async def aiohttp_startup(self, app):
+        """Queue up creation of all tasks required for serial comunication.
+
+        Parameters
+        ----------
+        app : web.Application
+            application instance
+        """
         app["create_aiohttp_tasks"] = asyncio.create_task(
             self.create_aiohttp_tasks(app)
         )
 
     async def create_aiohttp_tasks(self, app):
+        """Create tasks that will be ran constantly after app has started.
+
+        Parameters
+        ----------
+        app : web.Application
+            application instance
         """
-        Create tasks that will be ran constantly after app has started
-        """
-        await self.async_serial_init()
+        await self.serial_init()
         app["serial_listener"] = asyncio.create_task(self.commands())
         app["settings_listener"] = asyncio.create_task(self.settings_listener())
         app["breaks_listener"] = asyncio.create_task(self.breaks())
         app["serial_ping"] = asyncio.create_task(self.ping())
         app["periodic_reset"] = asyncio.create_task(self.periodic_reset())
         self.logger.info(
-            f"Listening on {self.config.get('interface', {}).get('port', '/dev/serial0')}"
+            "Listening on %s",
+            self.config.get("interface", {}).get("port", "/dev/serial0"),
         )
 
     async def cleanup(self, app=None):
+        """Clean up change streams and serial after app is closed.
+
+        Parameters
+        ----------
+        app : web.Application
+            application instance
         """
-        Clean up change streams and serial after app is closed
-        """
-        if self.settings_change_stream != None:
+        if self.settings_change_stream is not None:
             await self.settings_change_stream.close()
         await self.serial.close()
         if gpio_enabled:
             GPIO.cleanup()
-
-    def serial_init(self):
-        """
-        Synchronous function for initializing serial connection - deprecated as of 0.7
-        """
-        try:
-            self.serial = aioserial.AioSerial(
-                loop=self.loop,
-                port=self.config.get("interface", {}).get("port", "/dev/serial0"),
-                baudrate=self.config.get("interface", {}).get("baudrate", 115200),
-            )
-        except aioserial.serialutil.SerialException as e:
-            self.logger.debug(
-                "unable to connect to serial, trying again in 2 seconds. Exception: %s",
-                str(e),
-            )
-            sleep(2)
-            self.serial_init()
+        app["serial_listener"].cancel()
+        app["settings_listener"].cancel()
+        app["breaks_listener"].cancel()
+        app["serial_ping"].cancel()
+        app["periodic_reset"].cancel()
 
     async def reset(self):
+        """Reset the arduino by turning the reset pin low and high again.
+
+        ..warning:: Only works if gpio_enabled is set to True (RPi.GPIO was imported successfully). Otherwise does nothing.
+        """
         if gpio_enabled:
             GPIO.output(self.reset_pin, GPIO.LOW)
             await asyncio.sleep(1)
             GPIO.output(self.reset_pin, GPIO.HIGH)
 
-    async def async_serial_init(self, n=1):
-        """
-        Asynchronous function for initializing serial connection
+    async def serial_init(self, n=1):
+        """Asynchronous function for initializing serial connection.
+
+        Parameters
+        ----------
+        n : int
+            number of times connection failed
         """
         try:
             self.serial = aioserial.AioSerial(
@@ -153,16 +182,15 @@ class Serial:
                 )
             elif n == 21:
                 self.logger.warning(
-                    "unable to connect to serial for more than 40 seconds, logging for this issue stopped until the attempts to connect are successful. Exception: %s",
+                    "unable to connect to serial for more than 40 seconds, logging for this issue stopped until the attempts to connect are successful. "
+                    "Exception: %s",
                     str(e),
                 )
             await asyncio.sleep(1 + (n * (n < 25) or 24))
-            await self.async_serial_init(n + 1)
+            await self.serial_init(n + 1)
 
     async def commands(self):
-        """
-        Process commands by listening on serial connection
-        """
+        """Process commands by listening on serial connection."""
         while True:
             self.card_event.clear()
             try:
@@ -172,18 +200,27 @@ class Serial:
                     "disconnected from serial while trying to read. Exception: %s",
                     str(e),
                 )
-                await self.async_serial_init()
+                await self.serial_init()
                 continue
             command = line.decode("utf-8", errors="ignore").rstrip().split(" ")
             self.loop.create_task(self.log_command(command))
             if len(command) == 0 or len(command[0]) < 4:
                 continue
             process = self.command_funcions.get(command[0], None)
-            if process != None:
+            if process is not None:
                 await process(command[1] if len(command) > 1 else None)
                 await asyncio.sleep(0.1)
 
     async def card(self, block0):
+        """Process first block of a MiFare card.
+
+        Authenticates the card with either UID or manufacturer code and logs the envent.
+
+        Parameters
+        ----------
+        block0 : str
+            first block of a MiFare card (hexadecimal, UID + manufacturer data)
+        """
         self.logger.debug("processing a card")
         uid = self.extract_uid(block0)
         if await self.auth_required():
@@ -192,7 +229,7 @@ class Serial:
         else:
             result = block0[-2:] == self.config.get("manufacturer-code", "18")
             auth_mode = "Manufacturer code"
-            if result == False:
+            if not result:
                 self.logger.debug(
                     "manufacturer code doesn't match - card: %s, expected %s",
                     block0[-2:],
@@ -205,18 +242,39 @@ class Serial:
         await self.writeline(f"AUTH {int(result)}")
         self.loop.create_task(self.log_entry(block0, auth_mode, result))
         self.logger.debug(
-            f"Authentication {'successful' if result else 'unsuccessful'}"
+            "Authentication %s", "successful" if result else "unsuccessful"
         )
         self.last_uid = uid
         self.card_event.set()
 
-    async def authenticate(self, card):
+    async def authenticate(self, uid):
+        """Authenticate a card with its UID.
+
+        Parameters
+        ----------
+        uid : str
+            UID of the card (hexadecimal)
+        Returns
+        -------
+        bool
+            True if the card was successfully authenticated, False otherwise
+        """
         result = await self.db.users.count_documents(
-            {"permissions": {"$in": ["admin", "enter"]}, "cards": str(card)}
+            {"permissions": {"$in": ["admin", "enter"]}, "cards": str(uid)}
         )
         return result > 0
 
     async def auth_required(self):
+        """Check if authentication is required.
+
+        Authentication is not required if it's currently a break and require_auth is not set to manual,
+        or require_auth is set to manual and its value is set to False.
+
+        Returns
+        -------
+        bool
+            True if authentication is required, False otherwise
+        """
         auth = await self.db.settings.find_one(
             {"setting": "require_auth"}, {"_id": 0, "manual": 1, "value": 1}
         )
@@ -229,6 +287,7 @@ class Serial:
         return not self.is_break
 
     async def settings_listener(self):
+        """Listen for settings changes and update variables accordingly."""
         break_documents = await self.db.settings.find_one({"setting": "break_times"})
         self.break_times = break_documents.get("value", [])
         async with self.db.settings.watch(
@@ -258,6 +317,7 @@ class Serial:
                     print(f"new response delay: {self.delay}s")
 
     async def breaks(self):
+        """Adjust self.is_break when a break starts or ends."""
         while True:
             now = datetime.now()
             next_time = datetime.fromtimestamp(ceil(now.timestamp()))
@@ -266,30 +326,70 @@ class Serial:
             time = next_time.replace(year=2020, month=2, day=2)
             previous = self.is_break
             for break_time in self.break_times:
-                self.is_break = time > break_time.get(
-                    "from", datetime.max
-                ) and time < break_time.get("to", datetime.min)
+                self.is_break = (
+                    break_time.get("from", datetime.max)
+                    < time
+                    < break_time.get("to", datetime.min)
+                )
             if previous != self.is_break and not self.manual_auth:
                 self.logger.debug("break time: %s", self.is_break)
                 await self.writeline(f"NTFY {3 if self.is_break else 4}")
 
-    async def open(self, open: bool) -> None:
+    # pylint: disable=unsubscriptable-object
+    async def open(self, open_door: Union[bool, str]) -> None:
+        """Explicitely open or close the door.
+
+        Parameters
+        ----------
+        open_door : bool or str
+            True or "open" if the door should be opened, False or any other value if the door should be closed
         """
-        set status of the door (open/close)
-        """
-        if not isinstance(open, bool):
-            open = open.lower() == "open"
-        await self.writeline(f"DOOR {int(open)}")
+        if not isinstance(open_door, bool):
+            open_door = open_door.lower() == "open"
+        await self.writeline(f"DOOR {int(open_door)}")
 
     async def writeline(self, text):
+        """Send a line of text to the arduino over serial connection.
+
+        Parameters
+        ----------
+        text : str
+            line of text to be sent
+        """
         try:
             await self.serial.write_async(f"{text}\n".encode(self.encoding))
             self.serial.flush()
         except (aioserial.serialutil.SerialException, AttributeError) as e:
             self.logger.exception("Serial exception while trying to write. %s", str(e))
-            await self.async_serial_init()
+            await self.serial_init()
 
     async def log_entry(self, block0: str, auth_mode: str, success: bool):
+        """Log an entry event.
+
+        Parameters
+        ----------
+        block0 : str
+            full first block of the card
+        auth_mode : str
+            authentication mode used ("UID" or "Manufacturer code")
+        success : bool
+            True if authentication was successful, False otherwise
+
+        Notes
+        ---------------
+        Full database entry:
+
+        timestamp : datetime
+            time of the event
+        card : str
+            UID of the card
+        manufacturer_code : str
+            Manufacturer code of the card (last 2 bytes of block 0)
+        auth_mode : str
+            authentication mode used ("UID" or "Manufacturer code")
+        success : bool
+            True if authentication was successful, False otherwise
+        """
         await self.db.logs.insert_one(
             {
                 "timestamp": datetime.now(),
@@ -304,6 +404,13 @@ class Serial:
         self.card_event.clear()
 
     async def log_command(self, command):
+        """Log all commands sent over serial.
+
+        Parameters
+        ----------
+        command : str
+            command sent by or to the arduino
+        """
         await self.db.terminal.insert_one(
             {
                 "command": command[0],
@@ -314,8 +421,8 @@ class Serial:
         )
 
     async def ping(self):
-        """
-        Test connection to arduino every 0.5 second
+        """Test connection to arduino every 2 seconds.
+
         TODO #54 create and use a new status command instead of a ping/pong
         """
         while True:
@@ -331,31 +438,30 @@ class Serial:
                 )
             await self.writeline("PING")
             self.ping_counter += 1
-            await asyncio.sleep(1)
+            await asyncio.sleep(2)
 
     async def pong(self, status=0):
-        """
-        Acknowledge ping return and use the argument to set current door status
+        """Acknowledges ping return and uses the argument to set current door status.
+
         TODO create and use a new status command instead of a ping/pong
         """
-        if status == None:
+        if status is None:
             status = 0
         self.ping_counter = 0
         self.door_open = int(status) > 0
 
-    async def periodic_reset(self):
-        await self.reset()
-        while True:
-            card_used = await self.db.logs.find_one(
-                {"timestamp": {"$gt": datetime.now() - timedelta(hours=1)}}
-            )
-            if card_used == None:
-                await self.reset()
-                await asyncio.sleep(3600)
-            else:
-                await asyncio.sleep(600)
+    # pylint: disable=unsubscriptable-object
+    def extract_uid(self, block0: Union[str, bytearray]) -> str:
+        """Extract UID from block 0.
 
-    def extract_uid(self, block0):
+        Works with all MiFare UID types :)
+
+        Parameters
+        ----------
+        block0 : str
+            first block of the card (hexadecimal)
+
+        """
         if isinstance(block0, str):
             try:
                 if len(block0) % 2 != 0:
@@ -399,7 +505,7 @@ class Serial:
                             i,
                         )
                         return None
-                    elif len(uid) >= uid_len:
+                    if len(uid) >= uid_len:
                         break
                 continue
             uid.append(byte)

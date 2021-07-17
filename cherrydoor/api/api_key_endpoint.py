@@ -206,7 +206,9 @@ class DoorEndpoint(AioHTTPRestEndpoint):
         await check_api_permissions(request, required_permissions)
 
         key, token_name, permissions = app["api_tokens"].generate_token(
-            username, data.get("token_name", None), data.get("permissions", ["*"]),
+            username,
+            data.get("token_name", None),
+            data.get("permissions", ["*"]),
         )
         token = {
             "name": token_name,

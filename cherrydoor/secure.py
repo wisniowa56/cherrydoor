@@ -1,6 +1,4 @@
-"""
-Set up security headers
-"""
+"""Set up security headers."""
 
 __author__ = "opliko"
 __license__ = "MIT"
@@ -16,6 +14,13 @@ import secure
 
 
 def setup(app):
+    """Set secure headers values.
+
+    Parameters
+    ----------
+    app : aiohttp.web.Application
+        The aiohttp application instance.
+    """
     server = secure.Server().set("Secure")
     csp_value = (
         secure.ContentSecurityPolicy()
@@ -32,7 +37,7 @@ def setup(app):
         .manifest_src("'self'")
         .worker_src("'self'", "blob:")
     )
-    feature_value = secure.PermissionsPolicy().geolocation("'none'").vibrate("'none'")
+    # feature_value = secure.PermissionsPolicy().geolocation("'none'").vibrate("'none'")
     if app["config"].get("https", False):
         csp_value = csp_value.upgrade_insecure_requests()
         hsts_value = (
@@ -69,6 +74,19 @@ def setup(app):
 
 @middleware
 async def set_secure_headers(request, handler):
+    """Add secure headers to requests.
+
+    Parameters
+    ----------
+    request : aiohttp.web.Request
+        The request to set secure headers on.
+    handler : function
+        The middleware handler function.
+    Returns
+    -------
+    aiohttp.web.Response
+        The modified response to the request.
+    """
     nonce = b64encode(uuid4().bytes).decode("utf-8")
     script_src = [
         "'self'",

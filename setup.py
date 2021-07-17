@@ -1,3 +1,5 @@
+"""Setuptools setup script."""
+
 from os import environ
 
 from setuptools import find_packages, setup
@@ -29,7 +31,8 @@ setup(
     version=__version__,
     author="oplik0",
     description=(
-        "An overengineered rfid lock manager created for my school community. Made for Raspberry Pi connected with another microcontroler that send and recieved rfid data via UART"
+        "An overengineered rfid lock manager created for my school community. "
+        "Made for Raspberry Pi connected with another microcontroler that send and receieves rfid data via UART"
     ),
     long_description=readme,
     long_description_content_type="text/markdown",
@@ -41,7 +44,7 @@ setup(
     zip_safe=False,
     scripts=["scripts/cherrydoor-install"],
     entry_points={"console_scripts": ["cherrydoor = cherrydoor.__main__:cherrydoor"]},
-    python_requires=">=3.7",
+    python_requires=">=3.9",
     install_requires=[
         "aiohttp==3.6.3",
         "aioserial>=1.3",
@@ -62,7 +65,14 @@ setup(
         "aiojobs>=0.2.2",
         "python-socketio>=4.6.0",
     ],
-    extras_require={"speedups": ["aiodns>=1.1", "Brotli", "cchardet", "uvloop>=0.14",]},
+    extras_require={
+        "speedups": [
+            "aiodns>=1.1",
+            "Brotli",
+            "cchardet",
+            "uvloop>=0.14",
+        ]
+    },
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Education",

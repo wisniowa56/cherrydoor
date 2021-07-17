@@ -98,7 +98,9 @@ class FindUserEndpoint(AioHTTPRestEndpoint):
         else:
             cards = list(parameters.get("cards", []))
         user = await find_user_by_cards(
-            request.app, cards, ["username", "cards", "permissions"],
+            request.app,
+            cards,
+            ["username", "cards", "permissions"],
         )
         if user == None:
             raise HTTPNotFound(
