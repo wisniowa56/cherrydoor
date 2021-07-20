@@ -17,7 +17,7 @@ from cherrydoor.config import add_args, load_config
 
 
 def cherrydoor():
-    """Main function to run the server."""
+    """Run the server."""
     parser = argparse.ArgumentParser(
         prog="cherrydoor", description="Cherrydoor management"
     )

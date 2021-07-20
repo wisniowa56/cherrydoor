@@ -1,6 +1,4 @@
-"""
-Websocket handlers
-"""
+"""Websocket handlers."""
 
 __author__ = "opliko"
 __license__ = "MIT"
@@ -40,6 +38,23 @@ sio = socketio.AsyncServer(
 
 
 async def authenticate_socket(sid, permission):
+    """Authenticate the socker for a given permission based on its sid.
+
+    Parameters
+    ----------
+    sid : str
+        The sid of the socket.
+    permission : str
+        The permission the user needs to have.
+    Returns
+    -------
+    bool
+        True if the user has the permission, raises an exception otherwise.
+    Raises
+    ------
+    socketio.exceptions.ConnectionRefusedError
+        If the user does not have the permission required or no user is authenticated.
+    """
     request = sio.get_environ(sid)["aiohttp.request"]
     async with sio.session(sid) as session:
         if not isinstance(session.get("permissions", None), list):
@@ -58,12 +73,26 @@ async def authenticate_socket(sid, permission):
 
 
 async def setup_socket_tasks(app):
+    """Set up background tasks.
+
+    Parameters
+    ----------
+    app : aiohttp.web.Application
+        The aiohttp application instance.
+    """
     app["emit_status"] = sio.start_background_task(send_status, app)
     app["emit_serial"] = sio.start_background_task(send_console, app)
     logger.debug("Finished setting up socket.io tasks")
 
 
 async def send_status(app):
+    """Send door status to connected clients in "door" room every second.
+
+    Parameters
+    ----------
+    app : aiohttp.web.Application
+        The aiohttp application instance.
+    """
     while True:
         try:
             await sio.emit(
@@ -80,6 +109,13 @@ async def send_status(app):
 
 
 async def send_console(app):
+    """Senda all serial input/output to clients in "console" room as it's logged.
+
+    Parameters
+    ----------
+    app : aiohttp.web.Application
+        The aiohttp application instance.
+    """
     async with app["db"].terminal.watch(
         pipeline=[
             {
@@ -110,6 +146,13 @@ async def send_console(app):
 
 
 async def send_new_logs(app):
+    """Send new logs to clients in "new_logs" room as they're created for live analytics purposes.
+
+    Parameters
+    ----------
+    app : aiohttp.web.Application
+        The aiohttp application instance.
+    """
     # TODO actually finish this function
     async with app["db"].logs.watch(
         pipeline=[
@@ -140,6 +183,19 @@ async def send_new_logs(app):
 
 @sio.on("door")
 async def door_socket(sid, data):
+    """Open/close the door.
+
+    Parameters
+    ----------
+    sid : str
+        The sid of the socket.
+    data : dict
+        The data sent by the client, containing a "open" key with boolean value (True for open, False for close).
+    Returns
+    -------
+    dict
+        The response to the client, with "Ok" key set to True if request was successful.
+    """
     await authenticate_socket(sid, "enter")
 
     if isinstance(data, dict) and isinstance(data.get("open", None), bool):
@@ -150,6 +206,13 @@ async def door_socket(sid, data):
 
 @sio.on("reset")
 async def reset(sid):
+    """Reset the arduino over GPIO.
+
+    Parameters
+    ----------
+    sid : str
+        The sid of the socket.
+    """
     await authenticate_socket(sid, "admin")
     interface = sio.get_environ(sid)["aiohttp.request"].app["serial"]
     await interface.reset()
@@ -157,6 +220,17 @@ async def reset(sid):
 
 @sio.on("get_card")
 async def get_card(sid):
+    """Read a single card from the card reader and return it to the client.
+
+    Parameters
+    ----------
+    sid : str
+        The sid of the socket.
+    Returns
+    -------
+    dict
+        The response to the client, with "uid" key set to the card id.
+    """
     await asyncio.gather(
         authenticate_socket(sid, "cards"), authenticate_socket(sid, "users_read")
     )
@@ -169,6 +243,15 @@ async def get_card(sid):
 
 @sio.on("modify_users")
 async def modify_users(sid, data):
+    """Modify multiple users at once.
+
+    Parameters
+    ----------
+    sid : str
+        The sid of the socket.
+    data : dict
+        The data sent by the keys containing "users" key with a list of dicts containing modified user data.
+    """
     await asyncio.gather(
         authenticate_socket(sid, "users_read"), authenticate_socket(sid, "users_manage")
     )
@@ -189,6 +272,15 @@ async def modify_users(sid, data):
 
 @sio.on("create_users")
 async def create_users(sid, data):
+    """Create multiple users at once.
+
+    Parameters
+    ----------
+    sid : str
+        The sid of the socket.
+    data : dict
+        The data sent by the keys containing "users" key with a list of dicts containing new user data.
+    """
     await asyncio.gather(
         authenticate_socket(sid, "users_read"), authenticate_socket(sid, "users_manage")
     )
@@ -202,6 +294,15 @@ async def create_users(sid, data):
 
 @sio.on("delete_user")
 async def delete_user(sid, data):
+    """Delete a single user.
+
+    Parameters
+    ----------
+    sid : str
+        The sid of the socket.
+    data : dict
+        The data sent by the keys containing "username" key with the username of the user to delete.
+    """
     await authenticate_socket(sid, "users_manage")
     app = sio.get_environ(sid)["aiohttp.request"].app
     await delete_user_from_db(app, username=data.get("username", None))
@@ -210,6 +311,15 @@ async def delete_user(sid, data):
 
 @sio.on("settings")
 async def settings(sid, data):
+    """Change and send back the settings.
+
+    Parameters
+    ----------
+    sid : str
+        The sid of the socket.
+    data : dict
+        The data sent with a key for each setting to change (currently only "breaks" is supported).
+    """
     await authenticate_socket(sid, "admin")
     app = sio.get_environ(sid)["aiohttp.request"].app
     if data.get("breaks", False):
@@ -225,6 +335,15 @@ async def settings(sid, data):
 
 @sio.on("serial_command")
 async def serial_command(sid, data):
+    """Send a command to arduino over serial.
+
+    Parameters
+    ----------
+    sid : str
+        The sid of the socket.
+    data : dict
+        The data sent with a "command" key containing the text to send.
+    """
     await authenticate_socket(sid, "admin")
     app = sio.get_environ(sid)["aiohttp.request"].app
     command = data.get("command", False)
@@ -233,6 +352,17 @@ async def serial_command(sid, data):
 
 
 async def send_users(sid, data={}, broadcast=False):
+    """Ask to emit the users list to the client.
+
+    Parameters
+    ----------
+    sid : str
+        The sid of the socket.
+    data : dict
+        currently unused.
+    broadcast : bool
+        Whether to send the list to all clients in "users" room or just the one that requested it.
+    """
     app = sio.get_environ(sid)["aiohttp.request"].app
     users = await (await get_users(app, ["username", "permissions", "cards"])).to_list(
         None
@@ -245,6 +375,17 @@ async def send_users(sid, data={}, broadcast=False):
 
 
 async def send_settings(sid, data={}, broadcast=False):
+    """Ask to emit the settings to the client.
+
+    Parameters
+    ----------
+    sid : str
+        The sid of the socket.
+    data : dict
+        Currently unused.
+    broadcast : bool
+        Whether to send the list to all clients in "settings" room or just the one that requested it.
+    """
     app = sio.get_environ(sid)["aiohttp.request"].app
     settings = await get_settings(app)
     for break_time in settings["breaks"]:
@@ -265,8 +406,14 @@ rooms = {
 
 @sio.on("enter_room")
 async def enter_room(sid, data):
-    """
-    Enter a socketio room specified in `room` property inside socket data
+    """Enter a socketio room after checking permissions and running a room-specific function.
+
+    Parameters
+    ----------
+    sid : str
+        The sid of the socket.
+    data : dict
+        The data sent with a "room" key containing the room name.
     """
     if not isinstance(data.get("room", False), str) or not rooms.get(
         data["room"], {}
@@ -286,6 +433,19 @@ async def enter_room(sid, data):
 
 
 async def map_permissions(app, user):
+    """Create a dictionary with a bool for each permission for a user.
+
+    Parameters
+    ----------
+    app : aiohttp.web.Application
+        The aiohttp application instance.
+    user : dict
+        A dictionary containing the user data.
+    Returns
+    -------
+    user : dict
+        The same dictionary, but with all permissions mapped to bool values instead of a list of permissions the user has.
+    """
     if not isinstance(user.get("permissions", False), list):
         user = await set_default_permissions(app, user.get("username", None))
     is_admin = "admin" in user.get("permissions", [])

@@ -1,6 +1,4 @@
-"""
-Create and validate Branca-based API tokens
-"""
+"""Create and validate Branca-based API tokens."""
 
 __author__ = "opliko"
 __license__ = "MIT"

@@ -1,3 +1,4 @@
+"""Functions to simplify interacting with database."""
 import datetime as dt
 from math import ceil
 
@@ -117,7 +118,9 @@ async def user_exists(app, username):
     return count > 0
 
 
-async def create_user(app, username, hashed_password=None, permissions=[], cards=[]):
+async def create_user(
+    app, username, hashed_password=None, permissions=None, cards=None
+):
     """Create a single new user.
 
     Parameters
@@ -137,6 +140,8 @@ async def create_user(app, username, hashed_password=None, permissions=[], cards
     uid : str
         The uid of the new user
     """
+    permissions = permissions if permissions else []
+    cards = cards if cards else []
     result = (
         await app["db"]
         .users.with_options(write_concern=WriteConcern(w="majority"))
