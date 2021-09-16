@@ -226,13 +226,13 @@ class Serial:
             result = await self.authenticate(uid)
             auth_mode = "UID"
         else:
-            result = block0[-2:] == self.config.get("manufacturer-code", "18")
+            result = block0[-2:] in self.config.get("manufacturer_code", ["18", "20"])
             auth_mode = "Manufacturer code"
             if not result:
                 self.logger.debug(
                     "manufacturer code doesn't match - card: %s, expected %s",
                     block0[-2:],
-                    self.config.get("manufacturer-code", "18"),
+                    self.config.get("manufacturer_code", ["18", "20"]),
                 )
                 result = await self.authenticate(uid)
                 auth_mode = "UID" if result else auth_mode

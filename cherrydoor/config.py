@@ -47,7 +47,7 @@ template = {
         "baudrate": int,
         "encoding": optional(str, "utf-8"),
     },
-    "manufacturer_code": confuse.String(pattern="^[a-fA-F0-9]{2}$"),
+    "manufacturer_code": confuse.StrSeq(),
     "secret_key": optional(str),
     "max_session_age": confuse.OneOf([int, None]),
     "https": optional(bool, False),
@@ -118,7 +118,7 @@ def add_args(parser):
             "dest": "interface.encoding",
         },
         "manufacturer-code": {
-            "type": str,
+            "type": list,
             "help": "Last two digits of block 0 of cards you want to allow during breaks",
             "dest": "manufacturer_code",
         },
