@@ -45,25 +45,30 @@ async def setup_db(app):
         IndexModel([("tokens.token", ASCENDING)], name="token_index", sparse=True),
     ]
     command_log_options = app["db"].terminal.options()
-    if (
-        "capped" not in command_log_options
-        or not command_log_options["capped"]
-        or "timeseries" not in command_log_options
-        or command_log_options["timeseries"]["timeField"] != "timestamp"
-    ):
-        await app["db"].drop_collection("terminal")
-        await app["db"].create_collection(
-            "terminal",
-            size=app["config"].get("command_log_size", 100000000),
-            capped=True,
-            max=10000,
-            timeseries={
-                "timeField": "timestamp",
-                "metaField": "command",
-                "granularity": "seconds",
-            },
-            expireAfterSeconds=app["config"].get("command_log_expire_after", 604800),
-        )
+    try:
+        if (
+            "capped" not in command_log_options
+            or not command_log_options["capped"]
+            or "timeseries" not in command_log_options
+            or command_log_options["timeseries"]["timeField"] != "timestamp"
+        ):
+            await app["db"].drop_collection("terminal")
+            await app["db"].create_collection(
+                "terminal",
+                size=app["config"].get("command_log_size", 100000000),
+                capped=True,
+                max=10000,
+                timeseries={
+                    "timeField": "timestamp",
+                    "metaField": "command",
+                    "granularity": "seconds",
+                },
+                expireAfterSeconds=app["config"].get(
+                    "command_log_expire_after", 604800
+                ),
+            )
+    except Exception:
+        pass
     await app["db"].users.create_indexes(user_indexes)
 
 
