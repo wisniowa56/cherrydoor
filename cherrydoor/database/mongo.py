@@ -67,7 +67,7 @@ async def setup_db(app):
                     "command_log_expire_after", 604800
                 ),
             )
-    except Exception:
+    except RuntimeError:
         pass
     await app["db"].users.create_indexes(user_indexes)
 
