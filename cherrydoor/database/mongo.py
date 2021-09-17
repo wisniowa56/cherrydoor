@@ -57,11 +57,11 @@ async def setup_db(app):
             size=app["config"].get("command_log_size", 100000000),
             capped=True,
             max=10000,
-            timeseries={
-                "timeField": "timestamp",
-                "metaField": "command",
-                "granularity": "seconds",
-            },
+#             timeseries={
+#                 "timeField": "timestamp",
+#                 "metaField": "command",
+#                 "granularity": "seconds",
+#             },
             expireAfterSeconds=app["config"].get(
                 "command_log_expire_after", 604800
             ),
