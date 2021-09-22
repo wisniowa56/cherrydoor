@@ -62,9 +62,9 @@ async def setup_db(app):
 #                 "metaField": "command",
 #                 "granularity": "seconds",
 #             },
-            expireAfterSeconds=app["config"].get(
-                "command_log_expire_after", 604800
-            ),
+#             expireAfterSeconds=app["config"].get(
+#                 "command_log_expire_after", 604800
+#             ),
         )
     await app["db"].users.create_indexes(user_indexes)
 
