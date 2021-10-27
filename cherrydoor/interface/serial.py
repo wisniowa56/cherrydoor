@@ -324,8 +324,9 @@ class Serial:
             await asyncio.sleep(delta.total_seconds())
             time = next_time.replace(year=2020, month=2, day=2)
             previous = self.is_break
+            self.is_break = False
             for break_time in self.break_times:
-                self.is_break = (
+                self.is_break = self.is_break or (
                     break_time.get("from", datetime.max)
                     < time
                     < break_time.get("to", datetime.min)
