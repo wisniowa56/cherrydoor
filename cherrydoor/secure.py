@@ -95,6 +95,7 @@ async def set_secure_headers(request, handler):
         f"'nonce-{nonce}'",
         "https://unpkg.com",
         "'unsafe-eval'",
+        "'unsafe-inline'",
     ]
     style_src = [
         "'self'",
