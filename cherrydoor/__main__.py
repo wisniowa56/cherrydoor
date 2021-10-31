@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Run the server"""
+"""Run the server."""
 
 __author__ = "opliko"
 __license__ = "MIT"
@@ -17,6 +17,7 @@ from cherrydoor.config import add_args, load_config
 
 
 def cherrydoor():
+    """Run the server."""
     parser = argparse.ArgumentParser(
         prog="cherrydoor", description="Cherrydoor management"
     )

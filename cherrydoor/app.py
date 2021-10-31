@@ -1,10 +1,8 @@
-"""
-Everything connected to setup of the app
-"""
+"""Everything connected to setup of the app."""
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.7"
+__version__ = "0.8.b0"
 __status__ = "Prototype"
 
 import asyncio
@@ -52,6 +50,19 @@ CSRF_HEADER_NAME = "csrf_token"
 
 
 def setup_app(loop=asyncio.get_event_loop(), config=load_config()[0]):
+    """Create the app and initiate all services (database, security, etc).
+
+    Parameters
+    ----------
+    loop : asyncio.EventLoop
+        The event loop to use.
+    config : AttrDict
+        a dictionary with configuration values
+    Returns
+    -------
+    app : web.Application
+        The application instance.
+    """
     if config.get("sentry_dsn", None):
         sentry_sdk.init(
             dsn=config["sentry_dsn"],
@@ -129,6 +140,13 @@ def setup_app(loop=asyncio.get_event_loop(), config=load_config()[0]):
 
 
 def setup_static_routes(app):
+    """Set the mapping of system static items path to /static url.
+
+    Parameters
+    ----------
+    app : web.Application
+        The application instance.
+    """
     app.router.add_static(
         "/static/",
         path=f"{os.path.dirname(os.path.realpath(__file__))}/static",
@@ -140,11 +158,34 @@ def setup_static_routes(app):
 
 
 def setup_routes(app):
+    """Set all the routes for the app using RouteTableDef.
+
+    Notes
+    -----
+    Currently imported files with routes:
+        - views.py
+
+    Parameters
+    ----------
+    app : web.Application
+        The application instance.
+    """
     app.add_routes(views)
 
 
 @contextfunction
-def sri_for(context: Dict[str, Any], static_file_path: str) -> str:
+def sri_for(
+    context: Dict[str, Any], static_file_path: str  # pylint: disable=unused-argument
+) -> str:
+    """
+    Return a hash in the format used by the SRI HTML attribute.
+
+    Parameters:
+        context (dict): The template context.
+        static_file_path (str): The path to the static file.
+    Returns:
+        sri (str): The SRI hash in sha256 format.
+    """
     input_file = (
         f"{os.path.dirname(os.path.realpath(__file__))}/static/{static_file_path}"
     )
@@ -161,8 +202,13 @@ def sri_for(context: Dict[str, Any], static_file_path: str) -> str:
 
 
 def vue(item):
-    """
-    Filter out vue templates
-    For example: {{ "message.text" | vue }} will be transformed to just {{ "message.text" }}
+    """Filter out vue templates.
+
+    For example: {{ "message.text" | vue }} will be transformed to just {{ "message.text" }} in HTML
+
+    Parameters:
+        item (str): The text to filter.
+    Returns:
+        item (str): Text that jinja2 will render properly.
     """
     return f"{{{{ {item} }}}}"

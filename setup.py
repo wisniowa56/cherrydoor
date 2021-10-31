@@ -1,10 +1,12 @@
+"""Setuptools setup script."""
+
 from os import environ
 
 from setuptools import find_packages, setup
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.7.0b10"
+__version__ = "0.8.0"
 __status__ = "Prototype"
 
 try:
@@ -29,7 +31,8 @@ setup(
     version=__version__,
     author="oplik0",
     description=(
-        "An overengineered rfid lock manager created for my school community. Made for Raspberry Pi connected with another microcontroler that send and recieved rfid data via UART"
+        "An overengineered rfid lock manager created for my school community. "
+        "Made for Raspberry Pi connected with another microcontroler that send and receieves rfid data via UART"
     ),
     long_description=readme,
     long_description_content_type="text/markdown",
@@ -41,9 +44,9 @@ setup(
     zip_safe=False,
     scripts=["scripts/cherrydoor-install"],
     entry_points={"console_scripts": ["cherrydoor = cherrydoor.__main__:cherrydoor"]},
-    python_requires=">=3.7",
+    python_requires=">=3.9",
     install_requires=[
-        "aiohttp>=3.6",
+        "aiohttp==3.6.3",
         "aioserial>=1.3",
         "argon2-cffi>=19",
         "motor>=2.1",
@@ -56,7 +59,7 @@ setup(
         "aiohttp-security>=0.4.0",
         "aiohttp-session>=2.9.0",
         "aiohttp-session-mongo>=0.0.1",
-        "secure>=0.2.1",
+        "secure>=0.3.0",
         "sentry-sdk>=0.16.5",
         "packaging>=20",
         "aiojobs>=0.2.2",

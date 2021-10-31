@@ -1,21 +1,32 @@
-"""
-Load configuration
-"""
+"""Load configuration."""
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.7b0"
+__version__ = "0.8.b0"
 __status__ = "Prototype"
 
 import argparse
 from uuid import uuid4
-
+from os import environ
 import confuse
 
 
 # add otpional type, because confuse doesn't have it yet
-def optional(type, default=None):
-    template = confuse.as_template(type)
+def optional(optional_type, default=None):
+    """Create a confuse-compatible type for optional values.
+
+    Parameters
+    ----------
+    optional_type : type
+        type of the optional value
+    default : optional
+        default value if not specified
+    Returns
+    -------
+    template: type
+        optional type template
+    """
+    template = confuse.as_template(optional_type)
     template.default = default
     return template
 
@@ -32,11 +43,11 @@ template = {
         "password": optional(str),
     },
     "interface": {
-        "port": confuse.OneOf([confuse.String(pattern="COM\d+$"), confuse.Filename()]),
+        "port": confuse.OneOf([confuse.String(pattern="COM\\d+$"), confuse.Filename()]),
         "baudrate": int,
         "encoding": optional(str, "utf-8"),
     },
-    "manufacturer_code": confuse.String(pattern="^[a-fA-F0-9]{2}$"),
+    "manufacturer_code": confuse.StrSeq(),
     "secret_key": optional(str),
     "max_session_age": confuse.OneOf([int, None]),
     "https": optional(bool, False),
@@ -49,6 +60,17 @@ config = confuse.LazyConfig("cherrydoor", __name__)
 
 
 def add_args(parser):
+    """Add arguments to the arparse parser.
+
+    Parameters
+    ----------
+    parser : argparse.ArgumentParser
+        parser to add arguments to
+    Returns
+    -------
+    parser : argparse.ArgumentParser
+        parser with added arguments
+    """
     args_template = {
         "host": {
             "type": str,
@@ -96,7 +118,7 @@ def add_args(parser):
             "dest": "interface.encoding",
         },
         "manufacturer-code": {
-            "type": str,
+            "type": list,
             "help": "Last two digits of block 0 of cards you want to allow during breaks",
             "dest": "manufacturer_code",
         },
@@ -149,19 +171,38 @@ def add_args(parser):
 
 
 def load_config(args=None):
-    if args != None:
-        if args.config != None:
+    """
+    Load configuration from file, environ, or command line arguments.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        arguments from argparse
+    Returns
+    -------
+    config : AttrDict
+        configuration
+    """
+    if args is not None:
+        if args.config is not None:
             config.set_file(args.config.name)
         if args.env:
             config.add(load_env())
         config.set_args(args, dots=True)
     valid_config = config.get(template)
-    if valid_config.get("secret_key", None) == None:
+    if valid_config.get("secret_key", None) is None:
         valid_config["secret_key"] = str(uuid4())
     return valid_config, config
 
 
 def load_env():
-    from os import environ
+    """
+    Load environmental variables.
+
+    Returns
+    --------
+    env : dict
+        environmental variables
+    """
 
     return confuse.ConfigSource.of(dict(environ))

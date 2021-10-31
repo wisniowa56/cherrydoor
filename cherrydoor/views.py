@@ -1,21 +1,14 @@
-"""
-Pages visible to users
-"""
+"""Pages visible to users."""
 
 __author__ = "opliko"
 __license__ = "MIT"
-__version__ = "0.7"
+__version__ = "0.8.b0"
 __status__ = "Prototype"
-
-import asyncio
-from cgitb import handler
 
 import aiohttp_jinja2
 from aiohttp import web
-from aiohttp_session import new_session, get_session
-from aiohttp_csrf import csrf_protect
 from aiohttp_csrf import generate_token as generate_csrf_token
-from aiohttp_security import check_authorized, check_permission, forget, remember
+from aiohttp_security import check_authorized, check_permission, remember
 
 from cherrydoor.auth import check_credentials, get_permissions
 from cherrydoor.util import redirect
@@ -30,6 +23,23 @@ routes = web.RouteTableDef()
 @routes.get("/console", name="console")
 @aiohttp_jinja2.template("index.html")
 async def index(request: web.Request):
+    """Render Main page. Jinja2 template is index.html.
+
+    Parameters
+    ----------
+    request : aiohttp.web.Request
+        The request object
+    Returns
+    -------
+    dict
+        values injected to the template (permissions)
+    Raises
+    ------
+    aiohttp.web.HTTPUnauthorized
+        If the user is not logged in
+    aiohttp.web.HTTPForbidden
+        If the user is not authorized to access the dashboard
+    """
     try:
         await check_permission(request, "dashboard")
     except web.HTTPUnauthorized:
@@ -42,13 +52,37 @@ async def index(request: web.Request):
 
 @routes.view("/login", name="login")
 class Login(web.View):
+    """Login page.
+
+    Methods
+    -------
+    get
+        Render the login page
+    post
+        Attempt to login the user
+    """
+
     @aiohttp_jinja2.template("login.html")
     async def get(self):
+        """Render the login page. Jinja2 template is login.html.
+
+        Returns
+        -------
+        dict
+            values injected to the template (csrf token)
+        """
         csrf_token = await generate_csrf_token(self.request)
         return {"csrf_token": csrf_token}
 
     @aiohttp_jinja2.template("login.html")
     async def post(self):
+        """Attempt to login the user. Jinja2 template is login.html.
+
+        Returns
+        -------
+        web.Response
+            Redirect to the dashboard page or back to the login page
+        """
         try:
             authorized = await check_authorized(self.request)
         except web.HTTPUnauthorized:
@@ -75,6 +109,5 @@ class Login(web.View):
                 remember=form.get("remember", False),
             )
             raise redirect_response
-        else:
-            csrf_token = await generate_csrf_token(self.request)
-            return {"invalid_credentials": True, "csrf_token": csrf_token}
+        csrf_token = await generate_csrf_token(self.request)
+        return {"invalid_credentials": True, "csrf_token": csrf_token}

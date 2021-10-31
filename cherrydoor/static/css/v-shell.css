@@ -1,0 +1,59 @@
+#container {
+	color: white;
+	background-color: black;
+	font-size: 11pt;
+	font-family: Inconsolata, monospace;
+	padding: 0.5em 1.5em 1em 1em;
+	height: calc(96vh - max(200px, 25vh));
+	max-height: calc(97vh - max(200px, 25vh));
+	overflow-anchor: none;
+	overflow-y: auto;
+}
+#container output {
+	clear: both;
+	width: 100%;
+}
+#banner {
+	margin-bottom: 3em;
+}
+.input-line {
+	display: -webkit-box;
+	-webkit-box-orient: horizontal;
+	-webkit-box-align: stretch;
+	display: -moz-box;
+	-moz-box-orient: horizontal;
+	-moz-box-align: stretch;
+	display: box;
+	box-orient: horizontal;
+	box-align: stretch;
+	clear: both;
+	overflow-anchor: auto;
+}
+.input-line > div:nth-child(2) {
+	-webkit-box-flex: 1;
+	-moz-box-flex: 1;
+	box-flex: 1;
+}
+.prompt {
+	white-space: nowrap;
+	color: #3a8b17;
+	margin-right: 7px;
+	display: -webkit-box;
+	display: -moz-box;
+	display: box;
+	box-pack: center;
+	box-orient: vertical;
+	user-select: none;
+}
+.cmdline {
+	outline: none;
+	background-color: transparent;
+	margin: 0;
+	width: 100%;
+	font: inherit;
+	border: none;
+	color: inherit;
+}
+.ls-files {
+	height: 2rem;
+}

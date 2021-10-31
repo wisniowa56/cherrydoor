@@ -105,7 +105,9 @@ The arrow size and position depends from sizes of square because I needed an arr
 	transform: rotate(-40deg) skew(10deg);
 }
 
-.checkbox-input:not(:disabled):checked ~ .checkbox-label .checkbox-text::before {
+.checkbox-input:not(:disabled):checked
+	~ .checkbox-label
+	.checkbox-text::before {
 	--uiCheckboxArrowWidth: var(--toggleArrowWidth, 2px);
 
 	width: 0.4em;
@@ -160,12 +162,15 @@ The animation of switching states
 	opacity: 0;
 }
 
-.checkbox-input:not(:disabled):checked ~ .checkbox-label .checkbox-text::before {
+.checkbox-input:not(:disabled):checked
+	~ .checkbox-label
+	.checkbox-text::before {
 	opacity: 1;
-	transition: opacity 0.1s ease-out 0.2s, width 0.1s ease-out 0.3s, height 0.1s ease-out 0.2s;
+	transition: opacity 0.1s ease-out 0.2s, width 0.1s ease-out 0.3s,
+		height 0.1s ease-out 0.2s;
 }
 
-input,
+input :not(.cmdline),
 button {
 	-moz-appearance: none;
 	-webkit-appearance: none;
@@ -204,7 +209,7 @@ label {
 	font-weight: 700;
 	font-family: "Poppins", sans-serif;
 }
-input:hover,
+input:hover :not(.cmdline),
 textarea:hover,
 button:hover {
 	border-color: var(--gradient-end);
@@ -217,7 +222,7 @@ button:disabled {
 	filter: saturate(0.25) contrast(0.5);
 }
 
-input:focus,
+input:focus :not(.cmdline),
 button:focus {
 	outline: none;
 	border-color: var(--primary);
