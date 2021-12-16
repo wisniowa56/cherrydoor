@@ -245,6 +245,8 @@ class Serial:
         )
         self.last_uid = uid
         self.card_event.set()
+        # TODO: stop requiring this repeat. Perhaps by implementing any kind of error detection/correction?
+        await self.writeline(f"AUTH {int(result)}")
 
     async def authenticate(self, uid):
         """Authenticate a card with its UID.
@@ -514,6 +516,9 @@ class Serial:
             uid.append(byte)
             if len(uid) > uid_len:
                 break
+        # TODO: investigate why sometimes uid a longer sequence with \u in the middle...
+        if len(uid) > 10:
+            return None
         return uid.hex()
 
 
