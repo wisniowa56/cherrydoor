@@ -46,7 +46,7 @@ setup(
     entry_points={"console_scripts": ["cherrydoor = cherrydoor.__main__:cherrydoor"]},
     python_requires=">=3.9",
     install_requires=[
-        "aiohttp==3.6.3",
+        "aiohttp==3.8.1",
         "aioserial>=1.3",
         "argon2-cffi>=19",
         "motor>=2.1",
