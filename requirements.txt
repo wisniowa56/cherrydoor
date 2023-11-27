@@ -1,6 +1,6 @@
 ﻿adafruit-nrfutil==0.5.3.post12
 aiodns==3.0.0
-aiohttp==3.6.3
+aiohttp==3.9.0
 aiohttp-csrf-fixed==0.0.3
 aiohttp-jinja2==1.4.2
 aiohttp-rest-api-redoc==0.2.3
